@@ -24,10 +24,9 @@
 
 #include "list.h"
 
+
 /* Enumerates all supported optical devices */
 int optcl_device_enumerate(optcl_list **devices);
 
-/* Gets info about the specified device */
-int optcl_device_get_info(const char *device_name, optcl_device **device);
 
 #endif /* _SYSDEVICE_H */

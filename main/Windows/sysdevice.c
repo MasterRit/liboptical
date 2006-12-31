@@ -39,15 +39,3 @@ int optcl_device_enumerate(optcl_list **devices)
 
 	return SUCCESS;
 }
-
-int optcl_device_getinfo(const char *device_name, optcl_device **device)
-{
-	assert(0);
-	assert(device_name);
-	assert(device);
-
-	if (!device_name || !device)
-		return E_INVALIDARG;
-
-	return SUCCESS;
-}
