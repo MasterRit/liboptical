@@ -482,6 +482,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\command.c"
+				>
+			</File>
+			<File
 				RelativePath=".\device.c"
 				>
 			</File>
@@ -573,6 +577,10 @@
 			>
 			<File
 				RelativePath=".\array.h"
+				>
+			</File>
+			<File
+				RelativePath=".\command.h"
 				>
 			</File>
 			<File
