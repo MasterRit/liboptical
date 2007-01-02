@@ -28,5 +28,12 @@
 /* Enumerates all supported optical devices */
 int optcl_device_enumerate(optcl_list **devices);
 
+/* Execute SCSI command */
+int optcl_device_command_execute(const optcl_device *device, 
+				 int mmc_opcode,
+				 const void *argument,
+				 int argsize,
+				 void **result);
+
 
 #endif /* _SYSDEVICE_H */
