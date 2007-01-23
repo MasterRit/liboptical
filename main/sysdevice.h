@@ -20,8 +20,6 @@
 #ifndef _SYSDEVICE_H
 #define _SYSDEVICE_H
 
-#include <stdafx.h>
-
 #include "list.h"
 
 
@@ -30,10 +28,10 @@ int optcl_device_enumerate(optcl_list **devices);
 
 /* Execute SCSI command */
 int optcl_device_command_execute(const optcl_device *device, 
-				 int mmc_opcode,
-				 const void *argument,
-				 int argsize,
-				 void **result);
+				 const void *cdb,
+				 int cdb_size,
+				 void *param,
+				 int param_size);
 
 
 #endif /* _SYSDEVICE_H */
