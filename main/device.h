@@ -20,6 +20,7 @@
 #ifndef _DEVICE_H
 #define _DEVICE_H
 
+#include "adapter.h"
 #include "list.h"
 #include "media.h"
 #include "profile.h"
@@ -54,6 +55,10 @@ int optcl_device_copy(optcl_device *dest, const optcl_device *src);
 
 /* Destroy and deallocate device */
 int optcl_device_destroy(optcl_device *device);
+
+/* Get device adapter info */
+int optcl_device_get_adapter(const optcl_device *device,
+			     optcl_adapter **adapter);
 
 /* Get device feature */
 int optcl_device_get_feature(const optcl_device *device, 
@@ -95,6 +100,9 @@ int optcl_device_add_media_info(optcl_device *device, optcl_media_info *info);
 int optcl_device_set_feature(optcl_device *device, 
 			     int feature_number, 
 			     optcl_feature *feature);
+
+/* Set device adapter */
+int optcl_device_set_adapter(optcl_device *device, optcl_adapter *adapter);
 
 /* Set device name */
 int optcl_device_set_path(optcl_device *device, char *path);

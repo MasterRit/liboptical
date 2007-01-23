@@ -19,6 +19,7 @@
 
 #include <stdafx.h>
 
+#include "adapter.h"
 #include "errors.h"
 #include "device.h"
 #include "hashtable.h"
@@ -52,6 +53,7 @@ typedef struct tag_device {
 	int type;
 	char *path;
 	optcl_list *medias;
+	optcl_adapter *adapter;
 	optcl_device_info *info;
 } optcl_device;
 
@@ -282,54 +284,49 @@ int optcl_device_clear(optcl_device *device)
 	if (!device)
 		return E_INVALIDARG;
 
-	assert(device->info);
-
-	if (!device->info)
-		return E_UNEXPECTED;
-
-	device->type = DEVICE_TYPE_IMAGE;
+	device->type = 0;
 
 	free(device->path);
 	device->path = 0;
 
-	error = optcl_hashtable_clear(device->info->features, 1);
+	if (device->adapter) {
+		error = optcl_adapter_clear(device->adapter);
 
-	if (FAILED(error))
-		return error;
+		if (FAILED(error))
+			return error;
+	}
 
-	free(device->info->product);
-	free(device->info->revision);
-	free(device->info->vendor);
-	free(device->info->vendor_string);
+	if (device->info) {
+		if (device->info->features) {
+			error = optcl_hashtable_clear(device->info->features, 1);
 
-	device->info->product = 0;
-	device->info->revision = 0;
-	device->info->vendor = 0;
-	device->info->vendor_string = 0;
+			if (FAILED(error))
+				return error;
+		}
 
-	assert(device->medias);
+		free(device->info->product);
+		free(device->info->revision);
+		free(device->info->vendor);
+		free(device->info->vendor_string);
 
-	if (!device->medias)
-		return E_UNEXPECTED;
+		device->info->product = 0;
+		device->info->revision = 0;
+		device->info->vendor = 0;
+		device->info->vendor_string = 0;
+	}
 
-	error = clear_media_info_list(device->medias);
+	if (device->medias) {
+		error = clear_media_info_list(device->medias);
 
-	if (FAILED(error))
-		return error;
+		if (FAILED(error))
+			return error;
+	}
 
-	error = optcl_list_destroy(device->medias, 0);
-
-	if (FAILED(error))
-		return error;
-
-	device->medias = 0;
-
-	return error;
+	return SUCCESS;
 }
 
 int optcl_device_copy(optcl_device *dest, const optcl_device *src)
 {
-
 	int error;
 
 	assert(dest);
@@ -348,6 +345,17 @@ int optcl_device_copy(optcl_device *dest, const optcl_device *src)
 
 	if (src->path && !dest->path)
 		return E_OUTOFMEMORY;
+
+	assert(src->adapter);
+	assert(dest->adapter);
+
+	if (!src->adapter || !dest->adapter)
+		return E_UNEXPECTED;
+
+	error = optcl_adapter_copy(dest->adapter, src->adapter);
+
+	if (FAILED(error))
+		return error;
 
 	assert(src->info);
 	assert(dest->info);
@@ -433,10 +441,17 @@ int optcl_device_create(optcl_device **device)
 
 	memset(newdev, 0, sizeof(optcl_device));
 
+	error = optcl_adapter_create(&newdev->adapter);
+
+	if (FAILED(error)) {
+		free(newdev);
+		return error;
+	}
+
 	newdev->info = (optcl_device_info*)malloc(sizeof(optcl_device_info));
 
 	if (!newdev->info) {
-		free(newdev);
+		optcl_device_destroy(newdev);
 		return E_OUTOFMEMORY;
 	}
 
@@ -476,37 +491,41 @@ int optcl_device_destroy(optcl_device *device)
 
 	optcl_device_clear(device);
 
-	assert(device->info);
+	if (device->adapter) {
+		error = optcl_adapter_destroy(device->adapter);
 
-	if (!device->info)
-		return E_UNEXPECTED;
-
-	assert(device->info->features);
-
-	if (!device->info->features)
-		return E_UNEXPECTED;
-
-	optcl_hashtable_destroy(device->info->features, 1);
+		if (FAILED(error))
+			return error;
+	}
 
 #ifdef _DEBUG
-	device->info->product = POISON;
-	device->info->features = POISON;
-	device->info->revision = POISON;
-	device->info->vendor = POISON;
-	device->info->vendor_string = POISON;
+	device->adapter = POISON;
 #endif
 
-	free(device->info);
+	if (device->info) {
+		if (device->info->features) {
+			error = optcl_hashtable_destroy(device->info->features, 1);
 
-	assert(device->medias);
+			if (FAILED(error))
+				return error;
+		}
 
-	if (!device->medias)
-		return E_UNEXPECTED;
+#ifdef _DEBUG
+		device->info->product = POISON;
+		device->info->features = POISON;
+		device->info->revision = POISON;
+		device->info->vendor = POISON;
+		device->info->vendor_string = POISON;
+#endif
+		free(device->info);
+	}
 
-	error = optcl_list_destroy(device->medias, 1);
+	if (device->medias) {
+		error = optcl_list_destroy(device->medias, 1);
 
-	if (FAILED(error))
-		return error;
+		if (FAILED(error))
+			return error;
+	}
 
 #ifdef _DEBUG
 	device->path = POISON;
@@ -515,6 +534,36 @@ int optcl_device_destroy(optcl_device *device)
 	free(device);
 
 	return SUCCESS;
+}
+
+int optcl_device_get_adapter(const optcl_device *device,
+			     optcl_adapter **adapter)
+{
+	int error;
+
+	assert(device);
+	assert(adapter);
+
+	if (!device || !adapter)
+		return E_INVALIDARG;
+
+	assert(device->adapter);
+
+	if (!device->adapter)
+		return E_UNEXPECTED;
+
+
+	error = optcl_adapter_create(adapter);
+
+	if (FAILED(error))
+		return error;
+
+	error = optcl_adapter_copy(*adapter, device->adapter);
+
+	if (FAILED(error))
+		optcl_adapter_destroy(*adapter);
+	
+	return error;
 }
 
 int optcl_device_get_feature(const optcl_device *device, 
@@ -749,6 +798,31 @@ int optcl_device_add_media_info(optcl_device *device,
 		return E_UNEXPECTED;
 
 	return optcl_list_add_tail(device->medias, info);
+}
+
+int optcl_device_set_adapter(optcl_device *device, optcl_adapter *adapter)
+{
+	int error;
+
+	assert(device);
+	assert(adapter);
+
+	if (!device || !adapter)
+		return E_INVALIDARG;
+
+	assert(device->adapter);
+
+	if (!device->adapter)
+		return E_UNEXPECTED;
+
+	error = optcl_adapter_destroy(device->adapter);
+
+	if (FAILED(error))
+		return error;
+
+	device->adapter = adapter;
+
+	return SUCCESS;	
 }
 
 int optcl_device_set_feature(optcl_device *device, 
