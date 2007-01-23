@@ -46,6 +46,7 @@
 				Optimization="0"
 				AdditionalIncludeDirectories="$(ProjectDir)"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
+				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
@@ -75,6 +76,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="Setupapi.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -223,6 +225,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="Setupapi.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -370,6 +373,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="Setupapi.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -478,6 +482,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\adapter.c"
+				>
+			</File>
+			<File
 				RelativePath=".\array.c"
 				>
 			</File>
@@ -575,6 +583,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\adapter.h"
+				>
+			</File>
 			<File
 				RelativePath=".\array.h"
 				>
