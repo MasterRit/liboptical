@@ -219,6 +219,8 @@ int optcl_hashtable_create(size_t keysize,
 	nhashtable->hashfn = (hashfn) ? hashfn : joaat_hash;
 	nhashtable->keysize = keysize;
 
+	*hashtable = nhashtable;
+
 	return SUCCESS;
 }
 
