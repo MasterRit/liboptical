@@ -47,17 +47,17 @@ typedef unsigned __int64	uint64_t;
 	(((uint32_t)(val) & (uint32_t)(0x000000ffU) << 24)	|	\
 	(((uint32_t)(val) & (uint32_t)(0x0000ff00U) <<  8)	|	\
 	(((uint32_t)(val) & (uint32_t)(0x00ff0000U) >>  8)	|	\
-	(((uint32_t)(val) & (uitn32_t)(0xff000000U) >> 24)))
+	(((uint32_t)(val) & (uint32_t)(0xff000000U) >> 24)))
 
 #define uint64_swap_le_be(val)	((uint64_t)(				\
 	(((uint64_t)(val) & (uint64_t)(0x00000000000000ffU) << 56) |	\
-	(((uint64_t)(val) & (uitn64_t)(0x000000000000ff00U) << 40) |	\
-	(((uint64_t)(val) & (uitn64_t)(0x0000000000ff0000U) << 24) |	\
-	(((uint64_t)(val) & (uitn64_t)(0x00000000ff000000U) <<  8) |	\
-	(((uint64_t)(val) & (uitn64_t)(0x000000ff00000000U) >>  8) |	\
-	(((uint64_t)(val) & (uitn64_t)(0x0000ff0000000000U) >> 24) |	\
-	(((uint64_t)(val) & (uitn64_t)(0x00ff000000000000U) >> 40) |	\
-	(((uint64_t)(val) & (uitn64_t)(0xff00000000000000U) >> 56)))
+	(((uint64_t)(val) & (uint64_t)(0x000000000000ff00U) << 40) |	\
+	(((uint64_t)(val) & (uint64_t)(0x0000000000ff0000U) << 24) |	\
+	(((uint64_t)(val) & (uint64_t)(0x00000000ff000000U) <<  8) |	\
+	(((uint64_t)(val) & (uint64_t)(0x000000ff00000000U) >>  8) |	\
+	(((uint64_t)(val) & (uint64_t)(0x0000ff0000000000U) >> 24) |	\
+	(((uint64_t)(val) & (uint64_t)(0x00ff000000000000U) >> 40) |	\
+	(((uint64_t)(val) & (uint64_t)(0xff00000000000000U) >> 56)))
 
 
 #ifdef LITTLE_ENDIAN
