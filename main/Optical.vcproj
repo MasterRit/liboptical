@@ -494,6 +494,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\debug.c"
+				>
+			</File>
+			<File
 				RelativePath=".\device.c"
 				>
 			</File>
@@ -593,6 +597,10 @@
 			</File>
 			<File
 				RelativePath=".\command.h"
+				>
+			</File>
+			<File
+				RelativePath=".\debug.h"
 				>
 			</File>
 			<File
