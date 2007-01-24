@@ -117,7 +117,7 @@ int optcl_feature_copy(optcl_feature **dest, const optcl_feature *src)
 	size = get_feature_size(src->feature_code);
 
 	if (size <= 0)
-		return E_UNKNOWNFEATURE;
+		return E_DEVUNKNFEATURE;
 
 	free(*dest);
 
@@ -143,7 +143,7 @@ int optcl_feature_create(optcl_feature **feature, uint16_t feature_code)
 	size = get_feature_size(feature_code);
 
 	if (size <= 0)
-		return E_UNKNOWNFEATURE;
+		return E_DEVUNKNFEATURE;
 
 	*feature = malloc(size);
 
