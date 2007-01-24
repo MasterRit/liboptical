@@ -20,6 +20,7 @@
 #include <stdafx.h>
 
 #include "command.h"
+#include "debug.h"
 #include "device.h"
 #include "sysdevice.h"
 #include "transport.h"
@@ -68,6 +69,7 @@
 #define SPT_SENSE_LENGTH	32
 #define SPTWB_DATA_LENGTH	512
 
+
 typedef struct _SCSI_PASS_THROUGH_WITH_BUFFERS {
     SCSI_PASS_THROUGH spt;
     ULONG filler;      /* realign buffers to double word boundary */
@@ -75,11 +77,13 @@ typedef struct _SCSI_PASS_THROUGH_WITH_BUFFERS {
     UCHAR ucDataBuf[SPTWB_DATA_LENGTH];
 } SCSI_PASS_THROUGH_WITH_BUFFERS;
 
+
 typedef struct _SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER {
     SCSI_PASS_THROUGH_DIRECT sptd;
     ULONG filler;      /* realign buffer to double word boundary */
     UCHAR ucSenseBuf[SPT_SENSE_LENGTH];
 } SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER;
+
 
 typedef enum _STORAGE_PROPERTY_ID {
     StorageDeviceProperty = 0,
@@ -91,6 +95,7 @@ typedef enum _STORAGE_PROPERTY_ID {
     StorageAccessAlignmentProperty
 } STORAGE_PROPERTY_ID;
 
+
 typedef enum _STORAGE_QUERY_TYPE {
     PropertyStandardQuery = 0,          // Retrieves the descriptor
     PropertyExistsQuery,                // Used to test whether the descriptor is supported
@@ -98,11 +103,13 @@ typedef enum _STORAGE_QUERY_TYPE {
     PropertyQueryMaxDefined     // use to validate the value
 } STORAGE_QUERY_TYPE;
 
+
 typedef struct _STORAGE_PROPERTY_QUERY {
     STORAGE_PROPERTY_ID PropertyId;
     STORAGE_QUERY_TYPE QueryType;
     BYTE  AdditionalParameters[1];
 } STORAGE_PROPERTY_QUERY;
+
 
 typedef struct _STORAGE_ADAPTER_DESCRIPTOR {
     DWORD Version;
@@ -125,14 +132,16 @@ typedef struct _STORAGE_ADAPTER_DESCRIPTOR {
     WORD   BusMinorVersion;
 } STORAGE_ADAPTER_DESCRIPTOR, *PSTORAGE_ADAPTER_DESCRIPTOR;
 
+
 #define IOCTL_STORAGE_QUERY_PROPERTY	\
 	CTL_CODE(IOCTL_STORAGE_BASE, 0x0500, METHOD_BUFFERED, FILE_ANY_ACCESS)
+
 
 /*
  * Helper functions
  */
 
-int enumerate_device_adapter(const char *path, optcl_adapter **adapter)
+static int enumerate_device_adapter(const char *path, optcl_adapter **adapter)
 {
 	int error;
 	ULONG bytes;
@@ -240,17 +249,28 @@ int enumerate_device_adapter(const char *path, optcl_adapter **adapter)
 	return SUCCESS;
 }
 
+static int enumerate_device_features(optcl_device *device)
+{
+	assert(device);
+
+	if (!device)
+		return E_INVALIDARG;
+
+
+}
+
 static int enumerate_device(int index, HDEVINFO hDevInfo, optcl_device **device)
 {
 	int error;
 	BOOL status;
+	char *tmp;
 	char *devicepath;
 	DWORD dwReqSize;
 	DWORD dwErrorCode;
 	optcl_device *ndevice;
 	optcl_adapter *adapter;
 	optcl_mmc_inquiry command;
-	optcl_mmc_result_inquiry *result;
+	optcl_mmc_response_inquiry *response;
 	SP_DEVICE_INTERFACE_DATA interfaceData;
 	PSP_DEVICE_INTERFACE_DETAIL_DATA_A pInterfaceDetailData;
 
@@ -381,7 +401,72 @@ static int enumerate_device(int index, HDEVINFO hDevInfo, optcl_device **device)
 
 	memset(&command, 0, sizeof(command));
 
-	error = optcl_command_inquiry(ndevice, &command, &result);
+	error = optcl_command_inquiry(ndevice, &command, &response);
+
+	if (FAILED(error)) {
+		optcl_device_destroy(ndevice);
+		return error;
+	}
+
+	error = optcl_device_set_type(ndevice, response->device_type);
+
+	if (FAILED(error)) {
+		optcl_device_destroy(ndevice);
+		free(response);
+		return error;
+	}
+
+	tmp = _strdup((char*)response->product);
+
+	if (!tmp && response->product) {
+		optcl_device_destroy(ndevice);
+		free(response);
+		return E_OUTOFMEMORY;
+	}
+
+	error = optcl_device_set_product(ndevice, tmp);
+
+	if (FAILED(error)) {
+		optcl_device_destroy(ndevice);
+		free(response);
+		return error;
+	}
+
+	tmp = _strdup((char*)response->vendor);
+
+	if (!tmp && response->vendor) {
+		optcl_device_destroy(ndevice);
+		free(response);
+		return E_OUTOFMEMORY;
+	}
+
+	error = optcl_device_set_vendor(ndevice, tmp);
+
+	if (FAILED(error)) {
+		optcl_device_destroy(ndevice);
+		free(response);
+		return error;
+	}
+
+	tmp = _strdup((char*)response->vendor_string);
+
+	if (!tmp && response->vendor_string) {
+		optcl_device_destroy(ndevice);
+		free(response);
+		return E_OUTOFMEMORY;
+	}
+
+	error = optcl_device_set_vendor_string(ndevice, tmp);
+
+	if (FAILED(error)) {
+		optcl_device_destroy(ndevice);
+		free(response);
+		return error;
+	}
+
+	free(response);
+
+	error = enumerate_device_features(ndevice);
 
 	if (FAILED(error)) {
 		optcl_device_destroy(ndevice);
@@ -433,8 +518,11 @@ int optcl_device_enumerate(optcl_list **devices)
 	for(index = 0; ; ++index) {
 		error = enumerate_device(index, hIntDevInfo, &ndevice);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
+			/* No more devices */
+			error = SUCCESS;
 			break;
+		}
 
 		error = optcl_list_add_tail(*devices, ndevice);
 
@@ -508,6 +596,9 @@ int optcl_device_command_execute(const optcl_device *device,
 	sptdwb.sptd.TargetId = 1;
 	sptdwb.sptd.TimeOutValue = 2;
 
+	OPTCL_TRACE_ARRAY_MSG("CDB bytes:", cdb, cdb_size);
+	OPTCL_TRACE_ARRAY_MSG("CDB parameter bytes:", param, param_size);
+
 	/* Execute command */
 	success = DeviceIoControl(
 		hDevice,
@@ -522,6 +613,8 @@ int optcl_device_command_execute(const optcl_device *device,
 
 	dwErrorCode = GetLastError();
 
+	OPTCL_TRACE_ARRAY_MSG("DeviceIoControl error code:", (uint8_t*)&dwErrorCode, sizeof(dwErrorCode));
+
 	if (!success && dwErrorCode != ERROR_INSUFFICIENT_BUFFER) {
 		error = MAKE_ERRORCODE(
 			SEVERITY_ERROR, 
@@ -532,6 +625,8 @@ int optcl_device_command_execute(const optcl_device *device,
 
 	if (!success && bytes != 0)
 		error = E_UNEXPECTED;
+
+	OPTCL_TRACE_ARRAY_MSG("Device response bytes:", param, bytes);
 
 	CloseHandle(hDevice);
 
