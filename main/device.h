@@ -29,13 +29,7 @@
 
 /* Device type codes */
 #define DEVICE_TYPE_IMAGE		0
-#define DEVICE_TYPE_CDROM		1
-#define DEVICE_TYPE_CDR			2
-#define DEVICE_TYPE_CDRW		3
-#define DEVICE_TYPE_DVDROM		10
-#define DEVICE_TYPE_DVDR		11
-#define DEVICE_TYPE_DVDRW		12
-#define DEVICE_TYPE_DVDRAM		13
+#define DEVICE_TYPE_CD_DVD		5
 
 
 /* Device descriptor */
