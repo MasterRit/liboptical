@@ -98,7 +98,9 @@ int optcl_media_info_destroy(optcl_media_info *media)
 	if (media->profiles)
 		error = optcl_hashtable_destroy(media->profiles, 1);
 
+#ifdef _DEBUG
 	media->profiles = POISON;
+#endif
 
 	free(media);
 
