@@ -262,17 +262,31 @@ static uint32_t joaat_hash_for_device(const void *key, size_t len)
 
 int optcl_device_bind2file(optcl_device *device, const char *filename)
 {
+	int error;
+	char *devicepath;
+
 	assert(device);
 	assert(filename);
 
 	if (!device || !filename)
 		return E_INVALIDARG;
 
-	optcl_device_clear(device);
-	optcl_device_set_path(device, _strdup(filename));
-	optcl_device_set_type(device, DEVICE_TYPE_IMAGE);
+	error = optcl_device_clear(device);
 
-	return SUCCESS;
+	if (FAILED(error))
+		return error;
+
+	devicepath = _strdup(filename);
+
+	if (!devicepath)
+		return E_OUTOFMEMORY;
+
+	error = optcl_device_set_path(device, devicepath);
+
+	if (FAILED(error))
+		return error;
+
+	return optcl_device_set_type(device, DEVICE_TYPE_IMAGE);
 }
 
 int optcl_device_clear(optcl_device *device)
