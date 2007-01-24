@@ -318,7 +318,7 @@ int optcl_hashtable_get_pairs(const optcl_hashtable *hashtable,
 				break;
 
 			if (!bucket_pair) {
-				error = E_INVALIDHASHTABLE;
+				error = E_COLLINVLDHASHTABLE;
 				break;
 			}
 
@@ -385,7 +385,7 @@ int optcl_hashtable_lookup(const optcl_hashtable *hashtable,
 	assert(hashtable->keysize > 0);
 
 	if (!hashtable->hashfn || hashtable->keysize <= 0)
-		return E_INVALIDHASHTABLE;
+		return E_COLLINVLDHASHTABLE;
 
 	hashfn = hashtable->hashfn;
 	hash = hashfn(key, hashtable->keysize);
@@ -401,7 +401,7 @@ int optcl_hashtable_lookup(const optcl_hashtable *hashtable,
 	assert(entrycount > 0);
 
 	if (entrycount <= 0)
-		return E_INVALIDHASHTABLE;
+		return E_COLLINVLDHASHTABLE;
 
 	error = optcl_array_get(hashtable->entries, hash % entrycount, &entry);
 
@@ -411,7 +411,7 @@ int optcl_hashtable_lookup(const optcl_hashtable *hashtable,
 	assert(entry);
 
 	if (!entry)
-		return E_INVALIDHASHTABLE;
+		return E_COLLINVLDHASHTABLE;
 
 	if (hashfn(entry->pair.key, hashtable->keysize) == hash) {
 		assert(!entry->bucket);
@@ -427,7 +427,7 @@ int optcl_hashtable_lookup(const optcl_hashtable *hashtable,
 	assert(it);
 
 	if (!it)
-		return E_INVALIDHASHTABLE;
+		return E_COLLINVLDHASHTABLE;
 
 	while (it) {
 		error = optcl_list_get_at_pos(entry->bucket, it, &pair);
@@ -470,7 +470,7 @@ int optcl_hashtable_set(optcl_hashtable *hashtable,
 	assert(hashtable->keysize > 0);
 
 	if (hashtable->keysize <= 0)
-		return E_INVALIDHASHTABLE;
+		return E_COLLINVLDHASHTABLE;
 
 	assert(hashtable->entries);
 
