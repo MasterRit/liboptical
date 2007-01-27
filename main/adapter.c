@@ -44,13 +44,13 @@ RESULT optcl_adapter_create(optcl_adapter **adapter)
 {
 	assert(adapter);
 
-	if (!adapter) {
+	if (adapter == 0) {
 		return E_INVALIDARG;
 	}
 
 	*adapter = malloc(sizeof(optcl_adapter));
 
-	if (!*adapter) {
+	if (*adapter == 0) {
 		return E_OUTOFMEMORY;
 	}
 
@@ -63,7 +63,7 @@ RESULT optcl_adapter_clear(optcl_adapter *adapter)
 {
 	assert(adapter);
 
-	if (!adapter) {
+	if (adapter == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -77,7 +77,7 @@ RESULT optcl_adapter_copy(optcl_adapter *dest, const optcl_adapter *src)
 	assert(dest);
 	assert(src);
 
-	if (!dest || !src) {
+	if (dest == 0 || src == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -90,7 +90,7 @@ RESULT optcl_adapter_destroy(optcl_adapter *adapter)
 {
 	assert(adapter);
 
-	if (adapter) {
+	if (adapter != 0) {
 		free(adapter);
 	}
 
@@ -103,7 +103,7 @@ RESULT optcl_adapter_get_bus_type(const optcl_adapter *adapter,
 	assert(adapter);
 	assert(bus_type);
 
-	if (!adapter || !bus_type) {
+	if (adapter == 0 || bus_type == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -118,7 +118,7 @@ RESULT optcl_adapter_get_max_transfer_len(const optcl_adapter *adapter,
 	assert(adapter);
 	assert(max_transfer_len);
 
-	if (!adapter || !max_transfer_len) {
+	if (adapter == 0 || max_transfer_len == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -133,7 +133,7 @@ RESULT optcl_adapter_get_max_physical_pages(const optcl_adapter *adapter,
 	assert(adapter);
 	assert(max_physical_pages);
 
-	if (!adapter || !max_physical_pages) {
+	if (adapter == 0 || max_physical_pages == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -148,7 +148,7 @@ RESULT optcl_adapter_get_alignment_mask(const optcl_adapter *adapter,
 	assert(adapter);
 	assert(alignment_mask);
 
-	if (!adapter || !alignment_mask) {
+	if (adapter == 0 || alignment_mask == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -161,7 +161,7 @@ RESULT optcl_adapter_set_bus_type(optcl_adapter *adapter, uint32_t bus_type)
 {
 	assert(adapter);
 	
-	if (!adapter) {
+	if (adapter == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -175,7 +175,7 @@ RESULT optcl_adapter_set_max_transfer_length(optcl_adapter *adapter,
 {
 	assert(adapter);
 
-	if (!adapter) {
+	if (adapter == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -189,7 +189,7 @@ RESULT optcl_adapter_set_max_physical_pages(optcl_adapter *adapter,
 {
 	assert(adapter);
 
-	if (!adapter) {
+	if (adapter == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -203,7 +203,7 @@ RESULT optcl_adapter_set_max_alignment_mask(optcl_adapter *adapter,
 {
 	assert(adapter);
 
-	if (!adapter) {
+	if (adapter == 0) {
 		return E_INVALIDARG;
 	}
 
