@@ -29,25 +29,14 @@
 #include <stdlib.h>
 
 
+/*
+ * Helper constants
+ */
+
 #ifdef _DEBUG
 // Poison value to detect use of deallocated pointers
 #define POISON	((void*)0x12345678)
 #endif
-
-
-struct entry {
-	uint32_t hash;
-	struct pair pair;
-	optcl_list *bucket;
-};
-
-struct tag_optcl_hashtable {
-	int keycount;
-	size_t keysize;
-	int primeindex;
-	optcl_array *entries;
-	optcl_hashtable_hashfn hashfn;
-};
 
 static const unsigned int primes[] = {
 	53, 97, 193, 389,
@@ -60,15 +49,34 @@ static const unsigned int primes[] = {
 };
 
 const float max_load_factor = 0.65f;
-const int prime_table_length = sizeof(primes) / sizeof(primes[0]);
+const uint32_t prime_table_length = sizeof(primes) / sizeof(primes[0]);
+
+
+/*
+ * Internal hashtable data structures
+ */
+
+struct entry {
+	uint32_t hash;
+	struct pair pair;
+	optcl_list *bucket;
+};
+
+struct tag_optcl_hashtable {
+	uint32_t keycount;
+	uint32_t keysize;
+	uint32_t primeindex;
+	optcl_array *entries;
+	optcl_hashtable_hashfn hashfn;
+};
 
 /*
  * Helpers
  */
 
-static uint32_t joaat_hash(const void *key, size_t len)
+static uint32_t joaat_hash(const void *key, uint32_t len)
 {
-     size_t i;
+     uint32_t i;
      uint32_t hash = 0;
      
      for (i = 0; i < len; i++) {
@@ -88,11 +96,11 @@ static uint32_t joaat_hash(const void *key, size_t len)
  *  Hashtable functions implementation
  */
 
-int optcl_hashtable_clear(optcl_hashtable *hashtable, int deallocate)
+RESULT optcl_hashtable_clear(optcl_hashtable *hashtable, bool_t deallocate)
 {
-	int i;
-	int error;
-	int entrycount;
+	uint32_t i;
+	RESULT error;
+	uint32_t entrycount;
 	struct entry *entry;
 
 	assert(hashtable);
@@ -134,10 +142,10 @@ int optcl_hashtable_clear(optcl_hashtable *hashtable, int deallocate)
 	return error;
 }
 
-int optcl_hashtable_copy(optcl_hashtable *dest, const optcl_hashtable *src)
+RESULT optcl_hashtable_copy(optcl_hashtable *dest, const optcl_hashtable *src)
 {
-	int i;
-	int error;
+	uint32_t i;
+	RESULT error;
 	struct entry *entry;
 	optcl_list *nbucket;
 	optcl_list_equalfn equalfn;
@@ -196,10 +204,9 @@ int optcl_hashtable_copy(optcl_hashtable *dest, const optcl_hashtable *src)
 	return error;
 }
 
-int optcl_hashtable_create(size_t keysize,
-			   optcl_hashtable_hashfn hashfn,
-			   optcl_hashtable **hashtable
-			   )
+RESULT optcl_hashtable_create(uint32_t keysize,
+			      optcl_hashtable_hashfn hashfn,
+			      optcl_hashtable **hashtable)
 {
 	optcl_hashtable *nhashtable;
 
@@ -224,9 +231,9 @@ int optcl_hashtable_create(size_t keysize,
 	return SUCCESS;
 }
 
-int optcl_hashtable_destroy(optcl_hashtable *hashtable, int deallocate)
+RESULT optcl_hashtable_destroy(optcl_hashtable *hashtable, bool_t deallocate)
 {
-	int error;
+	RESULT error;
 
 	assert(hashtable);
 
@@ -241,12 +248,12 @@ int optcl_hashtable_destroy(optcl_hashtable *hashtable, int deallocate)
 	return SUCCESS;
 }
 
-int optcl_hashtable_get_pairs(const optcl_hashtable *hashtable,
-			      optcl_list **pairs)
+RESULT optcl_hashtable_get_pairs(const optcl_hashtable *hashtable,
+				 optcl_list **pairs)
 {
-	int i;
-	int error;
-	int entries_count;
+	uint32_t i;
+	RESULT error;
+	uint32_t entries_count;
 	struct pair *pair;
 	struct pair *bucket_pair;
 	struct entry *entry;
@@ -360,13 +367,13 @@ int optcl_hashtable_get_pairs(const optcl_hashtable *hashtable,
 	return error;
 }
 
-int optcl_hashtable_lookup(const optcl_hashtable *hashtable, 
-			   const void *key, 
-			   void **value)
+RESULT optcl_hashtable_lookup(const optcl_hashtable *hashtable, 
+			      const void *key, 
+			      void **value)
 {
-	int error;
+	RESULT error;
 	uint32_t hash;
-	int entrycount;
+	uint32_t entrycount;
 	struct pair *pair;
 	struct entry *entry;
 	optcl_list_iterator it;
@@ -449,13 +456,13 @@ int optcl_hashtable_lookup(const optcl_hashtable *hashtable,
 	return SUCCESS;
 }
 
-int optcl_hashtable_set(optcl_hashtable *hashtable, 
-			void *key, 
-			void *value)
+RESULT optcl_hashtable_set(optcl_hashtable *hashtable, 
+			   void *key, 
+			   void *value)
 {
-	int hash;
-	int size;
-	int error;
+	uint32_t hash;
+	uint32_t size;
+	RESULT error;
 	float loadfactor;
 	struct pair *pair;
 	struct entry *entry;
@@ -549,13 +556,13 @@ int optcl_hashtable_set(optcl_hashtable *hashtable,
 	return error;
 }
 
-int optcl_hashtable_rehash(optcl_hashtable *hashtable)
+RESULT optcl_hashtable_rehash(optcl_hashtable *hashtable)
 {
-	int i;
-	int hash;
-	int size;
-	int nsize;
-	int error;
+	uint32_t i;
+	uint32_t hash;
+	uint32_t size;
+	uint32_t nsize;
+	RESULT error;
 	struct entry *entry;
 	optcl_array *nentries;
 
