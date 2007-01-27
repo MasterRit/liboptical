@@ -22,6 +22,7 @@
 #include "array.h"
 #include "errors.h"
 #include "list.h"
+#include "types.h"
 
 #include <assert.h>
 #include <malloc.h>
@@ -44,14 +45,14 @@ typedef struct tag_optcl_list_node optcl_list_node;
 
 /* List type */
 struct tag_optcl_list {
-	int node_count;
+	uint32_t node_count;
 	optcl_list_node *first_node;
 	optcl_list_node *last_node;
 	optcl_list_equalfn equalfn;
 };
 
 
-int optcl_list_add_head(optcl_list *list, const void *data)
+RESULT optcl_list_add_head(optcl_list *list, const void *data)
 {
 	optcl_list_node *nnode = 0;
 
@@ -84,7 +85,7 @@ int optcl_list_add_head(optcl_list *list, const void *data)
 	return(SUCCESS);
 }
 
-int optcl_list_add_tail(optcl_list *list, const void *data)
+RESULT optcl_list_add_tail(optcl_list *list, const void *data)
 {
 	optcl_list_node *nnode = 0;
 
@@ -117,9 +118,9 @@ int optcl_list_add_tail(optcl_list *list, const void *data)
 	return(SUCCESS);
 }
 
-int optcl_list_append(optcl_list *dest, const optcl_list *src)
+RESULT optcl_list_append(optcl_list *dest, const optcl_list *src)
 {
-	int error;
+	RESULT error;
 	optcl_list_iterator it = 0;
 
 	assert(src);
@@ -152,14 +153,22 @@ int optcl_list_append(optcl_list *dest, const optcl_list *src)
 	return(error);
 }
 
-static int compare_data_ptrs(const void *left, const void *right)
+/* NOTE: There are no relations '<' and '>' for pointers. */
+static uint8_t compare_data_ptrs(const void *left, const void *right)
 {
-	/* NOTE: There are no relations '<' and '>' for pointers. */
-	return(left != right);
+	uint8_t result;
+
+	if (left == right) {
+		result = 0;
+	} else {
+		result = 1;
+	}
+
+	return(result);
 }
 
-int optcl_list_create(const optcl_list_equalfn equalfn, 
-		      optcl_list **list)
+RESULT optcl_list_create(const optcl_list_equalfn equalfn, 
+			 optcl_list **list)
 {
 	optcl_list *newlist = 0;
 
@@ -183,9 +192,9 @@ int optcl_list_create(const optcl_list_equalfn equalfn,
 	return(SUCCESS);
 }
 
-int optcl_list_destroy(optcl_list *list, int deallocate)
+RESULT optcl_list_destroy(optcl_list *list, bool_t deallocate)
 {
-	int error;
+	RESULT error;
 
 	assert(list);
 
@@ -211,7 +220,7 @@ int optcl_list_destroy(optcl_list *list, int deallocate)
 	return(SUCCESS);
 }
 
-int optcl_list_clear(optcl_list *list, int deallocate)
+RESULT optcl_list_clear(optcl_list *list, bool_t deallocate)
 {
 	optcl_list_iterator next = 0;
 	optcl_list_iterator current = 0;
@@ -248,9 +257,9 @@ int optcl_list_clear(optcl_list *list, int deallocate)
 	return(SUCCESS);
 }
 
-int optcl_list_copy(optcl_list *dest, const optcl_list *src)
+RESULT optcl_list_copy(optcl_list *dest, const optcl_list *src)
 {
-	int error;
+	RESULT error;
 
 	assert(src);
 	assert(dest);
@@ -270,11 +279,11 @@ int optcl_list_copy(optcl_list *dest, const optcl_list *src)
 	return(optcl_list_append(dest, src));
 }
 
-int optcl_list_find(const optcl_list *list, 
-		    const void *data,
-		    optcl_list_iterator *pos)
+RESULT optcl_list_find(const optcl_list *list, 
+		       const void *data,
+		       optcl_list_iterator *pos)
 {
-	int error;
+	RESULT error;
 	void *element = 0;
 	optcl_list_iterator it = 0;
 
@@ -323,8 +332,8 @@ int optcl_list_find(const optcl_list *list,
 	return(error);
 }
 
-int optcl_list_get_equalfn(const optcl_list *list, 
-			   optcl_list_equalfn *equalfn)
+RESULT optcl_list_get_equalfn(const optcl_list *list, 
+			      optcl_list_equalfn *equalfn)
 {
 	assert(list);
 	assert(equalfn);
@@ -338,12 +347,14 @@ int optcl_list_get_equalfn(const optcl_list *list,
 	return(SUCCESS);
 }
 
-int optcl_list_get_at_index(const optcl_list *list, int index, void**data)
+RESULT optcl_list_get_at_index(const optcl_list *list, 
+			       uint32_t index, 
+			       void**data)
 {
-	int i = 0;
-	int count;
-	int error;
 	int forward;
+	RESULT error;
+	uint32_t count;
+	uint32_t i = 0;
 	optcl_list_iterator it = 0;
 
 	assert(data);
@@ -398,9 +409,9 @@ int optcl_list_get_at_index(const optcl_list *list, int index, void**data)
 	return(optcl_list_get_at_pos(list, it, data));
 }
 
-int optcl_list_get_at_pos(const optcl_list *list, 
-			  const optcl_list_iterator pos, 
-			  const void **data)
+RESULT optcl_list_get_at_pos(const optcl_list *list, 
+			     const optcl_list_iterator pos, 
+			     const void **data)
 {
 	assert(pos);
 	assert(list);
@@ -415,7 +426,7 @@ int optcl_list_get_at_pos(const optcl_list *list,
 	return(SUCCESS);
 }
 
-int optcl_list_get_count(const optcl_list *list, int *count)
+RESULT optcl_list_get_count(const optcl_list *list, uint32_t *count)
 {
 	assert(list);
 	assert(count);
@@ -429,8 +440,8 @@ int optcl_list_get_count(const optcl_list *list, int *count)
 	return(SUCCESS);
 }
 
-int optcl_list_get_head_pos(const optcl_list *list, 
-			    optcl_list_iterator *pos)
+RESULT optcl_list_get_head_pos(const optcl_list *list, 
+			       optcl_list_iterator *pos)
 {
 	assert(list);
 	assert(pos);
@@ -444,8 +455,8 @@ int optcl_list_get_head_pos(const optcl_list *list,
 	return(SUCCESS);
 }
 
-int optcl_list_get_tail_pos(const optcl_list *list,
-			    optcl_list_iterator *pos)
+RESULT optcl_list_get_tail_pos(const optcl_list *list,
+			       optcl_list_iterator *pos)
 {
 	assert(list);
 	assert(pos);
@@ -459,9 +470,9 @@ int optcl_list_get_tail_pos(const optcl_list *list,
 	return(SUCCESS);
 }
 
-int optcl_list_get_next(const optcl_list *list,
-			const optcl_list_iterator pos,
-			optcl_list_iterator *next)
+RESULT optcl_list_get_next(const optcl_list *list,
+			   const optcl_list_iterator pos,
+			   optcl_list_iterator *next)
 {
 	assert(list);
 	assert(pos);
@@ -476,9 +487,9 @@ int optcl_list_get_next(const optcl_list *list,
 	return(SUCCESS); 
 }
 
-int optcl_list_get_previous(const optcl_list *list,
-			    const optcl_list_iterator pos,
-			    optcl_list_iterator *previous)
+RESULT optcl_list_get_previous(const optcl_list *list,
+			       const optcl_list_iterator pos,
+			       optcl_list_iterator *previous)
 {
 	assert(list);
 	assert(pos);
@@ -493,9 +504,9 @@ int optcl_list_get_previous(const optcl_list *list,
 	return(SUCCESS);
 }
 
-int optcl_list_insert_after(const optcl_list *list, 
-			    const optcl_list_iterator pos, 
-			    const void *data)
+RESULT optcl_list_insert_after(const optcl_list *list, 
+			       const optcl_list_iterator pos, 
+			       const void *data)
 {
 	optcl_list_node *nnode = 0;
 
@@ -526,9 +537,9 @@ int optcl_list_insert_after(const optcl_list *list,
 	return(SUCCESS);
 }
 
-int optcl_list_insert_before(const optcl_list *list, 
-			     const optcl_list_iterator pos, 
-			     const void *data)
+RESULT optcl_list_insert_before(const optcl_list *list, 
+				const optcl_list_iterator pos, 
+				const void *data)
 {
 	optcl_list_node *nnode = 0;
 
@@ -559,7 +570,7 @@ int optcl_list_insert_before(const optcl_list *list,
 	return(SUCCESS);
 }
 
-int optcl_list_remove(optcl_list *list, optcl_list_iterator pos)
+RESULT optcl_list_remove(optcl_list *list, optcl_list_iterator pos)
 {
 	assert(list);
 	assert(pos);
@@ -614,10 +625,9 @@ int optcl_list_remove(optcl_list *list, optcl_list_iterator pos)
 	return(SUCCESS);
 }
 
-int optcl_list_set_at_pos(const optcl_list *list, 
-			  optcl_list_iterator pos, 
-			  const void *element
-			  )
+RESULT optcl_list_set_at_pos(const optcl_list *list, 
+			     optcl_list_iterator pos, 
+			     const void *element)
 {
 	assert(list);
 	assert(pos);
@@ -631,8 +641,8 @@ int optcl_list_set_at_pos(const optcl_list *list,
 	return(SUCCESS);
 }
 
-int optcl_list_set_equalfn(optcl_list *list, 
-			   optcl_list_equalfn equalfn)
+RESULT optcl_list_set_equalfn(optcl_list *list, 
+			      optcl_list_equalfn equalfn)
 {
 	assert(list);
 	assert(equalfn);
@@ -646,12 +656,12 @@ int optcl_list_set_equalfn(optcl_list *list,
 	return(SUCCESS);
 }
 
-int optcl_list_sort(optcl_list *list)
+RESULT optcl_list_sort(optcl_list *list)
 {
 	int i;
-	int error;
-	int destroy_error;
-	int count;
+	RESULT error;
+	RESULT destroy_error;
+	uint32_t count;
 	void *element = 0;
 	optcl_array *array = 0;
 	optcl_list_iterator it = 0;
