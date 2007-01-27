@@ -80,7 +80,7 @@ static uint32_t joaat_hash(const void *key, uint32_t len)
      uint32_t hash = 0;
      
      for (i = 0; i < len; i++) {
-         hash += ((unsigned char*)key)[i];
+         hash += ((uint8_t*)key)[i];
          hash += (hash << 10);
          hash ^= (hash >> 6);
      }
