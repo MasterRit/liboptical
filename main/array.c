@@ -527,7 +527,6 @@ RESULT optcl_array_set_size(optcl_array *array,
 	RESULT error;
 	void *buffer;
 	void *nbuffer;
-	char **dispose;
 	uint32_t element_size;
 
 	assert(array);
@@ -555,15 +554,13 @@ RESULT optcl_array_set_size(optcl_array *array,
 
 	if (deallocate == True && array->count > size) {
 	
-		dispose = (char**)buffer;
-
 		/* Deallocate pointers */
 		for(i = 0; i < array->count - size; ++i) {
 			index = array->count - size + i;
-			free(dispose[index]);
 
+			free(*((char**)buffer + index * sizeof(char)));
 #ifdef _DEBUG
-			dispose[index] = POISON;
+			*((char**)buffer + index * sizeof(char)) = POISON;
 #endif
 
 		}
