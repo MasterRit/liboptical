@@ -179,6 +179,8 @@ RESULT optcl_array_create(uint32_t element_size,
 	narray->element_size = element_size;
 	narray->equalfn = (equalfn) ? equalfn : &compare_ints;
 
+	*array = narray;
+
 	return(SUCCESS);
 }
 
