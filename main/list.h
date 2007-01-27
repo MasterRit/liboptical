@@ -34,10 +34,10 @@ typedef int (*optcl_list_equalfn)(const void *left, const void *right);
 
 
 /* Add new element to head of the list */
-int optcl_list_add_head(optcl_list *list, void *data);
+int optcl_list_add_head(optcl_list *list, const void *data);
 
 /* Add new element to tail of the list */
-int optcl_list_add_tail(optcl_list *list, void *data);
+int optcl_list_add_tail(optcl_list *list, const void *data);
 
 /* Append list to another */
 int optcl_list_append(optcl_list *dest, const optcl_list *src);
@@ -92,14 +92,14 @@ int optcl_list_get_previous(const optcl_list *list,
 			    optcl_list_iterator *previous);
 
 /* Insert new element after iterator position */
-int optcl_list_insert_after(optcl_list *list, 
+int optcl_list_insert_after(const optcl_list *list, 
 			    const optcl_list_iterator pos, 
-			    void *data);
+			    const void *data);
 
 /* Insert new element before iterator position */
-int optcl_list_insert_before(optcl_list *list, 
+int optcl_list_insert_before(const optcl_list *list, 
 			     const optcl_list_iterator pos, 
-			     void *data);
+			     const void *data);
 
 /* Remove element from the list */
 int optcl_list_remove(optcl_list *list, optcl_list_iterator pos);
@@ -107,7 +107,7 @@ int optcl_list_remove(optcl_list *list, optcl_list_iterator pos);
 /* Set element at iterator position */
 int optcl_list_set_at_pos(const optcl_list *list, 
 			  optcl_list_iterator pos, 
-			  void *element
+			  const void *element
 			  );
 
 /* Set list element equalfn */
