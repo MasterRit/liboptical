@@ -155,6 +155,7 @@ RESULT optcl_hashtable_copy(optcl_hashtable *dest, const optcl_hashtable *src)
 {
 	uint32_t i;
 	RESULT error;
+	RESULT destroy_error;
 	struct entry *entry = 0;
 	optcl_list *nbucket = 0;
 	optcl_list_equalfn equalfn = 0;
@@ -188,6 +189,8 @@ RESULT optcl_hashtable_copy(optcl_hashtable *dest, const optcl_hashtable *src)
 		return(error);
 	}
 
+	destroy_error = SUCCESS;
+
 	for(i = 0; i < dest->keycount; ++i) {
 		
 		error = optcl_array_get(dest->entries, i, &entry);
@@ -211,14 +214,14 @@ RESULT optcl_hashtable_copy(optcl_hashtable *dest, const optcl_hashtable *src)
 		error = optcl_list_copy(nbucket, entry->bucket);
 
 		if (FAILED(error)) {
-			optcl_list_destroy(nbucket, 0);
+			destroy_error = optcl_list_destroy(nbucket, 0);
 			break;
 		}
 
 		entry->bucket = nbucket;
 	}
 
-	return(error);
+	return(SUCCEEDED(destroy_error) ? error : destroy_error);
 }
 
 RESULT optcl_hashtable_create(uint32_t keysize,
@@ -274,6 +277,7 @@ RESULT optcl_hashtable_get_pairs(const optcl_hashtable *hashtable,
 {
 	uint32_t i;
 	RESULT error;
+	RESULT destroy_error;
 	uint32_t entries_count;
 	struct pair *pair = 0;
 	struct entry *entry = 0;
@@ -391,15 +395,17 @@ RESULT optcl_hashtable_get_pairs(const optcl_hashtable *hashtable,
 		}
 	}
 
+	destroy_error = SUCCESS;
+
 	if (FAILED(error)) {
 		/* Destroy created list of pairs on error */
-		optcl_list_destroy(pair_list, 1);
+		destroy_error = optcl_list_destroy(pair_list, 1);
 		pair_list = 0;
 	}
 
 	*pairs = pair_list;
 
-	return(error);
+	return(SUCCEEDED(destroy_error) ? error : destroy_error);
 }
 
 RESULT optcl_hashtable_lookup(const optcl_hashtable *hashtable, 
@@ -619,6 +625,7 @@ RESULT optcl_hashtable_rehash(optcl_hashtable *hashtable)
 	uint32_t size;
 	uint32_t nsize;
 	RESULT error;
+	RESULT destroy_error;
 	struct entry *entry = 0;
 	optcl_array *nentries = 0;
 
@@ -652,15 +659,15 @@ RESULT optcl_hashtable_rehash(optcl_hashtable *hashtable)
 	error = optcl_array_set_size(nentries, nsize, 0);
 
 	if (FAILED(error)) {
-		optcl_array_destroy(nentries, 0);
-		return(error);
+		destroy_error = optcl_array_destroy(nentries, 0);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
 	error = optcl_array_get_size(hashtable->entries, &size);
 
 	if (FAILED(error)) {
-		optcl_array_destroy(nentries, 0);
-		return(error);
+		destroy_error = optcl_array_destroy(nentries, 0);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
 	for(i = 0; i < size; ++i) {
@@ -683,12 +690,14 @@ RESULT optcl_hashtable_rehash(optcl_hashtable *hashtable)
 		}
 	}
 
+	destroy_error = SUCCESS;
+
 	if (FAILED(error)) {
-		optcl_array_destroy(nentries, 0);
+		destroy_error = optcl_array_destroy(nentries, 0);
 	} else {
 		error = optcl_array_destroy(hashtable->entries, 0);
 		hashtable->entries = nentries;
 	}
 
-	return(error);
+	return(SUCCEEDED(destroy_error) ? error : destroy_error);
 }
