@@ -58,13 +58,13 @@ int optcl_list_add_head(optcl_list *list, const void *data)
 	assert(list);
 
 	if (list == 0) {
-		return (E_INVALIDARG);
+		return(E_INVALIDARG);
 	}
 
 	nnode = (optcl_list_node*)malloc(sizeof(optcl_list_node));
 
 	if (nnode == 0) {
-		return (E_OUTOFMEMORY);
+		return(E_OUTOFMEMORY);
 	}
 
 	nnode->data = data;
@@ -81,7 +81,7 @@ int optcl_list_add_head(optcl_list *list, const void *data)
 		list->last_node = nnode;
 	}
 
-	return (SUCCESS);
+	return(SUCCESS);
 }
 
 int optcl_list_add_tail(optcl_list *list, const void *data)
@@ -91,13 +91,13 @@ int optcl_list_add_tail(optcl_list *list, const void *data)
 	assert(list);
 
 	if (list == 0) {
-		return (E_INVALIDARG);
+		return(E_INVALIDARG);
 	}
 
 	nnode = (optcl_list_node*)malloc(sizeof(optcl_list_node));
 
 	if (nnode == 0) {
-		return (E_OUTOFMEMORY);
+		return(E_OUTOFMEMORY);
 	}
 
 	nnode->data = data;
@@ -114,7 +114,7 @@ int optcl_list_add_tail(optcl_list *list, const void *data)
 		list->first_node = nnode;
 	}
 
-	return (SUCCESS);
+	return(SUCCESS);
 }
 
 int optcl_list_append(optcl_list *dest, const optcl_list *src)
@@ -126,13 +126,13 @@ int optcl_list_append(optcl_list *dest, const optcl_list *src)
 	assert(dest);
 
 	if (dest == 0 || src == 0) {
-		return (E_INVALIDARG);
+		return(E_INVALIDARG);
 	}
 
 	error = optcl_list_get_head_pos(src, &it);
 
 	if (FAILED(error)) {
-		return (error);
+		return(error);
 	}
 
 	while (it != 0) {
@@ -149,13 +149,13 @@ int optcl_list_append(optcl_list *dest, const optcl_list *src)
 		}
 	}
 
-	return (error);
+	return(error);
 }
 
 static int compare_data_ptrs(const void *left, const void *right)
 {
 	/* NOTE: There are no relations '<' and '>' for pointers. */
-	return (left != right);
+	return(left != right);
 }
 
 int optcl_list_create(const optcl_list_equalfn equalfn, 
@@ -166,13 +166,13 @@ int optcl_list_create(const optcl_list_equalfn equalfn,
 	assert(list);
 
 	if (list == 0) {
-		return (E_INVALIDARG);
+		return(E_INVALIDARG);
 	}
 
 	newlist = (optcl_list*)malloc(sizeof(optcl_list));
 
 	if (newlist == 0) {
-		return (E_OUTOFMEMORY);
+		return(E_OUTOFMEMORY);
 	}
 
 	memset(newlist, 0, sizeof(optcl_list));
@@ -180,7 +180,7 @@ int optcl_list_create(const optcl_list_equalfn equalfn,
 
 	*list = newlist;
 
-	return (SUCCESS);
+	return(SUCCESS);
 }
 
 int optcl_list_destroy(optcl_list *list, int deallocate)
@@ -190,13 +190,13 @@ int optcl_list_destroy(optcl_list *list, int deallocate)
 	assert(list);
 
 	if (list == 0) {
-		return (E_INVALIDARG);
+		return(E_INVALIDARG);
 	}
 
 	error = optcl_list_clear(list, deallocate);
 
 	if (FAILED(error)) {
-		return (error);
+		return(error);
 	}
 	
 	memset(list, 0, sizeof(optcl_list));
@@ -208,7 +208,7 @@ int optcl_list_destroy(optcl_list *list, int deallocate)
 
 	free(list);
 
-	return (SUCCESS);
+	return(SUCCESS);
 }
 
 int optcl_list_clear(optcl_list *list, int deallocate)
@@ -219,7 +219,7 @@ int optcl_list_clear(optcl_list *list, int deallocate)
 	assert(list);
 
 	if (list == 0) {
-		return (E_INVALIDARG);
+		return(E_INVALIDARG);
 	}
 
 	current = list->first_node;
@@ -245,7 +245,7 @@ int optcl_list_clear(optcl_list *list, int deallocate)
 	list->first_node = 0;
 	list->last_node = 0;
 
-	return (SUCCESS);
+	return(SUCCESS);
 }
 
 int optcl_list_copy(optcl_list *dest, const optcl_list *src)
@@ -256,18 +256,18 @@ int optcl_list_copy(optcl_list *dest, const optcl_list *src)
 	assert(dest);
 
 	if (dest == 0 || src == 0) {
-		return (E_INVALIDARG);
+		return(E_INVALIDARG);
 	}
 
 	error = optcl_list_clear(dest, 0);
 
 	if (FAILED(error)) {
-		return (error);
+		return(error);
 	}
 
 	dest->equalfn = src->equalfn;
 
-	return (optcl_list_append(dest, src));
+	return(optcl_list_append(dest, src));
 }
 
 int optcl_list_find(const optcl_list *list, 
@@ -282,19 +282,19 @@ int optcl_list_find(const optcl_list *list,
 	assert(pos);
 
 	if (list == 0 || pos == 0) {
-		return (E_INVALIDARG);
+		return(E_INVALIDARG);
 	}
 
 	assert(list->equalfn);
 
 	if (list->equalfn == 0) {
-		return (E_UNEXPECTED);
+		return(E_UNEXPECTED);
 	}
 
 	error = optcl_list_get_head_pos(list, &it);
 
 	if (FAILED(error)) {
-		return (error);
+		return(error);
 	}
 
 	while (it != 0) {
@@ -320,7 +320,7 @@ int optcl_list_find(const optcl_list *list,
 		*pos = it;
 	}
 
-	return (error);
+	return(error);
 }
 
 int optcl_list_get_equalfn(const optcl_list *list, 
@@ -330,12 +330,12 @@ int optcl_list_get_equalfn(const optcl_list *list,
 	assert(equalfn);
 
 	if (list == 0 || equalfn == 0) {
-		return (E_INVALIDARG);
+		return(E_INVALIDARG);
 	}
 
 	*equalfn = list->equalfn;
 
-	return (SUCCESS);
+	return(SUCCESS);
 }
 
 int optcl_list_get_at_index(const optcl_list *list, int index, void**data)
@@ -350,21 +350,21 @@ int optcl_list_get_at_index(const optcl_list *list, int index, void**data)
 	assert(list);
 
 	if (data == 0|| list == 0) {
-		return (E_INVALIDARG);
+		return(E_INVALIDARG);
 	}
 
 	if (index < 0) {
-		return (E_OUTOFRANGE);
+		return(E_OUTOFRANGE);
 	}
 
 	error = optcl_list_get_count(list, &count);
 
 	if (FAILED(error)) {
-		return (error);
+		return(error);
 	}
 
 	if (index >= count) {
-		return (E_OUTOFRANGE);
+		return(E_OUTOFRANGE);
 	}
 
 	forward = (count - index < index);
@@ -378,7 +378,7 @@ int optcl_list_get_at_index(const optcl_list *list, int index, void**data)
 	}
 
 	if (FAILED(error)) {
-		return (error);
+		return(error);
 	}
 
 	while (it != 0 && i != index) {
@@ -392,10 +392,10 @@ int optcl_list_get_at_index(const optcl_list *list, int index, void**data)
 	}
 
 	if (it == 0) {
-		return (error);
+		return(error);
 	}
 	
-	return (optcl_list_get_at_pos(list, it, data));
+	return(optcl_list_get_at_pos(list, it, data));
 }
 
 int optcl_list_get_at_pos(const optcl_list *list, 
@@ -407,12 +407,12 @@ int optcl_list_get_at_pos(const optcl_list *list,
 	assert(data);
 
 	if (list == 0 || pos == 0 || data == 0) {
-		return (E_INVALIDARG);
+		return(E_INVALIDARG);
 	}
 
 	*data = (void*)pos->data;
 
-	return (SUCCESS);
+	return(SUCCESS);
 }
 
 int optcl_list_get_count(const optcl_list *list, int *count)
@@ -421,12 +421,12 @@ int optcl_list_get_count(const optcl_list *list, int *count)
 	assert(count);
 
 	if (list == 0 || count == 0) {
-		return (E_INVALIDARG);
+		return(E_INVALIDARG);
 	}
 
 	*count = list->node_count;
 
-	return (SUCCESS);
+	return(SUCCESS);
 }
 
 int optcl_list_get_head_pos(const optcl_list *list, 
@@ -436,12 +436,12 @@ int optcl_list_get_head_pos(const optcl_list *list,
 	assert(pos);
 
 	if (list == 0 || pos == 0) {
-		return (E_INVALIDARG);
+		return(E_INVALIDARG);
 	}
 
 	*pos = list->first_node;
 
-	return (SUCCESS);
+	return(SUCCESS);
 }
 
 int optcl_list_get_tail_pos(const optcl_list *list,
@@ -451,12 +451,12 @@ int optcl_list_get_tail_pos(const optcl_list *list,
 	assert(pos);
 
 	if (list == 0 || pos == 0) {
-		return (E_INVALIDARG);
+		return(E_INVALIDARG);
 	}
 
 	*pos = list->last_node;
 
-	return (SUCCESS);
+	return(SUCCESS);
 }
 
 int optcl_list_get_next(const optcl_list *list,
@@ -468,12 +468,12 @@ int optcl_list_get_next(const optcl_list *list,
 	assert(next);
 
 	if (list == 0 || pos == 0 || next == 0) {
-		return (E_INVALIDARG);
+		return(E_INVALIDARG);
 	}
 
 	*next = pos->next;
 
-	return (SUCCESS); 
+	return(SUCCESS); 
 }
 
 int optcl_list_get_previous(const optcl_list *list,
@@ -485,12 +485,12 @@ int optcl_list_get_previous(const optcl_list *list,
 	assert(previous);
 
 	if (list == 0 || pos == 0 || previous == 0) {
-		return (E_INVALIDARG);
+		return(E_INVALIDARG);
 	}
 
 	*previous = pos->prev;
 
-	return (SUCCESS);
+	return(SUCCESS);
 }
 
 int optcl_list_insert_after(const optcl_list *list, 
@@ -504,13 +504,13 @@ int optcl_list_insert_after(const optcl_list *list,
 	assert(data);
 
 	if (pos == 0 || list == 0 || data == 0) {
-		return (E_INVALIDARG);
+		return(E_INVALIDARG);
 	}
 
 	nnode = (optcl_list_node*)malloc(sizeof(optcl_list_node));
 
 	if (nnode == 0) {
-		return (E_OUTOFMEMORY);
+		return(E_OUTOFMEMORY);
 	}
 
 	nnode->data = data;
@@ -523,7 +523,7 @@ int optcl_list_insert_after(const optcl_list *list,
 	pos->next = nnode;
 	nnode->prev = pos;
 
-	return (SUCCESS);
+	return(SUCCESS);
 }
 
 int optcl_list_insert_before(const optcl_list *list, 
@@ -537,13 +537,13 @@ int optcl_list_insert_before(const optcl_list *list,
 	assert(data);
 
 	if (pos == 0 || list == 0 || data == 0) {
-		return (E_INVALIDARG);
+		return(E_INVALIDARG);
 	}
 
 	nnode = (optcl_list_node*)malloc(sizeof(optcl_list_node));
 
 	if (nnode == 0) {
-		return (E_OUTOFMEMORY);
+		return(E_OUTOFMEMORY);
 	}
 
 	nnode->data = data;
@@ -556,7 +556,7 @@ int optcl_list_insert_before(const optcl_list *list,
 	pos->prev = nnode;
 	nnode->next = pos;
 
-	return (SUCCESS);
+	return(SUCCESS);
 }
 
 int optcl_list_remove(optcl_list *list, optcl_list_iterator pos)
@@ -565,14 +565,14 @@ int optcl_list_remove(optcl_list *list, optcl_list_iterator pos)
 	assert(pos);
 
 	if (list == 0 || pos == 0) {
-		return (E_INVALIDARG);
+		return(E_INVALIDARG);
 	}
 
 	if (pos->prev == 0) {
 		assert(pos == list->first_node);
 
 		if (pos != list->first_node) {
-			return (E_UNEXPECTED);
+			return(E_UNEXPECTED);
 		}
 
 		list->first_node = pos->next;
@@ -586,7 +586,7 @@ int optcl_list_remove(optcl_list *list, optcl_list_iterator pos)
 		assert(pos == list->last_node);
 
 		if (pos != list->last_node) {
-			return (E_UNEXPECTED);
+			return(E_UNEXPECTED);
 		}
 
 		list->last_node = pos->prev;
@@ -611,7 +611,7 @@ int optcl_list_remove(optcl_list *list, optcl_list_iterator pos)
 
 	free(pos);
 
-	return (SUCCESS);
+	return(SUCCESS);
 }
 
 int optcl_list_set_at_pos(const optcl_list *list, 
@@ -623,12 +623,12 @@ int optcl_list_set_at_pos(const optcl_list *list,
 	assert(pos);
 
 	if (list == 0 || pos == 0) {
-		return (E_INVALIDARG);
+		return(E_INVALIDARG);
 	}
 
 	pos->data = element;
 
-	return (SUCCESS);
+	return(SUCCESS);
 }
 
 int optcl_list_set_equalfn(optcl_list *list, 
@@ -638,12 +638,12 @@ int optcl_list_set_equalfn(optcl_list *list,
 	assert(equalfn);
 
 	if (list == 0 || equalfn == 0) {
-		return (E_INVALIDARG);
+		return(E_INVALIDARG);
 	}
 
 	list->equalfn = equalfn;
 
-	return (SUCCESS);
+	return(SUCCESS);
 }
 
 int optcl_list_sort(optcl_list *list)
@@ -659,40 +659,40 @@ int optcl_list_sort(optcl_list *list)
 	assert(list);
 
 	if (list == 0) {
-		return (E_INVALIDARG);
+		return(E_INVALIDARG);
 	}
 
 	assert(list->equalfn);
 
 	if (list->equalfn == 0) {
-		return (E_UNEXPECTED);
+		return(E_UNEXPECTED);
 	}
 
 	error = optcl_array_create(sizeof(int*), list->equalfn, &array);
 
 	if (FAILED(error)) {
-		return (error);
+		return(error);
 	}
 
 	error = optcl_list_get_count(list, &count);
 
 	if (FAILED(error)) {
 		destroy_error = optcl_array_destroy(array, 0);
-		return (SUCCEEDED(destroy_error)) ? error : destroy_error;
+		return(SUCCEEDED(destroy_error)) ? error : destroy_error;
 	}
 
 	error = optcl_array_set_size(array, count, 0);
 
 	if (FAILED(error)) {
 		destroy_error = optcl_array_destroy(array, 0);
-		return (SUCCEEDED(destroy_error)) ? error : destroy_error;
+		return(SUCCEEDED(destroy_error)) ? error : destroy_error;
 	}
 
 	error = optcl_list_get_head_pos(list, &it);
 
 	if (FAILED(error)) {
 		destroy_error = optcl_array_destroy(array, 0);
-		return (SUCCEEDED(destroy_error)) ? error : destroy_error;
+		return(SUCCEEDED(destroy_error)) ? error : destroy_error;
 	}
 
 	i = 0;
@@ -719,35 +719,35 @@ int optcl_list_sort(optcl_list *list)
 
 	if (FAILED(error)) {
 		destroy_error = optcl_array_destroy(array, 0);
-		return (SUCCEEDED(destroy_error)) ? error : destroy_error;
+		return(SUCCEEDED(destroy_error)) ? error : destroy_error;
 	}
 
 	assert(list->equalfn);
 
 	if (list->equalfn == 0) {
 		destroy_error = optcl_array_destroy(array, 0);
-		return (SUCCEEDED(destroy_error)) ? E_UNEXPECTED : destroy_error;
+		return(SUCCEEDED(destroy_error)) ? E_UNEXPECTED : destroy_error;
 	}
 
 	error = optcl_array_set_equalfn(array, list->equalfn);
 
 	if (FAILED(error)) {
 		destroy_error = optcl_array_destroy(array, 0);
-		return (SUCCEEDED(destroy_error)) ? error : destroy_error;
+		return(SUCCEEDED(destroy_error)) ? error : destroy_error;
 	}
 
 	error = optcl_array_sort(array);
 
 	if (FAILED(error)) {
 		destroy_error = optcl_array_destroy(array, 0);
-		return (SUCCEEDED(destroy_error)) ? error : destroy_error;
+		return(SUCCEEDED(destroy_error)) ? error : destroy_error;
 	}
 
 	error = optcl_list_get_head_pos(list, &it);
 
 	if (FAILED(error)) {
 		destroy_error = optcl_array_destroy(array, 0);
-		return (SUCCEEDED(destroy_error)) ? error : destroy_error;
+		return(SUCCEEDED(destroy_error)) ? error : destroy_error;
 	}
 
 	i = 0;
@@ -774,5 +774,5 @@ int optcl_list_sort(optcl_list *list)
 
 	destroy_error = optcl_array_destroy(array, 0);
 
-	return (SUCCEEDED(destroy_error)) ? error : destroy_error;
+	return(SUCCEEDED(destroy_error)) ? error : destroy_error;
 }
