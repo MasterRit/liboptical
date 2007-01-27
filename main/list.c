@@ -299,7 +299,7 @@ int optcl_list_find(const optcl_list *list,
 		}
 
 		/* Break if equal */
-		if (!list->equalfn(element, data)) {
+		if (list->equalfn(element, data) == 0) {
 			break;
 		}
 
