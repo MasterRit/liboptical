@@ -29,10 +29,18 @@
 #include <memory.h>
 #include <stdlib.h>
 
+/*
+ * Helper constants
+ */
+
 #ifdef _DEBUG
 // Poison value to detect use of deallocated list elements
 #define POISON	((void*)0x12345678)
 #endif
+
+/*
+ * List internal structures
+ */
 
 /* List node type */
 struct tag_optcl_list_node {
@@ -51,6 +59,27 @@ struct tag_optcl_list {
 	optcl_list_equalfn equalfn;
 };
 
+/*
+ * Helper functions
+ */
+
+/* NOTE: There are no relations '<' and '>' for pointers. */
+static int8_t compare_data_ptrs(const void *left, const void *right)
+{
+	uint8_t result;
+
+	if (left == right) {
+		result = 0;
+	} else {
+		result = 1;
+	}
+
+	return(result);
+}
+
+/*
+ * List functions implementation
+ */
 
 RESULT optcl_list_add_head(optcl_list *list, const void *data)
 {
@@ -151,20 +180,6 @@ RESULT optcl_list_append(optcl_list *dest, const optcl_list *src)
 	}
 
 	return(error);
-}
-
-/* NOTE: There are no relations '<' and '>' for pointers. */
-static uint8_t compare_data_ptrs(const void *left, const void *right)
-{
-	uint8_t result;
-
-	if (left == right) {
-		result = 0;
-	} else {
-		result = 1;
-	}
-
-	return(result);
 }
 
 RESULT optcl_list_create(const optcl_list_equalfn equalfn, 
@@ -349,7 +364,7 @@ RESULT optcl_list_get_equalfn(const optcl_list *list,
 
 RESULT optcl_list_get_at_index(const optcl_list *list, 
 			       uint32_t index, 
-			       void**data)
+			       const void **data)
 {
 	int forward;
 	RESULT error;

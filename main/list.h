@@ -30,7 +30,7 @@ typedef struct tag_optcl_list_node* optcl_list_iterator;
  * Compare two list elements 
  * Return 0 for equal, -1 for left lesser and 1 for left greater.
  */
-typedef uint8_t (*optcl_list_equalfn)(const void *left, const void *right);
+typedef int8_t (*optcl_list_equalfn)(const void *left, const void *right);
 
 
 /* Add new element to head of the list */
@@ -63,7 +63,7 @@ extern RESULT optcl_list_find(const optcl_list *list,
 /* Get element at index */
 extern RESULT optcl_list_get_at_index(const optcl_list *list, 
 				      uint32_t index, 
-				      void **data);
+				      const void **data);
 
 /* Get element at iterator position */
 extern RESULT optcl_list_get_at_pos(const optcl_list *list, 
