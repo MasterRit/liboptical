@@ -51,7 +51,7 @@ struct tag_optcl_list {
 };
 
 
-int optcl_list_add_head(optcl_list *list, const void *data)
+int optcl_list_add_head(optcl_list *list, void *data)
 {
 	optcl_list_node *nnode;
 
@@ -84,7 +84,7 @@ int optcl_list_add_head(optcl_list *list, const void *data)
 	return SUCCESS;
 }
 
-int optcl_list_add_tail(optcl_list *list, const void *data)
+int optcl_list_add_tail(optcl_list *list, void *data)
 {
 	optcl_list_node *nnode;
 
@@ -100,7 +100,7 @@ int optcl_list_add_tail(optcl_list *list, const void *data)
 		return E_OUTOFMEMORY;
 	}
 
-	nnode->data = (void*)data;
+	nnode->data = data;
 	nnode->prev = list->last_node;
 	nnode->next = 0;
 
@@ -489,7 +489,7 @@ int optcl_list_get_previous(const optcl_list *list,
 
 int optcl_list_insert_after(optcl_list *list, 
 			    const optcl_list_iterator pos, 
-			    const void *data)
+			    void *data)
 {
 	optcl_list_node *nnode;
 
@@ -507,7 +507,7 @@ int optcl_list_insert_after(optcl_list *list,
 		return E_OUTOFMEMORY;
 	}
 
-	nnode->data = (void*)data;
+	nnode->data = data;
 
 	if (pos->next) {
 		pos->next->prev = nnode;
@@ -522,7 +522,7 @@ int optcl_list_insert_after(optcl_list *list,
 
 int optcl_list_insert_before(optcl_list *list, 
 			     const optcl_list_iterator pos, 
-			     const void *data)
+			     void *data)
 {
 	optcl_list_node *nnode;
 
@@ -540,7 +540,7 @@ int optcl_list_insert_before(optcl_list *list,
 		return E_OUTOFMEMORY;
 	}
 
-	nnode->data = (void*)data;
+	nnode->data = data;
 
 	if (pos->prev) {
 		pos->prev->next = nnode;
