@@ -101,7 +101,7 @@ RESULT optcl_hashtable_clear(optcl_hashtable *hashtable, bool_t deallocate)
 	uint32_t i;
 	RESULT error;
 	uint32_t entrycount;
-	struct entry *entry;
+	struct entry *entry = 0;
 
 	assert(hashtable);
 
@@ -155,9 +155,9 @@ RESULT optcl_hashtable_copy(optcl_hashtable *dest, const optcl_hashtable *src)
 {
 	uint32_t i;
 	RESULT error;
-	struct entry *entry;
-	optcl_list *nbucket;
-	optcl_list_equalfn equalfn;
+	struct entry *entry = 0;
+	optcl_list *nbucket = 0;
+	optcl_list_equalfn equalfn = 0;
 
 	assert(src);
 	assert(dest);
@@ -225,7 +225,7 @@ RESULT optcl_hashtable_create(uint32_t keysize,
 			      optcl_hashtable_hashfn hashfn,
 			      optcl_hashtable **hashtable)
 {
-	optcl_hashtable *nhashtable;
+	optcl_hashtable *nhashtable = 0;
 
 	assert(hashtable);
 	assert(keysize >0);
@@ -275,11 +275,11 @@ RESULT optcl_hashtable_get_pairs(const optcl_hashtable *hashtable,
 	uint32_t i;
 	RESULT error;
 	uint32_t entries_count;
-	struct pair *pair;
-	struct pair *bucket_pair;
-	struct entry *entry;
-	optcl_list *pair_list;
-	optcl_list_iterator it;
+	struct pair *pair = 0;
+	struct entry *entry = 0;
+	struct pair *bucket_pair = 0;
+	optcl_list *pair_list = 0;
+	optcl_list_iterator it = 0;
 
 	assert(hashtable);
 	assert(pairs);
@@ -409,10 +409,10 @@ RESULT optcl_hashtable_lookup(const optcl_hashtable *hashtable,
 	RESULT error;
 	uint32_t hash;
 	uint32_t entrycount;
-	struct pair *pair;
-	struct entry *entry;
-	optcl_list_iterator it;
-	optcl_hashtable_hashfn hashfn;
+	struct pair *pair = 0;
+	struct entry *entry = 0;
+	optcl_list_iterator it = 0;
+	optcl_hashtable_hashfn hashfn = 0;
 
 	assert(key);
 	assert(value);
@@ -511,8 +511,8 @@ RESULT optcl_hashtable_set(optcl_hashtable *hashtable,
 	uint32_t size;
 	RESULT error;
 	float loadfactor;
-	struct pair *pair;
-	struct entry *entry;
+	struct pair *pair = 0;
+	struct entry *entry = 0;
 
 	assert(key);
 	assert(hashtable);
@@ -619,8 +619,8 @@ RESULT optcl_hashtable_rehash(optcl_hashtable *hashtable)
 	uint32_t size;
 	uint32_t nsize;
 	RESULT error;
-	struct entry *entry;
-	optcl_array *nentries;
+	struct entry *entry = 0;
+	optcl_array *nentries = 0;
 
 	assert(hashtable);
 
