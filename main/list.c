@@ -57,13 +57,13 @@ int optcl_list_add_head(optcl_list *list, void *data)
 
 	assert(list);
 
-	if (!list) {
+	if (list == 0) {
 		return E_INVALIDARG;
 	}
 
 	nnode = (optcl_list_node*)malloc(sizeof(optcl_list_node));
 
-	if (!nnode) {
+	if (nnode == 0) {
 		return E_OUTOFMEMORY;
 	}
 
@@ -71,13 +71,13 @@ int optcl_list_add_head(optcl_list *list, void *data)
 	nnode->prev = 0;
 	nnode->next = list->first_node;
 
-	if (list->first_node) {
+	if (list->first_node != 0) {
 		list->first_node->prev = nnode;
 	}
 
 	list->first_node = nnode;
 
-	if (!list->last_node) {
+	if (list->last_node == 0) {
 		list->last_node = nnode;
 	}
 
@@ -90,13 +90,13 @@ int optcl_list_add_tail(optcl_list *list, void *data)
 
 	assert(list);
 
-	if (!list) {
+	if (list == 0) {
 		return E_INVALIDARG;
 	}
 
 	nnode = (optcl_list_node*)malloc(sizeof(optcl_list_node));
 
-	if (!nnode) {
+	if (nnode == 0) {
 		return E_OUTOFMEMORY;
 	}
 
@@ -104,13 +104,13 @@ int optcl_list_add_tail(optcl_list *list, void *data)
 	nnode->prev = list->last_node;
 	nnode->next = 0;
 
-	if (list->last_node) {
+	if (list->last_node != 0) {
 		list->last_node->next = nnode;
 	}
 
 	list->last_node = nnode;
 
-	if (!list->first_node) {
+	if (list->first_node == 0) {
 		list->first_node = nnode;
 	}
 
@@ -125,7 +125,7 @@ int optcl_list_append(optcl_list *dest, const optcl_list *src)
 	assert(src);
 	assert(dest);
 
-	if (!dest || !src) {
+	if (dest == 0 || src == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -135,7 +135,7 @@ int optcl_list_append(optcl_list *dest, const optcl_list *src)
 		return error;
 	}
 
-	while (it) {
+	while (it != 0) {
 		error = optcl_list_add_tail(dest, it->data);
 
 		if (FAILED(error)) {
@@ -165,13 +165,13 @@ int optcl_list_create(const optcl_list_equalfn equalfn,
 
 	assert(list);
 
-	if (!list) {
+	if (list == 0) {
 		return E_INVALIDARG;
 	}
 
 	newlist = (optcl_list*)malloc(sizeof(optcl_list));
 
-	if (!newlist) {
+	if (newlist == 0) {
 		return E_OUTOFMEMORY;
 	}
 
@@ -187,7 +187,7 @@ int optcl_list_destroy(optcl_list *list, int deallocate)
 {
 	assert(list);
 
-	if (!list) {
+	if (list == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -212,16 +212,16 @@ int optcl_list_clear(optcl_list *list, int deallocate)
 
 	assert(list);
 
-	if (!list) {
+	if (list == 0) {
 		return E_INVALIDARG;
 	}
 
 	current = list->first_node;
 
-	while(current) {
+	while (current != 0) {
 		next = current->next;
 
-		if (deallocate) {
+		if (deallocate != 0) {
 			free(current->data);
 		}
 
@@ -249,7 +249,7 @@ int optcl_list_copy(optcl_list *dest, const optcl_list *src)
 	assert(src);
 	assert(dest);
 
-	if (!dest || !src) {
+	if (dest == 0 || src == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -275,13 +275,13 @@ int optcl_list_find(const optcl_list *list,
 	assert(list);
 	assert(pos);
 
-	if (!list || !pos) {
+	if (list == 0 || pos == 0) {
 		return E_INVALIDARG;
 	}
 
 	assert(list->equalfn);
 
-	if (!list->equalfn) {
+	if (list->equalfn == 0) {
 		return E_UNEXPECTED;
 	}
 
@@ -291,7 +291,7 @@ int optcl_list_find(const optcl_list *list,
 		return error;
 	}
 
-	while (it) {
+	while (it != 0) {
 		error = optcl_list_get_at_pos(list, it, &element);
 
 		if (FAILED(error)) {
@@ -323,7 +323,7 @@ int optcl_list_get_equalfn(const optcl_list *list,
 	assert(list);
 	assert(equalfn);
 
-	if (!list || !equalfn) {
+	if (list == 0 || equalfn == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -343,7 +343,7 @@ int optcl_list_get_at_index(const optcl_list *list, int index, void**data)
 	assert(data);
 	assert(list);
 
-	if (!data || !list) {
+	if (data == 0|| list == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -363,7 +363,7 @@ int optcl_list_get_at_index(const optcl_list *list, int index, void**data)
 
 	forward = (count - index < index);
 
-	if (forward) {
+	if (forward != 0) {
 		error = optcl_list_get_head_pos(list, &it);
 		i = 0;
 	} else {
@@ -375,8 +375,8 @@ int optcl_list_get_at_index(const optcl_list *list, int index, void**data)
 		return error;
 	}
 
-	while (it && i != index) {
-		if (forward) {
+	while (it != 0 && i != index) {
+		if (forward != 0) {
 			error = optcl_list_get_next(list, it, &it);
 			i++;
 		} else {
@@ -385,7 +385,7 @@ int optcl_list_get_at_index(const optcl_list *list, int index, void**data)
 		}
 	}
 
-	if (!it) {
+	if (it == 0) {
 		return error;
 	}
 	
@@ -400,7 +400,7 @@ int optcl_list_get_at_pos(const optcl_list *list,
 	assert(list);
 	assert(data);
 
-	if (!list || !pos || !data) {
+	if (list == 0 || pos == 0 || data == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -414,7 +414,7 @@ int optcl_list_get_count(const optcl_list *list, int *count)
 	assert(list);
 	assert(count);
 
-	if (!list || !count) {
+	if (list == 0 || count == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -429,7 +429,7 @@ int optcl_list_get_head_pos(const optcl_list *list,
 	assert(list);
 	assert(pos);
 
-	if (!list || !pos) {
+	if (list == 0 || pos == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -444,7 +444,7 @@ int optcl_list_get_tail_pos(const optcl_list *list,
 	assert(list);
 	assert(pos);
 
-	if (!list || !pos) {
+	if (list == 0 || pos == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -461,7 +461,7 @@ int optcl_list_get_next(const optcl_list *list,
 	assert(pos);
 	assert(next);
 
-	if (!list || !pos || !next) {
+	if (list == 0 || pos == 0 || next == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -478,7 +478,7 @@ int optcl_list_get_previous(const optcl_list *list,
 	assert(pos);
 	assert(previous);
 
-	if (!list || !pos || !previous) {
+	if (list == 0 || pos == 0 || previous == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -497,19 +497,19 @@ int optcl_list_insert_after(optcl_list *list,
 	assert(list);
 	assert(data);
 
-	if (!pos || !list || !data) {
+	if (pos == 0 || list == 0 || data == 0) {
 		return E_INVALIDARG;
 	}
 
 	nnode = (optcl_list_node*)malloc(sizeof(optcl_list_node));
 
-	if (!nnode) {
+	if (nnode == 0) {
 		return E_OUTOFMEMORY;
 	}
 
 	nnode->data = data;
 
-	if (pos->next) {
+	if (pos->next != 0) {
 		pos->next->prev = nnode;
 		nnode->next = pos->next->prev;
 	}
@@ -530,19 +530,19 @@ int optcl_list_insert_before(optcl_list *list,
 	assert(list);
 	assert(data);
 
-	if (!pos || !list || !data) {
+	if (pos == 0 || list == 0 || data == 0) {
 		return E_INVALIDARG;
 	}
 
 	nnode = (optcl_list_node*)malloc(sizeof(optcl_list_node));
 
-	if (!nnode) {
+	if (nnode == 0) {
 		return E_OUTOFMEMORY;
 	}
 
 	nnode->data = data;
 
-	if (pos->prev) {
+	if (pos->prev != 0) {
 		pos->prev->next = nnode;
 		nnode->prev = pos->prev->next;
 	}
@@ -558,11 +558,11 @@ int optcl_list_remove(optcl_list *list, optcl_list_iterator pos)
 	assert(list);
 	assert(pos);
 
-	if (!list || !pos) {
+	if (list == 0 || pos == 0) {
 		return E_INVALIDARG;
 	}
 
-	if (!pos->prev) {
+	if (pos->prev == 0) {
 		assert(pos == list->first_node);
 
 		if (pos != list->first_node) {
@@ -571,12 +571,12 @@ int optcl_list_remove(optcl_list *list, optcl_list_iterator pos)
 
 		list->first_node = pos->next;
 		
-		if (pos->next) {
+		if (pos->next != 0) {
 			pos->next->prev = 0;
 		} else {
 			list->last_node = 0;
 		}
-	} else if (!pos->next) {
+	} else if (pos->next == 0) {
 		assert(pos == list->last_node);
 
 		if (pos != list->last_node) {
@@ -585,7 +585,7 @@ int optcl_list_remove(optcl_list *list, optcl_list_iterator pos)
 
 		list->last_node = pos->prev;
 
-		if (pos->prev) {
+		if (pos->prev != 0) {
 			pos->prev->next = 0;
 		} else {
 			list->first_node = 0;
@@ -616,7 +616,7 @@ int optcl_list_set_at_pos(const optcl_list *list,
 	assert(list);
 	assert(pos);
 
-	if (!list || !pos) {
+	if (list == 0 || pos == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -631,7 +631,7 @@ int optcl_list_set_equalfn(optcl_list *list,
 	assert(list);
 	assert(equalfn);
 
-	if (!list || !equalfn) {
+	if (list == 0 || equalfn == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -651,13 +651,13 @@ int optcl_list_sort(optcl_list *list)
 	
 	assert(list);
 
-	if (!list) {
+	if (list == 0) {
 		return E_INVALIDARG;
 	}
 
 	assert(list->equalfn);
 
-	if (!list->equalfn) {
+	if (list->equalfn == 0) {
 		return E_UNEXPECTED;
 	}
 
@@ -690,7 +690,7 @@ int optcl_list_sort(optcl_list *list)
 
 	i = 0;
 
-	while (it) {
+	while (it != 0) {
 		error = optcl_list_get_at_pos(list, it, &element);
 
 		if (FAILED(error)) {
@@ -717,7 +717,7 @@ int optcl_list_sort(optcl_list *list)
 
 	assert(list->equalfn);
 
-	if (!list->equalfn) {
+	if (list->equalfn == 0) {
 		optcl_array_destroy(array, 0);
 		return E_UNEXPECTED;
 	}
@@ -745,7 +745,7 @@ int optcl_list_sort(optcl_list *list)
 
 	i = 0;
 
-	while (it) {
+	while (it != 0) {
 		error = optcl_array_get(array, i, &element);
 
 		if (FAILED(error)) {
