@@ -46,7 +46,9 @@ int optcl_debug_set_log_file(char *filename)
 	return SUCCESS;
 }
 
-int optcl_debug_log_bytes(const char *message, const uint8_t *data, int size)
+int optcl_debug_log_bytes(const char *message, 
+			  const uint8_t *data, 
+			  uint32_t size)
 {
 	int i;
 	FILE *stream;
