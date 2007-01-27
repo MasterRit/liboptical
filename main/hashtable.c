@@ -74,7 +74,7 @@ static uint32_t joaat_hash(const uint8_t key[], uint32_t len)
 	uint32_t i;
 	uint32_t hash = 0U;
      
-	for (i = 0; i < len; i++) {
+	for (i = 0; i < len; ++i) {
 		hash += key[i];
 		hash += (hash << 10);
 		hash ^= (hash >> 6);
