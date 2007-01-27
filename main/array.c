@@ -74,7 +74,7 @@ static int8_t compare_ints(const void *left, const void *right)
 	assert(left);
 	assert(right);
 
-	if (!left || !right) {
+	if (left == 0 || right == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -108,7 +108,7 @@ RESULT optcl_array_append(optcl_array *dest, const optcl_array *src)
 	assert(src);
 	assert(dest);
 
-	if (!dest || !src) {
+	if (dest == 0 || src == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -159,13 +159,13 @@ RESULT optcl_array_create(uint32_t element_size,
 
 	assert(array);
 
-	if (!array) {
+	if (array == 0) {
 		return E_INVALIDARG;
 	}
 
 	narray = (optcl_array*)malloc(sizeof(optcl_array));
 
-	if (!narray) {
+	if (narray == 0) {
 		return E_OUTOFMEMORY;
 	}
 
@@ -184,7 +184,7 @@ RESULT optcl_array_clear(optcl_array *array, bool_t deallocate)
 
 	assert(array);
 
-	if (!array) {
+	if (array == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -211,7 +211,7 @@ RESULT optcl_array_copy(optcl_array *dest, const optcl_array *src)
 	assert(src);
 	assert(dest);
 
-	if (!dest || !src) {
+	if (dest == 0 || src == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -255,7 +255,7 @@ RESULT optcl_array_destroy(optcl_array *array, bool_t deallocate)
 	
 	assert(array);
 
-	if (!array) {
+	if (array == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -288,7 +288,7 @@ RESULT optcl_array_find(const optcl_array *array,
 	assert(element);
 	assert(index);
 
-	if (!array || !element || !index) {
+	if (array == 0 || element == 0 || index == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -302,7 +302,7 @@ RESULT optcl_array_find(const optcl_array *array,
 	
 	assert(equalfn);
 
-	if (!equalfn) {
+	if (equalfn == 0) {
 		return E_UNEXPECTED;
 	}
 
@@ -338,7 +338,7 @@ RESULT optcl_array_get(const optcl_array *array,
 	assert(element);
 	assert(index >= 0);
 
-	if (!array || !element) {
+	if (array == 0 || element == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -368,7 +368,7 @@ RESULT optcl_array_get_buffer(const optcl_array *array, void **buffer)
 	assert(array);
 	assert(buffer);
 
-	if (!array || !buffer) {
+	if (array == 0 || buffer == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -383,7 +383,7 @@ RESULT optcl_array_get_equalfn(const optcl_array *array,
 	assert(array);
 	assert(equalfn);
 
-	if (!array || !equalfn) {
+	if (array == 0 || equalfn == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -398,7 +398,7 @@ RESULT optcl_array_get_element_size(const optcl_array *array,
 	assert(array);
 	assert(element_size);
 
-	if (!array || !element_size) {
+	if (array == 0 || element_size == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -412,7 +412,7 @@ RESULT optcl_array_get_size(const optcl_array *array, uint32_t *size)
 	assert(array);
 	assert(size);
 
-	if (!array || !size) {
+	if (array == 0 || size == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -431,7 +431,7 @@ RESULT optcl_array_remove(optcl_array *array, uint32_t index)
 	assert(array);
 	assert(index >= 0);
 
-	if (!array) {
+	if (array == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -478,7 +478,7 @@ RESULT optcl_array_set(optcl_array *array, uint32_t index, const void *element)
 	assert(element);
 	assert(index >= 0);
 
-	if (!array || !element) {
+	if (array == 0 || element == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -509,7 +509,7 @@ RESULT optcl_array_set_equalfn(optcl_array *array,
 	assert(array);
 	assert(equalfn);
 
-	if (!array || !equalfn) {
+	if (array == 0 || equalfn == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -533,7 +533,7 @@ RESULT optcl_array_set_size(optcl_array *array,
 	assert(array);
 	assert(size >= 0);
 
-	if (!array || size < 0) {
+	if (array == 0 || size < 0) {
 		return E_INVALIDARG;
 	}
 
@@ -553,7 +553,7 @@ RESULT optcl_array_set_size(optcl_array *array,
 		return error;
 	}
 
-	if (deallocate && array->count > size) {
+	if (deallocate == True && array->count > size) {
 	
 		dispose = (char**)buffer;
 
@@ -561,15 +561,17 @@ RESULT optcl_array_set_size(optcl_array *array,
 		for(i = 0; i < array->count - size; ++i) {
 			index = array->count - size + i;
 			free(dispose[index]);
+
 #ifdef _DEBUG
 			dispose[index] = POISON;
 #endif
+
 		}
 	}
 
 	nbuffer = realloc(buffer, size * element_size);
 
-	if (!nbuffer && size > 0) {
+	if (nbuffer == 0 && size > 0) {
 		return E_OUTOFMEMORY;
 	}
 
@@ -588,7 +590,7 @@ RESULT optcl_array_sort(optcl_array *array)
 
 	assert(array);
 
-	if (!array) {
+	if (array == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -614,7 +616,7 @@ RESULT optcl_array_sort(optcl_array *array)
 
 	assert(equalfn);
 
-	if (!equalfn) {
+	if (equalfn == 0) {
 		return E_UNEXPECTED;
 	}
 
