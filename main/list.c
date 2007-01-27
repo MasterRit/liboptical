@@ -57,26 +57,29 @@ int optcl_list_add_head(optcl_list *list, const void *data)
 
 	assert(list);
 
-	if (!list)
+	if (!list) {
 		return E_INVALIDARG;
-
+	}
 
 	nnode = (optcl_list_node*)malloc(sizeof(optcl_list_node));
 
-	if (!nnode)
+	if (!nnode) {
 		return E_OUTOFMEMORY;
+	}
 
 	nnode->data = (void*)data;
 	nnode->prev = 0;
 	nnode->next = list->first_node;
 
-	if (list->first_node)
+	if (list->first_node) {
 		list->first_node->prev = nnode;
+	}
 
 	list->first_node = nnode;
 
-	if (!list->last_node)
+	if (!list->last_node) {
 		list->last_node = nnode;
+	}
 
 	return SUCCESS;
 }
@@ -87,25 +90,29 @@ int optcl_list_add_tail(optcl_list *list, const void *data)
 
 	assert(list);
 
-	if (!list)
+	if (!list) {
 		return E_INVALIDARG;
+	}
 
 	nnode = (optcl_list_node*)malloc(sizeof(optcl_list_node));
 
-	if (!nnode)
+	if (!nnode) {
 		return E_OUTOFMEMORY;
+	}
 
 	nnode->data = (void*)data;
 	nnode->prev = list->last_node;
 	nnode->next = 0;
 
-	if (list->last_node)
+	if (list->last_node) {
 		list->last_node->next = nnode;
+	}
 
 	list->last_node = nnode;
 
-	if (!list->first_node)
+	if (!list->first_node) {
 		list->first_node = nnode;
+	}
 
 	return SUCCESS;
 }
@@ -118,24 +125,28 @@ int optcl_list_append(optcl_list *dest, const optcl_list *src)
 	assert(src);
 	assert(dest);
 
-	if (!dest || !src)
+	if (!dest || !src) {
 		return E_INVALIDARG;
+	}
 
 	error = optcl_list_get_head_pos(src, &it);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	while (it) {
 		error = optcl_list_add_tail(dest, it->data);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 
 		error = optcl_list_get_next(src, it, &it);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 	}
 
 	return error;
@@ -154,13 +165,15 @@ int optcl_list_create(const optcl_list_equalfn equalfn,
 
 	assert(list);
 
-	if (!list)
+	if (!list) {
 		return E_INVALIDARG;
+	}
 
 	newlist = (optcl_list*)malloc(sizeof(optcl_list));
 
-	if (!newlist)
+	if (!newlist) {
 		return E_OUTOFMEMORY;
+	}
 
 	memset(newlist, 0, sizeof(optcl_list));
 	newlist->equalfn = (equalfn) ? equalfn : compare_data_ptrs;
@@ -174,8 +187,9 @@ int optcl_list_destroy(optcl_list *list, int deallocate)
 {
 	assert(list);
 
-	if (!list)
+	if (!list) {
 		return E_INVALIDARG;
+	}
 
 	optcl_list_clear(list, deallocate);
 	
@@ -198,21 +212,25 @@ int optcl_list_clear(optcl_list *list, int deallocate)
 
 	assert(list);
 
-	if (!list)
+	if (!list) {
 		return E_INVALIDARG;
+	}
 
 	current = list->first_node;
 
 	while(current) {
 		next = current->next;
 
-		if (deallocate)
+		if (deallocate) {
 			free(current->data);
+		}
+
 #ifdef _DEBUG		
-	current->data = POISON;
-	current->next = POISON;
-	current->prev = POISON;
+		current->data = POISON;
+		current->next = POISON;
+		current->prev = POISON;
 #endif
+
 		free(current);
 		current = next;
 	}
@@ -231,13 +249,15 @@ int optcl_list_copy(optcl_list *dest, const optcl_list *src)
 	assert(src);
 	assert(dest);
 
-	if (!dest || !src)
+	if (!dest || !src) {
 		return E_INVALIDARG;
+	}
 
 	error = optcl_list_clear(dest, 0);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	dest->equalfn = src->equalfn;
 
@@ -255,37 +275,44 @@ int optcl_list_find(const optcl_list *list,
 	assert(list);
 	assert(pos);
 
-	if (!list || !pos)
+	if (!list || !pos) {
 		return E_INVALIDARG;
+	}
 
 	assert(list->equalfn);
 
-	if (!list->equalfn)
+	if (!list->equalfn) {
 		return E_UNEXPECTED;
+	}
 
 	error = optcl_list_get_head_pos(list, &it);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	while (it) {
 		error = optcl_list_get_at_pos(list, it, &element);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 
 		/* Break if equal */
-		if (!list->equalfn(element, data))
+		if (!list->equalfn(element, data)) {
 			break;
+		}
 
 		error = optcl_list_get_next(list, it, &it);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 	}
 
-	if (SUCCEEDED(error))
+	if (SUCCEEDED(error)) {
 		*pos = it;
+	}
 
 	return error;
 }
@@ -296,8 +323,9 @@ int optcl_list_get_equalfn(const optcl_list *list,
 	assert(list);
 	assert(equalfn);
 
-	if (!list || !equalfn)
+	if (!list || !equalfn) {
 		return E_INVALIDARG;
+	}
 
 	*equalfn = list->equalfn;
 
@@ -315,19 +343,23 @@ int optcl_list_get_at_index(const optcl_list *list, int index, void**data)
 	assert(data);
 	assert(list);
 
-	if (!data || !list)
+	if (!data || !list) {
 		return E_INVALIDARG;
+	}
 
-	if (index < 0)
+	if (index < 0) {
 		return E_OUTOFRANGE;
+	}
 
 	error = optcl_list_get_count(list, &count);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
-	if (index >= count)
+	if (index >= count) {
 		return E_OUTOFRANGE;
+	}
 
 	forward = (count - index < index);
 
@@ -339,8 +371,9 @@ int optcl_list_get_at_index(const optcl_list *list, int index, void**data)
 		i = count - 1;
 	}
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	while (it && i != index) {
 		if (forward) {
@@ -352,8 +385,9 @@ int optcl_list_get_at_index(const optcl_list *list, int index, void**data)
 		}
 	}
 
-	if (!it) 
+	if (!it) {
 		return error;
+	}
 	
 	return optcl_list_get_at_pos(list, it, data);
 }
@@ -366,8 +400,9 @@ int optcl_list_get_at_pos(const optcl_list *list,
 	assert(list);
 	assert(data);
 
-	if (!list || !pos || !data)
+	if (!list || !pos || !data) {
 		return E_INVALIDARG;
+	}
 
 	*data = pos->data;
 
@@ -379,8 +414,9 @@ int optcl_list_get_count(const optcl_list *list, int *count)
 	assert(list);
 	assert(count);
 
-	if (!list || !count)
+	if (!list || !count) {
 		return E_INVALIDARG;
+	}
 
 	*count = list->node_count;
 
@@ -393,8 +429,9 @@ int optcl_list_get_head_pos(const optcl_list *list,
 	assert(list);
 	assert(pos);
 
-	if (!list || !pos)
+	if (!list || !pos) {
 		return E_INVALIDARG;
+	}
 
 	*pos = list->first_node;
 
@@ -407,8 +444,9 @@ int optcl_list_get_tail_pos(const optcl_list *list,
 	assert(list);
 	assert(pos);
 
-	if (!list || !pos)
+	if (!list || !pos) {
 		return E_INVALIDARG;
+	}
 
 	*pos = list->last_node;
 
@@ -423,8 +461,9 @@ int optcl_list_get_next(const optcl_list *list,
 	assert(pos);
 	assert(next);
 
-	if (!list || !pos || !next)
+	if (!list || !pos || !next) {
 		return E_INVALIDARG;
+	}
 
 	*next = pos->next;
 
@@ -439,8 +478,9 @@ int optcl_list_get_previous(const optcl_list *list,
 	assert(pos);
 	assert(previous);
 
-	if (!list || !pos || !previous)
+	if (!list || !pos || !previous) {
 		return E_INVALIDARG;
+	}
 
 	*previous = pos->prev;
 
@@ -457,13 +497,15 @@ int optcl_list_insert_after(optcl_list *list,
 	assert(list);
 	assert(data);
 
-	if (!pos || !list || !data)
+	if (!pos || !list || !data) {
 		return E_INVALIDARG;
+	}
 
 	nnode = (optcl_list_node*)malloc(sizeof(optcl_list_node));
 
-	if (!nnode)
+	if (!nnode) {
 		return E_OUTOFMEMORY;
+	}
 
 	nnode->data = (void*)data;
 
@@ -488,13 +530,15 @@ int optcl_list_insert_before(optcl_list *list,
 	assert(list);
 	assert(data);
 
-	if (!pos || !list || !data)
+	if (!pos || !list || !data) {
 		return E_INVALIDARG;
+	}
 
 	nnode = (optcl_list_node*)malloc(sizeof(optcl_list_node));
 
-	if (!nnode)
+	if (!nnode) {
 		return E_OUTOFMEMORY;
+	}
 
 	nnode->data = (void*)data;
 
@@ -514,33 +558,38 @@ int optcl_list_remove(optcl_list *list, optcl_list_iterator pos)
 	assert(list);
 	assert(pos);
 
-	if (!list || !pos)
+	if (!list || !pos) {
 		return E_INVALIDARG;
+	}
 
 	if (!pos->prev) {
 		assert(pos == list->first_node);
 
-		if (pos != list->first_node)
+		if (pos != list->first_node) {
 			return E_UNEXPECTED;
+		}
 
 		list->first_node = pos->next;
 		
-		if (pos->next)
+		if (pos->next) {
 			pos->next->prev = 0;
-		else
+		} else {
 			list->last_node = 0;
+		}
 	} else if (!pos->next) {
 		assert(pos == list->last_node);
 
-		if (pos != list->last_node)
+		if (pos != list->last_node) {
 			return E_UNEXPECTED;
+		}
 
 		list->last_node = pos->prev;
 
-		if (pos->prev)
+		if (pos->prev) {
 			pos->prev->next = 0;
-		else
+		} else {
 			list->first_node = 0;
+		}
 	} else {
 		pos->prev->next = pos->next;
 		pos->next->prev = pos->prev;
@@ -567,8 +616,9 @@ int optcl_list_set_at_pos(const optcl_list *list,
 	assert(list);
 	assert(pos);
 
-	if (!list || !pos)
+	if (!list || !pos) {
 		return E_INVALIDARG;
+	}
 
 	pos->data = element;
 
@@ -581,8 +631,9 @@ int optcl_list_set_equalfn(optcl_list *list,
 	assert(list);
 	assert(equalfn);
 
-	if (!list || !equalfn)
+	if (!list || !equalfn) {
 		return E_INVALIDARG;
+	}
 
 	list->equalfn = equalfn;
 
@@ -600,18 +651,21 @@ int optcl_list_sort(optcl_list *list)
 	
 	assert(list);
 
-	if (!list)
+	if (!list) {
 		return E_INVALIDARG;
+	}
 
 	assert(list->equalfn);
 
-	if (!list->equalfn)
+	if (!list->equalfn) {
 		return E_UNEXPECTED;
+	}
 
 	error = optcl_array_create(sizeof(int*), list->equalfn, &array);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	error = optcl_list_get_count(list, &count);
 
@@ -639,18 +693,21 @@ int optcl_list_sort(optcl_list *list)
 	while (it) {
 		error = optcl_list_get_at_pos(list, it, &element);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 
 		error = optcl_array_set(array, i++, element);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 
 		error = optcl_list_get_next(list, it, &it);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 	}
 
 	if (FAILED(error)) {
@@ -691,18 +748,21 @@ int optcl_list_sort(optcl_list *list)
 	while (it) {
 		error = optcl_array_get(array, i, &element);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 
 		error = optcl_list_set_at_pos(list, it, element);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 
 		error = optcl_list_get_next(list, it, &it);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 	}
 
 	optcl_array_destroy(array, 0);
