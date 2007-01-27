@@ -55,12 +55,13 @@ int optcl_debug_log_bytes(const char *message, const uint8_t *data, int size)
 	assert(data);
 	assert(size > 0);
 
-	if (!data || size <= 0)
+	if (!data || size <= 0) {
 		return E_INVALIDARG;
+	}
 
-	if (!_log_file)
+	if (!_log_file) {
 		stream = stderr;
-	else {
+	} else {
 #ifdef _WIN32
 		errno = fopen_s(&stream, _log_file, "a+");
 #else
@@ -77,14 +78,16 @@ int optcl_debug_log_bytes(const char *message, const uint8_t *data, int size)
 		}
 	}
 
-	if (message)
+	if (message) {
 		fprintf(stream, "%s\r\n\n", message);
+	}
 
 	for(i = 0; i < size; ++i) {
 		fprintf(stream, "%x", data[i]);
 
-		if (i < size - 1)
+		if (i < size - 1) {
 			fprintf(stream, "%s", ", ");
+		}
 	}
 
 	fprintf(stream, "%s", "\r\n\n");
