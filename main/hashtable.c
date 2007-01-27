@@ -73,6 +73,11 @@ static uint32_t joaat_hash(const uint8_t key[], uint32_t len)
 {
 	uint32_t i;
 	uint32_t hash = 0U;
+
+	assert(key);
+
+	if (key == 0)
+		return(0);
      
 	for (i = 0; i < len; ++i) {
 		hash += key[i];
