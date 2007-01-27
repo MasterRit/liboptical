@@ -134,7 +134,10 @@ RESULT optcl_array_append(optcl_array *dest, const optcl_array *src)
 		return error;
 	}
 
-	for(i = 0; i < src_size; ++i) {
+	i = 0;
+
+	while (i < src_size) {
+
 		error = optcl_array_get(src, i, &element);
 
 		if (FAILED(error)) {
@@ -146,6 +149,8 @@ RESULT optcl_array_append(optcl_array *dest, const optcl_array *src)
 		if (FAILED(error)) {
 			break;
 		}
+
+		++i;
 	}
 
 	return error;
@@ -231,8 +236,10 @@ RESULT optcl_array_copy(optcl_array *dest, const optcl_array *src)
 		return error;
 	}
 
-	for(i = 0; i < src_count; ++i) {
-		
+	i = 0;
+
+	while (i < src_count) {
+
 		error = optcl_array_get(src, i, &element);
 
 		if (FAILED(error)) {
@@ -244,6 +251,8 @@ RESULT optcl_array_copy(optcl_array *dest, const optcl_array *src)
 		if (FAILED(error)) {
 			break;
 		}
+
+		++i;
 	}
 
 	return error;
@@ -306,8 +315,10 @@ RESULT optcl_array_find(const optcl_array *array,
 		return E_UNEXPECTED;
 	}
 
-	for(i = 0; i < array_size; ++i) {
-	
+	i = 0;
+
+	while (i < array_size) {
+
 		error = optcl_array_get(array, i, &current_element);
 
 		if (FAILED(error)) {
@@ -319,6 +330,8 @@ RESULT optcl_array_find(const optcl_array *array,
 		}
 
 		*index = i;
+
+		++i;
 
 		break;
 	}
@@ -556,6 +569,7 @@ RESULT optcl_array_set_size(optcl_array *array,
 	
 		/* Deallocate pointers */
 		for(i = 0; i < array->count - size; ++i) {
+			
 			index = array->count - size + i;
 
 			free(*((char**)buffer + index * sizeof(char)));
