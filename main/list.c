@@ -66,7 +66,7 @@ struct tag_optcl_list {
 /* NOTE: There are no relations '<' and '>' for pointers. */
 static int8_t compare_data_ptrs(const void *left, const void *right)
 {
-	uint8_t result;
+	int8_t result;
 
 	if (left == right) {
 		result = 0;
