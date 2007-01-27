@@ -37,7 +37,7 @@
 struct tag_optcl_list_node {
 	struct tag_optcl_list_node *prev;
 	struct tag_optcl_list_node *next;
-	void *data;
+	const void *data;
 };
 
 typedef struct tag_optcl_list_node optcl_list_node;
@@ -51,7 +51,7 @@ struct tag_optcl_list {
 };
 
 
-int optcl_list_add_head(optcl_list *list, void *data)
+int optcl_list_add_head(optcl_list *list, const void *data)
 {
 	optcl_list_node *nnode;
 
@@ -67,7 +67,7 @@ int optcl_list_add_head(optcl_list *list, void *data)
 		return (E_OUTOFMEMORY);
 	}
 
-	nnode->data = (void*)data;
+	nnode->data = data;
 	nnode->prev = 0;
 	nnode->next = list->first_node;
 
@@ -84,7 +84,7 @@ int optcl_list_add_head(optcl_list *list, void *data)
 	return (SUCCESS);
 }
 
-int optcl_list_add_tail(optcl_list *list, void *data)
+int optcl_list_add_tail(optcl_list *list, const void *data)
 {
 	optcl_list_node *nnode;
 
@@ -228,7 +228,7 @@ int optcl_list_clear(optcl_list *list, int deallocate)
 		next = current->next;
 
 		if (deallocate != 0) {
-			free(current->data);
+			free((void*)current->data);
 		}
 
 #ifdef _DEBUG		
@@ -410,7 +410,7 @@ int optcl_list_get_at_pos(const optcl_list *list,
 		return (E_INVALIDARG);
 	}
 
-	*data = pos->data;
+	*data = (void*)pos->data;
 
 	return (SUCCESS);
 }
@@ -495,7 +495,7 @@ int optcl_list_get_previous(const optcl_list *list,
 
 int optcl_list_insert_after(optcl_list *list, 
 			    const optcl_list_iterator pos, 
-			    void *data)
+			    const void *data)
 {
 	optcl_list_node *nnode;
 
@@ -528,7 +528,7 @@ int optcl_list_insert_after(optcl_list *list,
 
 int optcl_list_insert_before(optcl_list *list, 
 			     const optcl_list_iterator pos, 
-			     void *data)
+			     const void *data)
 {
 	optcl_list_node *nnode;
 
@@ -616,7 +616,7 @@ int optcl_list_remove(optcl_list *list, optcl_list_iterator pos)
 
 int optcl_list_set_at_pos(const optcl_list *list, 
 			  optcl_list_iterator pos, 
-			  void *element
+			  const void *element
 			  )
 {
 	assert(list);
