@@ -66,7 +66,7 @@ int optcl_list_get_at_index(const optcl_list *list, int index, void **data);
 /* Get element at iterator position */
 int optcl_list_get_at_pos(const optcl_list *list, 
 			  const optcl_list_iterator pos, 
-			  void **data);
+			  const void **data);
 
 /* Get list element equalfn function */
 int optcl_list_get_equalfn(const optcl_list *list, 
