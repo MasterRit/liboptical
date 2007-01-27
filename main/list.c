@@ -185,13 +185,19 @@ int optcl_list_create(const optcl_list_equalfn equalfn,
 
 int optcl_list_destroy(optcl_list *list, int deallocate)
 {
+	int error;
+
 	assert(list);
 
 	if (list == 0) {
 		return E_INVALIDARG;
 	}
 
-	optcl_list_clear(list, deallocate);
+	error = optcl_list_clear(list, deallocate);
+
+	if (FAILED(error)) {
+		return error;
+	}
 	
 	memset(list, 0, sizeof(optcl_list));
 
@@ -644,6 +650,7 @@ int optcl_list_sort(optcl_list *list)
 {
 	int i;
 	int error;
+	int destroy_error;
 	int count;
 	void *element;
 	optcl_array *array;
@@ -670,22 +677,22 @@ int optcl_list_sort(optcl_list *list)
 	error = optcl_list_get_count(list, &count);
 
 	if (FAILED(error)) {
-		optcl_array_destroy(array, 0);
-		return error;
+		destroy_error = optcl_array_destroy(array, 0);
+		return (SUCCEEDED(destroy_error)) ? error : destroy_error;
 	}
 
 	error = optcl_array_set_size(array, count, 0);
 
 	if (FAILED(error)) {
-		optcl_array_destroy(array, 0);
-		return error;
+		destroy_error = optcl_array_destroy(array, 0);
+		return (SUCCEEDED(destroy_error)) ? error : destroy_error;
 	}
 
 	error = optcl_list_get_head_pos(list, &it);
 
 	if (FAILED(error)) {
-		optcl_array_destroy(array, 0);
-		return error;
+		destroy_error = optcl_array_destroy(array, 0);
+		return (SUCCEEDED(destroy_error)) ? error : destroy_error;
 	}
 
 	i = 0;
@@ -711,36 +718,36 @@ int optcl_list_sort(optcl_list *list)
 	}
 
 	if (FAILED(error)) {
-		optcl_array_destroy(array, 0);
-		return error;
+		destroy_error = optcl_array_destroy(array, 0);
+		return (SUCCEEDED(destroy_error)) ? error : destroy_error;
 	}
 
 	assert(list->equalfn);
 
 	if (list->equalfn == 0) {
-		optcl_array_destroy(array, 0);
-		return E_UNEXPECTED;
+		destroy_error = optcl_array_destroy(array, 0);
+		return (SUCCEEDED(destroy_error)) ? E_UNEXPECTED : destroy_error;
 	}
 
 	error = optcl_array_set_equalfn(array, list->equalfn);
 
 	if (FAILED(error)) {
-		optcl_array_destroy(array, 0);
-		return error;
+		destroy_error = optcl_array_destroy(array, 0);
+		return (SUCCEEDED(destroy_error)) ? error : destroy_error;
 	}
 
 	error = optcl_array_sort(array);
 
 	if (FAILED(error)) {
-		optcl_array_destroy(array, 0);
-		return error;
+		destroy_error = optcl_array_destroy(array, 0);
+		return (SUCCEEDED(destroy_error)) ? error : destroy_error;
 	}
 
 	error = optcl_list_get_head_pos(list, &it);
 
 	if (FAILED(error)) {
-		optcl_array_destroy(array, 0);
-		return error;
+		destroy_error = optcl_array_destroy(array, 0);
+		return (SUCCEEDED(destroy_error)) ? error : destroy_error;
 	}
 
 	i = 0;
@@ -765,7 +772,7 @@ int optcl_list_sort(optcl_list *list)
 		}
 	}
 
-	optcl_array_destroy(array, 0);
+	destroy_error = optcl_array_destroy(array, 0);
 
-	return error;
+	return (SUCCEEDED(destroy_error)) ? error : destroy_error;
 }
