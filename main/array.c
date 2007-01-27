@@ -537,8 +537,8 @@ RESULT optcl_array_set_size(optcl_array *array,
 			    uint32_t size, 
 			    bool_t deallocate)
 {
-	int index;
 	uint32_t i;
+	uint32_t index;
 	RESULT error;
 	void *buffer;
 	void *nbuffer;
