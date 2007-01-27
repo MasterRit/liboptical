@@ -105,38 +105,46 @@ RESULT optcl_hashtable_clear(optcl_hashtable *hashtable, bool_t deallocate)
 
 	assert(hashtable);
 
-	if (!hashtable)
+	if (!hashtable) {
 		return E_INVALIDARG;
+	}
 
-	if (!hashtable->entries)
+	if (!hashtable->entries) {
 		return SUCCESS;
+	}
 
 	error = optcl_array_get_size(hashtable->entries, &entrycount);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	for(i = 0; i < entrycount; ++i) {
 		error = optcl_array_get(hashtable->entries, i, &entry);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 
-		if (entry->bucket)
+		if (entry->bucket) {
 			error = optcl_list_destroy(entry->bucket, deallocate);
-		
-		if (FAILED(error))
-			break;
+
+			if (FAILED(error)) {
+				break;
+			}
+		}
 	}
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	error = optcl_array_destroy(hashtable->entries, 0);
 
 #ifdef _DEBUG
-	if (SUCCEEDED(error))
+	if (SUCCEEDED(error)) {
 		hashtable->entries = POISON;
+	}
 #endif
 
 	return error;
@@ -153,13 +161,15 @@ RESULT optcl_hashtable_copy(optcl_hashtable *dest, const optcl_hashtable *src)
 	assert(src);
 	assert(dest);
 
-	if (!dest || !src)
+	if (!dest || !src) {
 		return E_INVALIDARG;
+	}
 
 	error = optcl_hashtable_clear(dest, 0);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	dest->hashfn = src->hashfn;
 	dest->keysize = src->keysize;
@@ -167,29 +177,34 @@ RESULT optcl_hashtable_copy(optcl_hashtable *dest, const optcl_hashtable *src)
 
 	error = optcl_array_copy(dest->entries, src->entries);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	error = optcl_array_get_size(dest->entries, &dest->keycount);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	for(i = 0; i < dest->keycount; ++i) {
 		error = optcl_array_get(dest->entries, i, &entry);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 
 		error = optcl_list_get_equalfn(entry->bucket, &equalfn);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 
 		error = optcl_list_create(equalfn, &nbucket);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 
 		error = optcl_list_copy(nbucket, entry->bucket);
 
@@ -213,13 +228,15 @@ RESULT optcl_hashtable_create(uint32_t keysize,
 	assert(hashtable);
 	assert(keysize >0);
 
-	if (!hashtable || keysize <= 0)
+	if (!hashtable || keysize <= 0) {
 		return E_INVALIDARG;
+	}
 
 	nhashtable = (optcl_hashtable*)malloc(sizeof(optcl_hashtable));
 
-	if (!nhashtable)
+	if (!nhashtable) {
 		return E_OUTOFMEMORY;
+	}
 
 	memset(nhashtable, 0, sizeof(optcl_hashtable));
 
@@ -237,13 +254,15 @@ RESULT optcl_hashtable_destroy(optcl_hashtable *hashtable, bool_t deallocate)
 
 	assert(hashtable);
 
-	if (!hashtable)
+	if (!hashtable) {
 		return E_INVALIDARG;
+	}
 
 	error = optcl_hashtable_clear(hashtable, deallocate);
 
-	if (SUCCEEDED(error))
+	if (SUCCEEDED(error)) {
 		free(hashtable);
+	}
 
 	return SUCCESS;
 }
@@ -263,35 +282,42 @@ RESULT optcl_hashtable_get_pairs(const optcl_hashtable *hashtable,
 	assert(hashtable);
 	assert(pairs);
 
-	if (!hashtable || !pairs)
+	if (!hashtable || !pairs) {
 		return E_INVALIDARG;
+	}
 
 	*pairs = 0;
 
-	if (!hashtable->entries)
+	if (!hashtable->entries) {
 		return SUCCESS;
+	}
 
 	error = optcl_array_get_size(hashtable->entries, &entries_count);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
-	if (entries_count < 1)
+	if (entries_count < 1) {
 		return SUCCESS;
+	}
 
 	error = optcl_list_create(0, &pair_list);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	for(i = 0; i < entries_count; ++i) {
 		error = optcl_array_get(hashtable->entries, i, &entry);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 
-		if (!entry)
+		if (!entry) {
 			continue;
+		}
 
 		pair = (struct pair*)malloc(sizeof(struct pair));
 
@@ -310,19 +336,22 @@ RESULT optcl_hashtable_get_pairs(const optcl_hashtable *hashtable,
 			break;
 		}
 
-		if (!entry->bucket)
+		if (!entry->bucket) {
 			continue;
+		}
 
 		error = optcl_list_get_head_pos(entry->bucket, &it);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 
 		while (it) {
 			error = optcl_list_get_at_pos(entry->bucket, it, &bucket_pair);
 
-			if (FAILED(error))
+			if (FAILED(error)) {
 				break;
+			}
 
 			if (!bucket_pair) {
 				error = E_COLLINVLDHASHTABLE;
@@ -348,12 +377,14 @@ RESULT optcl_hashtable_get_pairs(const optcl_hashtable *hashtable,
 
 			error = optcl_list_get_next(entry->bucket, it, &it);
 
-			if (FAILED(error))
+			if (FAILED(error)) {
 				break;
+			}
 		}
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 	}
 
 	if (FAILED(error)) {
@@ -383,42 +414,49 @@ RESULT optcl_hashtable_lookup(const optcl_hashtable *hashtable,
 	assert(value);
 	assert(hashtable);
 
-	if (!hashtable || !key || !value)
+	if (!hashtable || !key || !value) {
 		return E_INVALIDARG;
+	}
 
 	*value = 0;
 
 	assert(hashtable->hashfn);
 	assert(hashtable->keysize > 0);
 
-	if (!hashtable->hashfn || hashtable->keysize <= 0)
+	if (!hashtable->hashfn || hashtable->keysize <= 0) {
 		return E_COLLINVLDHASHTABLE;
+	}
 
 	hashfn = hashtable->hashfn;
 	hash = hashfn(key, hashtable->keysize);
 
-	if (!hashtable->entries)
+	if (!hashtable->entries) {
 		return SUCCESS;
+	}
 
 	error = optcl_array_get_size(hashtable->entries, &entrycount);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	assert(entrycount > 0);
 
-	if (entrycount <= 0)
+	if (entrycount <= 0) {
 		return E_COLLINVLDHASHTABLE;
+	}
 
 	error = optcl_array_get(hashtable->entries, hash % entrycount, &entry);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	assert(entry);
 
-	if (!entry)
+	if (!entry) {
 		return E_COLLINVLDHASHTABLE;
+	}
 
 	if (hashfn(entry->pair.key, hashtable->keysize) == hash) {
 		assert(!entry->bucket);
@@ -428,19 +466,22 @@ RESULT optcl_hashtable_lookup(const optcl_hashtable *hashtable,
 
 	error = optcl_list_get_head_pos(entry->bucket, &it);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	assert(it);
 
-	if (!it)
+	if (!it) {
 		return E_COLLINVLDHASHTABLE;
+	}
 
 	while (it) {
 		error = optcl_list_get_at_pos(entry->bucket, it, &pair);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 
 		if (hashfn(pair->key, hashtable->keysize) == hash) {
 			*value = pair->value;
@@ -449,8 +490,9 @@ RESULT optcl_hashtable_lookup(const optcl_hashtable *hashtable,
 
 		error = optcl_list_get_next(entry->bucket, it, &it);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 	}
 
 	return SUCCESS;
@@ -470,24 +512,27 @@ RESULT optcl_hashtable_set(optcl_hashtable *hashtable,
 	assert(key);
 	assert(hashtable);
 
-	if (!key || !hashtable)
+	if (!key || !hashtable) {
 		return E_INVALIDARG;
+	}
 
 	assert(hashtable->hashfn);
 	assert(hashtable->keysize > 0);
 
-	if (hashtable->keysize <= 0)
+	if (hashtable->keysize <= 0) {
 		return E_COLLINVLDHASHTABLE;
+	}
 
 	assert(hashtable->entries);
 
-	if (!hashtable->entries)
+	if (!hashtable->entries) {
 		size = 0;
-	else {
+	} else {
 		error = optcl_array_get_size(hashtable->entries, &size);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			return error;
+		}
 	}
 
 	loadfactor =(size * 1.0f) / (hashtable->keycount * 1.0f);
@@ -495,27 +540,31 @@ RESULT optcl_hashtable_set(optcl_hashtable *hashtable,
 	if (loadfactor >= max_load_factor) {
 		error = optcl_hashtable_rehash(hashtable);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			return error;
+		}
 
 		error = optcl_array_get_size(hashtable->entries, &size);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			return error;
+		}
 	}
 
 	hash = hashtable->hashfn(key, hashtable->keysize);
 
 	error = optcl_array_get(hashtable->entries, hash % size, &entry);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	if (entry) {
 		pair = (struct pair*)malloc(sizeof(struct pair));
 
-		if (!pair)
+		if (!pair) {
 			return E_OUTOFMEMORY;
+		}
 
 		pair->key = key;
 		pair->value = value;
@@ -538,8 +587,9 @@ RESULT optcl_hashtable_set(optcl_hashtable *hashtable,
 	} else {
 		entry = (struct entry*)malloc(sizeof(struct entry));
 
-		if (!entry)
+		if (!entry) {
 			return E_OUTOFMEMORY;
+		}
 
 		memset(entry, 0, sizeof(struct entry));
 
@@ -549,8 +599,9 @@ RESULT optcl_hashtable_set(optcl_hashtable *hashtable,
 
 		error = optcl_array_set(hashtable->entries, hash % size, entry);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			return error;
+		}
 	}
 	
 	return error;
@@ -568,16 +619,19 @@ RESULT optcl_hashtable_rehash(optcl_hashtable *hashtable)
 
 	assert(hashtable);
 
-	if (!hashtable)
+	if (!hashtable) {
 		return E_INVALIDARG;
+	}
 
-	if (hashtable->primeindex + 1 > prime_table_length - 1)
+	if (hashtable->primeindex + 1 > prime_table_length - 1) {
 		return E_OUTOFRANGE;
+	}
 
 	error = optcl_array_create(sizeof(struct entry), 0, &nentries);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	if (!hashtable->entries) {
 		assert(hashtable->keycount == 0);
@@ -607,23 +661,26 @@ RESULT optcl_hashtable_rehash(optcl_hashtable *hashtable)
 	for(i = 0; i < size; ++i) {
 		error = optcl_array_get(hashtable->entries, i, &entry);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 
-		if (!entry)
+		if (!entry) {
 			continue;
+		}
 
 		hash = hashtable->hashfn(entry->pair.key, hashtable->keysize);
 
 		error = optcl_array_set(nentries, hash % nsize, entry);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 	}
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		optcl_array_destroy(nentries, 0);
-	else {
+	} else {
 		error = optcl_array_destroy(hashtable->entries, 0);
 		hashtable->entries = nentries;
 	}
