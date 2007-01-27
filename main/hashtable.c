@@ -77,7 +77,7 @@ struct tag_optcl_hashtable {
 static uint32_t joaat_hash(const void *key, uint32_t len)
 {
      uint32_t i;
-     uint32_t hash = 0;
+     uint32_t hash = 0U;
      
      for (i = 0; i < len; i++) {
          hash += ((const uint8_t*)key)[i];
