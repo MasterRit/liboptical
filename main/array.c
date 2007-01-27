@@ -103,7 +103,7 @@ RESULT optcl_array_append(optcl_array *dest, const optcl_array *src)
 	RESULT error;
 	uint32_t src_size;
 	uint32_t dest_size;
-	void *element;
+	void *element = 0;
 
 	assert(src);
 	assert(dest);
@@ -160,7 +160,7 @@ RESULT optcl_array_create(uint32_t element_size,
 			  const optcl_array_equalfn equalfn, 
 			  optcl_array **array)
 {
-	optcl_array *narray;
+	optcl_array *narray = 0;
 
 	assert(array);
 
@@ -187,7 +187,6 @@ RESULT optcl_array_create(uint32_t element_size,
 RESULT optcl_array_clear(optcl_array *array, bool_t deallocate)
 {
 	RESULT error;
-	optcl_array_equalfn equalfn;
 
 	assert(array);
 
@@ -195,15 +194,13 @@ RESULT optcl_array_clear(optcl_array *array, bool_t deallocate)
 		return(E_INVALIDARG);
 	}
 
-	equalfn = array->equalfn;
-
 	error = optcl_array_set_size(array, 0, deallocate);
 
 	if (FAILED(error)) {
 		return(error);
 	}
 
-	array->equalfn = equalfn;
+	array->equalfn = compare_ints;
 
 	return(SUCCESS);
 }
@@ -213,7 +210,7 @@ RESULT optcl_array_copy(optcl_array *dest, const optcl_array *src)
 	uint32_t i;
 	RESULT error;
 	uint32_t src_count;
-	void *element;
+	void *element = 0;
 
 	assert(src);
 	assert(dest);
@@ -292,8 +289,8 @@ RESULT optcl_array_find(const optcl_array *array,
 	uint32_t i;
 	RESULT error;
 	uint32_t array_size;
-	void *current_element;
-	optcl_array_equalfn equalfn;
+	void *current_element = 0;
+	optcl_array_equalfn equalfn = 0;
 
 	assert(array);
 	assert(element);
@@ -346,7 +343,7 @@ RESULT optcl_array_get(const optcl_array *array,
 		       const void **element)
 {
 	RESULT error;
-	void *buffer;
+	void *buffer = 0;
 	uint32_t element_size;
 
 	assert(array);
@@ -438,8 +435,8 @@ RESULT optcl_array_get_size(const optcl_array *array, uint32_t *size)
 
 RESULT optcl_array_remove(optcl_array *array, uint32_t index)
 {
-	void *buffer;
 	RESULT error;
+	void *buffer = 0;
 	uint32_t array_size;
 	uint32_t element_size;
 
@@ -485,8 +482,8 @@ RESULT optcl_array_remove(optcl_array *array, uint32_t index)
 
 RESULT optcl_array_set(optcl_array *array, uint32_t index, const void *element)
 {
-	void *buffer;
 	RESULT error;
+	void *buffer = 0;
 	uint32_t element_size;
 
 	assert(array);
@@ -540,8 +537,8 @@ RESULT optcl_array_set_size(optcl_array *array,
 	uint32_t i;
 	uint32_t index;
 	RESULT error;
-	void *buffer;
-	void *nbuffer;
+	void *buffer = 0;
+	void *nbuffer = 0;
 	uint32_t element_size;
 
 	assert(array);
@@ -596,10 +593,10 @@ RESULT optcl_array_set_size(optcl_array *array,
 RESULT optcl_array_sort(optcl_array *array)
 {
 	RESULT error;
-	void *buffer;
+	void *buffer = 0;
 	uint32_t array_size;
 	uint32_t element_size;
-	optcl_array_equalfn equalfn;
+	optcl_array_equalfn equalfn = 0;
 
 	assert(array);
 
