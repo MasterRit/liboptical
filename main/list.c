@@ -384,10 +384,10 @@ int optcl_list_get_at_index(const optcl_list *list, int index, void**data)
 	while (it != 0 && i != index) {
 		if (forward != 0) {
 			error = optcl_list_get_next(list, it, &it);
-			i++;
+			++i;
 		} else {
 			error = optcl_list_get_previous(list, it, &it);
-			i--;
+			--i;
 		}
 	}
 
@@ -601,7 +601,7 @@ int optcl_list_remove(optcl_list *list, optcl_list_iterator pos)
 		pos->next->prev = pos->prev;
 	}
 
-	list->node_count--;
+	--list->node_count;
 
 #ifdef _DEBUG
 	pos->data = POISON;
@@ -704,7 +704,9 @@ int optcl_list_sort(optcl_list *list)
 			break;
 		}
 
-		error = optcl_array_set(array, i++, element);
+		error = optcl_array_set(array, i, element);
+
+		++i;
 
 		if (FAILED(error)) {
 			break;
