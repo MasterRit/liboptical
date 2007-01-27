@@ -20,6 +20,10 @@
 #ifndef _ADAPTER_H
 #define _ADAPTER_H
 
+#include "errors.h"
+
+
+/* Bustype constants */
 #define ADAPTER_BUSTYPE_UNKNOWN		0x00
 #define ADAPTER_BUSTYPE_SCSI		0x01
 #define ADAPTER_BUSTYPE_ATAPI		0x02
@@ -36,47 +40,49 @@ typedef struct tag_adapter optcl_adapter;
 
 
 /* Create new adapter structure */
-int optcl_adapter_create(optcl_adapter **adapter);
+extern RESULT optcl_adapter_create(optcl_adapter **adapter);
 
 /* Clear adapter structure */
-int optcl_adapter_clear(optcl_adapter *adapter);
+extern RESULT optcl_adapter_clear(optcl_adapter *adapter);
 
 /* Copy adapter structure */
-int optcl_adapter_copy(optcl_adapter *dest, 
-		       const optcl_adapter *src);
+extern RESULT optcl_adapter_copy(optcl_adapter *dest, 
+				 const optcl_adapter *src);
 
 /* Destroy adapter structure */
-int optcl_adapter_destroy(optcl_adapter *adapter);
+extern RESULT optcl_adapter_destroy(optcl_adapter *adapter);
 
 /* Get bus type */
-int optcl_adapter_get_bus_type(const optcl_adapter *adapter, int *bus_type);
+extern RESULT optcl_adapter_get_bus_type(const optcl_adapter *adapter, 
+					 uint32_t *bus_type);
 
 /* Get maximal transfer length */
-int optcl_adapter_get_max_transfer_len(const optcl_adapter *adapter, 
-				       int *max_transfer_len);
+extern RESULT optcl_adapter_get_max_transfer_len(const optcl_adapter *adapter, 
+						 uint32_t *max_transfer_len);
 
 /* Get maximum physical pages */
-int optcl_adapter_get_max_physical_pages(const optcl_adapter *adapter, 
-					 int *max_physical_pages);
+extern RESULT optcl_adapter_get_max_physical_pages(const optcl_adapter *adapter, 
+						   uint32_t *max_physical_pages);
 
 /* Get alignment mask */
-int optcl_adapter_get_alignment_mask(const optcl_adapter *adapter,
-				     int *alignment_mask);
+extern RESULT optcl_adapter_get_alignment_mask(const optcl_adapter *adapter,
+					       uint32_t *alignment_mask);
 
 /* Set bus type */
-int optcl_adapter_set_bus_type(optcl_adapter *adapter, int bus_type);
+extern RESULT optcl_adapter_set_bus_type(optcl_adapter *adapter, 
+					 uint32_t bus_type);
 
 /* Set maximal transfer length */
-int optcl_adapter_set_max_transfer_length(optcl_adapter *adapter,
-					  int max_transfer_len);
+extern RESULT optcl_adapter_set_max_transfer_length(optcl_adapter *adapter,
+						    uint32_t max_transfer_len);
 
 /* Set physical pages */
-int optcl_adapter_set_max_physical_pages(optcl_adapter *adapter,
-					 int max_physical_pages);
+extern RESULT optcl_adapter_set_max_physical_pages(optcl_adapter *adapter,
+						   uint32_t max_physical_pages);
 
 /* Set alignment mask */
-int optcl_adapter_set_max_alignment_mask(optcl_adapter *adapter,
-					 int alignment_mask);
+extern RESULT optcl_adapter_set_max_alignment_mask(optcl_adapter *adapter,
+						   uint32_t alignment_mask);
 
 
 #endif /* _ADAPTER_H */

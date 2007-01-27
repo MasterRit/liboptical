@@ -29,10 +29,10 @@
 
 /* Adapter structure */
 typedef struct tag_adapter {
-	int bus_type;
-	int max_transfer_len;
-	int max_physical_pages;
-	int alignment_mask;
+	uint32_t bus_type;
+	uint32_t max_transfer_len;
+	uint32_t max_physical_pages;
+	uint32_t alignment_mask;
 } optcl_adapter;
 
 
@@ -40,7 +40,7 @@ typedef struct tag_adapter {
  * Adapter functions
  */
 
-int optcl_adapter_create(optcl_adapter **adapter)
+RESULT optcl_adapter_create(optcl_adapter **adapter)
 {
 	assert(adapter);
 
@@ -57,7 +57,7 @@ int optcl_adapter_create(optcl_adapter **adapter)
 	return SUCCESS;
 }
 
-int optcl_adapter_clear(optcl_adapter *adapter)
+RESULT optcl_adapter_clear(optcl_adapter *adapter)
 {
 	assert(adapter);
 
@@ -69,7 +69,7 @@ int optcl_adapter_clear(optcl_adapter *adapter)
 	return SUCCESS;
 }
 
-int optcl_adapter_copy(optcl_adapter *dest, const optcl_adapter *src)
+RESULT optcl_adapter_copy(optcl_adapter *dest, const optcl_adapter *src)
 {
 	assert(dest);
 	assert(src);
@@ -82,7 +82,7 @@ int optcl_adapter_copy(optcl_adapter *dest, const optcl_adapter *src)
 	return SUCCESS;
 }
 
-int optcl_adapter_destroy(optcl_adapter *adapter)
+RESULT optcl_adapter_destroy(optcl_adapter *adapter)
 {
 	if (adapter)
 		free(adapter);
@@ -90,8 +90,8 @@ int optcl_adapter_destroy(optcl_adapter *adapter)
 	return SUCCESS;
 }
 
-int optcl_adapter_get_bus_type(const optcl_adapter *adapter,
-			       int *bus_type)
+RESULT optcl_adapter_get_bus_type(const optcl_adapter *adapter,
+				  uint32_t *bus_type)
 {
 	assert(adapter);
 	assert(bus_type);
@@ -104,8 +104,8 @@ int optcl_adapter_get_bus_type(const optcl_adapter *adapter,
 	return SUCCESS;
 }
 
-int optcl_adapter_get_max_transfer_len(const optcl_adapter *adapter,
-				       int *max_transfer_len)
+RESULT optcl_adapter_get_max_transfer_len(const optcl_adapter *adapter,
+					  uint32_t *max_transfer_len)
 {
 	assert(adapter);
 	assert(max_transfer_len);
@@ -118,8 +118,8 @@ int optcl_adapter_get_max_transfer_len(const optcl_adapter *adapter,
 	return SUCCESS;
 }
 
-int optcl_adapter_get_max_physical_pages(const optcl_adapter *adapter,
-					 int *max_physical_pages)
+RESULT optcl_adapter_get_max_physical_pages(const optcl_adapter *adapter,
+					    uint32_t *max_physical_pages)
 {
 	assert(adapter);
 	assert(max_physical_pages);
@@ -132,8 +132,8 @@ int optcl_adapter_get_max_physical_pages(const optcl_adapter *adapter,
 	return SUCCESS;
 }
 
-int optcl_adapter_get_alignment_mask(const optcl_adapter *adapter,
-				     int *alignment_mask)
+RESULT optcl_adapter_get_alignment_mask(const optcl_adapter *adapter,
+					uint32_t *alignment_mask)
 {
 	assert(adapter);
 	assert(alignment_mask);
@@ -146,7 +146,7 @@ int optcl_adapter_get_alignment_mask(const optcl_adapter *adapter,
 	return SUCCESS;
 }
 
-int optcl_adapter_set_bus_type(optcl_adapter *adapter, int bus_type)
+RESULT optcl_adapter_set_bus_type(optcl_adapter *adapter, uint32_t bus_type)
 {
 	assert(adapter);
 	
@@ -158,8 +158,8 @@ int optcl_adapter_set_bus_type(optcl_adapter *adapter, int bus_type)
 	return SUCCESS;
 }
 
-int optcl_adapter_set_max_transfer_length(optcl_adapter *adapter,
-					  int max_transfer_len)
+RESULT optcl_adapter_set_max_transfer_length(optcl_adapter *adapter,
+					     uint32_t max_transfer_len)
 {
 	assert(adapter);
 
@@ -171,8 +171,8 @@ int optcl_adapter_set_max_transfer_length(optcl_adapter *adapter,
 	return SUCCESS;
 }
 
-int optcl_adapter_set_max_physical_pages(optcl_adapter *adapter,
-					 int max_physical_pages)
+RESULT optcl_adapter_set_max_physical_pages(optcl_adapter *adapter,
+					    uint32_t max_physical_pages)
 {
 	assert(adapter);
 
@@ -184,8 +184,8 @@ int optcl_adapter_set_max_physical_pages(optcl_adapter *adapter,
 	return SUCCESS;
 }
 
-int optcl_adapter_set_max_alignment_mask(optcl_adapter *adapter,
-					 int alignment_mask)
+RESULT optcl_adapter_set_max_alignment_mask(optcl_adapter *adapter,
+					    uint32_t alignment_mask)
 {
 	assert(adapter);
 
