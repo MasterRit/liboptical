@@ -77,8 +77,8 @@ static int8_t compare_ints(const void *left, const void *right)
 	if (!left || !right)
 		return E_INVALIDARG;
 
-	larg = *((uint32_t*)left);
-	rarg = *((uint32_t*)right);
+	memcpy(&larg, left, sizeof(int));
+	memcpy(&rarg, right, sizeof(int));
 
 	if (larg == rarg)
 		result = 0;
