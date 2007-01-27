@@ -43,7 +43,7 @@ static char *_log_file = "optical.log";
 int optcl_debug_set_log_file(char *filename)
 {
 	_log_file = filename;
-	return SUCCESS;
+	return(SUCCESS);
 }
 
 int optcl_debug_log_bytes(const char *message, 
@@ -58,7 +58,7 @@ int optcl_debug_log_bytes(const char *message,
 	assert(size > 0);
 
 	if (data == 0 || size <= 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	if (_log_file == 0) {
@@ -95,7 +95,7 @@ int optcl_debug_log_bytes(const char *message,
 	fprintf(stream, "%s", "\r\n\n");
 	fclose(stream);
 
-	return SUCCESS;
+	return(SUCCESS);
 }
 
 #endif /* _DEBUG */
