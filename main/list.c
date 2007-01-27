@@ -493,7 +493,7 @@ int optcl_list_get_previous(const optcl_list *list,
 	return (SUCCESS);
 }
 
-int optcl_list_insert_after(optcl_list *list, 
+int optcl_list_insert_after(const optcl_list *list, 
 			    const optcl_list_iterator pos, 
 			    const void *data)
 {
@@ -526,7 +526,7 @@ int optcl_list_insert_after(optcl_list *list,
 	return (SUCCESS);
 }
 
-int optcl_list_insert_before(optcl_list *list, 
+int optcl_list_insert_before(const optcl_list *list, 
 			     const optcl_list_iterator pos, 
 			     const void *data)
 {
