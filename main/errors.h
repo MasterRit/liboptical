@@ -66,25 +66,25 @@ typedef int32_t RESULT;
 
 /* Error status testing macros */
 
-#define SUCCEEDED(e)		((int32_t)(e) < 0)
-#define FAILED(e)		((int32_t)(e) >= 0)
+#define SUCCEEDED(e)		((bool_t)((RESULT)(e) < 0))
+#define FAILED(e)		((bool_t)((RESULT)(e) >= 0))
 
-#define IS_ERROR(e)		((int32_t)(e) >> 31 == SEVERITY_ERROR)
+#define IS_ERROR(e)		((bool_t)((RESULT)(e) >> 31 == SEVERITY_ERROR))
 
-#define ERROR_CODE(e)		((e) & 0xFFFF)
-#define ERROR_FACILITY(e)	(((e) >> 16) & 0x1fff)
-#define ERROR_SEVERITY(e)	(((e) >> 31) & 0x1)
+#define ERROR_CODE(e)		((int16_t)((RESULT)(e) & 0xFFFF))
+#define ERROR_FACILITY(e)	((int16_t)((RESULT)((e) >> 16) & 0x1fff))
+#define ERROR_SEVERITY(e)	((int8_t)(((RESULT)(e) >> 31) & 0x01))
 
 /* Error formating helper macros */
 
-#define MAKE_ERRORCODE(sev, fac, code) \
-	((int32_t)(((unsigned long)(sev) << 30) \
-		 | ((unsigned long)(fac) << 16) \
-		 | ((unsigned long)(code))))
+#define MAKE_ERRORCODE(sev, fac, code)		\
+	((RESULT)(((int32_t)(sev) << 30)	\
+		| ((int32_t)(fac) << 16)	\
+		| ((int32_t)(code))))
 
 /* General status codes */
 
-#define SUCCESS			(1 << 31)
+#define SUCCESS			((RESULT)(1 << 31))
 
 /* General error codes */
 
