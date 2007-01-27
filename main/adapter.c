@@ -44,13 +44,15 @@ RESULT optcl_adapter_create(optcl_adapter **adapter)
 {
 	assert(adapter);
 
-	if (!adapter)
+	if (!adapter) {
 		return E_INVALIDARG;
+	}
 
 	*adapter = malloc(sizeof(optcl_adapter));
 
-	if (!*adapter)
+	if (!*adapter) {
 		return E_OUTOFMEMORY;
+	}
 
 	memset(*adapter, 0, sizeof(optcl_adapter));
 
@@ -61,8 +63,9 @@ RESULT optcl_adapter_clear(optcl_adapter *adapter)
 {
 	assert(adapter);
 
-	if (!adapter)
+	if (!adapter) {
 		return E_INVALIDARG;
+	}
 
 	memset(adapter, 0, sizeof(optcl_adapter));
 
@@ -74,8 +77,9 @@ RESULT optcl_adapter_copy(optcl_adapter *dest, const optcl_adapter *src)
 	assert(dest);
 	assert(src);
 
-	if (!dest || !src)
+	if (!dest || !src) {
 		return E_INVALIDARG;
+	}
 
 	memcpy(dest, src, sizeof(optcl_adapter));
 
@@ -84,8 +88,11 @@ RESULT optcl_adapter_copy(optcl_adapter *dest, const optcl_adapter *src)
 
 RESULT optcl_adapter_destroy(optcl_adapter *adapter)
 {
-	if (adapter)
+	assert(adapter);
+
+	if (adapter) {
 		free(adapter);
+	}
 
 	return SUCCESS;
 }
@@ -96,8 +103,9 @@ RESULT optcl_adapter_get_bus_type(const optcl_adapter *adapter,
 	assert(adapter);
 	assert(bus_type);
 
-	if (!adapter || !bus_type)
+	if (!adapter || !bus_type) {
 		return E_INVALIDARG;
+	}
 
 	*bus_type = adapter->bus_type;
 
@@ -110,8 +118,9 @@ RESULT optcl_adapter_get_max_transfer_len(const optcl_adapter *adapter,
 	assert(adapter);
 	assert(max_transfer_len);
 
-	if (!adapter || !max_transfer_len)
+	if (!adapter || !max_transfer_len) {
 		return E_INVALIDARG;
+	}
 
 	*max_transfer_len = adapter->max_transfer_len;
 
@@ -124,8 +133,9 @@ RESULT optcl_adapter_get_max_physical_pages(const optcl_adapter *adapter,
 	assert(adapter);
 	assert(max_physical_pages);
 
-	if (!adapter || !max_physical_pages)
+	if (!adapter || !max_physical_pages) {
 		return E_INVALIDARG;
+	}
 
 	*max_physical_pages = adapter->max_physical_pages;
 
@@ -138,8 +148,9 @@ RESULT optcl_adapter_get_alignment_mask(const optcl_adapter *adapter,
 	assert(adapter);
 	assert(alignment_mask);
 
-	if (!adapter || !alignment_mask)
+	if (!adapter || !alignment_mask) {
 		return E_INVALIDARG;
+	}
 
 	*alignment_mask = adapter->alignment_mask;
 
@@ -150,8 +161,9 @@ RESULT optcl_adapter_set_bus_type(optcl_adapter *adapter, uint32_t bus_type)
 {
 	assert(adapter);
 	
-	if (!adapter)
+	if (!adapter) {
 		return E_INVALIDARG;
+	}
 
 	adapter->bus_type = bus_type;
 
@@ -163,8 +175,9 @@ RESULT optcl_adapter_set_max_transfer_length(optcl_adapter *adapter,
 {
 	assert(adapter);
 
-	if (!adapter)
+	if (!adapter) {
 		return E_INVALIDARG;
+	}
 
 	adapter->max_transfer_len = max_transfer_len;
 
@@ -176,8 +189,9 @@ RESULT optcl_adapter_set_max_physical_pages(optcl_adapter *adapter,
 {
 	assert(adapter);
 
-	if (!adapter)
+	if (!adapter) {
 		return E_INVALIDARG;
+	}
 
 	adapter->max_physical_pages = max_physical_pages;
 
@@ -189,8 +203,9 @@ RESULT optcl_adapter_set_max_alignment_mask(optcl_adapter *adapter,
 {
 	assert(adapter);
 
-	if (!adapter)
+	if (!adapter) {
 		return E_INVALIDARG;
+	}
 
 	adapter->alignment_mask = alignment_mask;
 
