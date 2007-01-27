@@ -55,11 +55,11 @@ int optcl_debug_log_bytes(const char *message, const uint8_t *data, int size)
 	assert(data);
 	assert(size > 0);
 
-	if (!data || size <= 0) {
+	if (data == 0 || size <= 0) {
 		return E_INVALIDARG;
 	}
 
-	if (!_log_file) {
+	if (_log_file == 0) {
 		stream = stderr;
 	} else {
 #ifdef _WIN32
@@ -69,7 +69,7 @@ int optcl_debug_log_bytes(const char *message, const uint8_t *data, int size)
 		_get_errno(&errno);
 #endif
 
-		if (!stream || errno != 0) {
+		if (stream == 0 || errno != 0) {
 			return MAKE_ERRORCODE(
 				SEVERITY_ERROR,
 				FACILITY_GENERAL,
@@ -78,7 +78,7 @@ int optcl_debug_log_bytes(const char *message, const uint8_t *data, int size)
 		}
 	}
 
-	if (message) {
+	if (message != 0) {
 		fprintf(stream, "%s\r\n\n", message);
 	}
 
