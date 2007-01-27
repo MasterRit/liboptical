@@ -478,7 +478,7 @@ RESULT optcl_array_remove(optcl_array *array, uint32_t index)
 			);
 	}
 
-	return (optcl_array_set_size(array, array_size - 1, 0));
+	return(optcl_array_set_size(array, array_size - 1, 0));
 }
 
 RESULT optcl_array_set(optcl_array *array, uint32_t index, const void *element)
