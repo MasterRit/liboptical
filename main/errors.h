@@ -22,6 +22,9 @@
 
 #include "types.h"
 
+/* Error code data type */
+
+typedef int32_t RESULT;
 
 /*
  *  Values are 32 bit values layed out as follows:
@@ -59,6 +62,7 @@
 #define FACILITY_DEVICE		1
 #define FACILITY_TRANSPORT	2
 #define FACILITY_COLLECTIONS	3
+#define FACILITY_FEATURES	4
 
 /* Error status testing macros */
 
@@ -129,5 +133,12 @@
 #define E_COLLINVLDHASHTABLE	\
 	MAKE_ERRORCODE(SEVERITY_ERROR, FACILITY_COLLECTIONS, 0)
 
+/* FACILITY_FEATURES erro codes */
+
+#define E_FEATINVHEADER		\
+	MAKE_ERRORCODE(SEVERITY_ERROR, FACILITY_FEATURES, 0)
+
+#define E_FEATTABLEFULL		\
+	MAKE_ERRORCODE(SEVERITY_ERROR, FACILITY_FEATURES, 1)
 
 #endif /* _ERRORS_H */
