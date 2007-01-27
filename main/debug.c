@@ -72,11 +72,11 @@ RESULT optcl_debug_log_bytes(const char *message,
 #endif
 
 		if (stream == 0 || errno != 0) {
-			return MAKE_ERRORCODE(
+			return(MAKE_ERRORCODE(
 				SEVERITY_ERROR,
 				FACILITY_GENERAL,
 				errno
-				);
+				));
 		}
 	}
 
