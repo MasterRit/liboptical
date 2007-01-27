@@ -404,7 +404,7 @@ RESULT optcl_hashtable_get_pairs(const optcl_hashtable *hashtable,
 
 RESULT optcl_hashtable_lookup(const optcl_hashtable *hashtable, 
 			      const void *key, 
-			      void **value)
+			      const void **value)
 {
 	RESULT error;
 	uint32_t hash;
@@ -504,8 +504,8 @@ RESULT optcl_hashtable_lookup(const optcl_hashtable *hashtable,
 }
 
 RESULT optcl_hashtable_set(optcl_hashtable *hashtable, 
-			   void *key, 
-			   void *value)
+			   const void *key, 
+			   const void *value)
 {
 	uint32_t hash;
 	uint32_t size;

@@ -30,8 +30,8 @@ typedef struct tag_optcl_hashtable optcl_hashtable;
 
 /* Key/value pair */
 typedef struct pair {
-	void *key;
-	void *value;
+	const void *key;
+	const void *value;
 } optcl_hashtable_pair;
 
 /* User hash function */
@@ -62,12 +62,12 @@ extern RESULT optcl_hashtable_get_pairs(const optcl_hashtable *hashtable,
 /* Lookup key in the hashtable */
 extern RESULT optcl_hashtable_lookup(const optcl_hashtable *hashtable, 
 				     const void *key, 
-				     void **value);
+				     const void **value);
 
 /* Set key/value pair */
 extern RESULT optcl_hashtable_set(optcl_hashtable *hashtable, 
-				  void *key, 
-				  void *value);
+				  const void *key, 
+				  const void *value);
 
 /* Rehash hashtable */
 extern RESULT optcl_hashtable_rehash(optcl_hashtable *hashtable);
