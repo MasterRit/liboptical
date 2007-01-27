@@ -35,7 +35,7 @@ typedef struct pair {
 } optcl_hashtable_pair;
 
 /* User hash function */
-typedef unsigned int (*optcl_hashtable_hashfn)(const void *key, uint32_t len);
+typedef unsigned int (*optcl_hashtable_hashfn)(const uint8_t key[], uint32_t len);
 
 
 
