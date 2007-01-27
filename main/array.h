@@ -20,69 +20,79 @@
 #ifndef _ARRAY_H
 #define _ARRAY_H
 
+#include "errors.h"
+#include "types.h"
+
 typedef struct tag_optcl_array optcl_array;
 
 /*
  * Compares two list elements 
  * Return 0 for equal, -1 for left lesser and 1 for left greater.
  */
-typedef int (*optcl_array_equalfn)(const void *left, const void *right);
+typedef int8_t (*optcl_array_equalfn)(const void *left, const void *right);
 
 
 /* Append two arrays */
-int optcl_array_append(optcl_array *dest, const optcl_array *src);
+extern RESULT optcl_array_append(optcl_array *dest, const optcl_array *src);
 
 /* Create new array */
-int optcl_array_create(int element_size, 
-		       const optcl_array_equalfn equalfn,
-		       optcl_array **array);
+extern RESULT optcl_array_create(uint32_t element_size, 
+				 const optcl_array_equalfn equalfn,
+				 optcl_array **array);
 
 /* Clear new array */
-int optcl_array_clear(optcl_array *array, int deallocate);
+extern RESULT optcl_array_clear(optcl_array *array, bool_t deallocate);
 
 /* Copy one array to another */
-int optcl_array_copy(optcl_array *dest, 
-		     const optcl_array *src);
+extern RESULT optcl_array_copy(optcl_array *dest, 
+			       const optcl_array *src);
 
 /* Destroy list */
-int optcl_array_destroy(optcl_array *array, int deallocate);
+extern RESULT optcl_array_destroy(optcl_array *array, bool_t deallocate);
 
 /* Find element in the array */
-int optcl_array_find(const optcl_array *array, 
-		     const void *element, 
-		     int *index);
+extern RESULT optcl_array_find(const optcl_array *array, 
+			       const void *element, 
+			       uint32_t *index);
 
 /* Get element at index */
-int optcl_array_get(const optcl_array *array, int index, void **element);
+extern RESULT optcl_array_get(const optcl_array *array, 
+			      uint32_t index, 
+			      const void **element);
 
 /* Get internal buffer */
-int optcl_array_get_buffer(const optcl_array *array, void **buffer);
+extern RESULT optcl_array_get_buffer(const optcl_array *array, void **buffer);
 
 /* Get array equalfn function */
-int optcl_array_get_equalfn(const optcl_array *array, 
-			    optcl_array_equalfn *equalfn);
+extern RESULT optcl_array_get_equalfn(const optcl_array *array, 
+				      optcl_array_equalfn *equalfn);
 
 /* Get array element size */
-int optcl_array_get_element_size(const optcl_array *array, int *element_size);
+extern RESULT optcl_array_get_element_size(const optcl_array *array, 
+					   uint32_t *element_size);
 
 /* Get array size */
-int optcl_array_get_size(const optcl_array *array, int *size);
+extern RESULT optcl_array_get_size(const optcl_array *array, uint32_t *size);
 
 /* Remove element from the array */
-int optcl_array_remove(optcl_array *array, int index);
+extern RESULT optcl_array_remove(optcl_array *array, uint32_t index);
 
 /* Set element at index position - resize list if required. */
-int optcl_array_set(optcl_array *array, int index, void *element);
+extern RESULT optcl_array_set(optcl_array *array, 
+			      uint32_t index, 
+			      const void *element);
 
 /* Resize array */
-int optcl_array_set_size(optcl_array *array, int size, int deallocate);
+extern RESULT optcl_array_set_size(optcl_array *array, 
+				   uint32_t size, 
+				   bool_t deallocate);
 
 /* Set array equalfn function */
-int optcl_array_set_equalfn(optcl_array *array, 
-			    optcl_array_equalfn equalfn);
+extern RESULT optcl_array_set_equalfn(optcl_array *array, 
+				      optcl_array_equalfn equalfn);
 
 /* Sort array */
-int optcl_array_sort(optcl_array *array);
+extern RESULT optcl_array_sort(optcl_array *array);
 
 #endif /* _ARRAY_H */
 
