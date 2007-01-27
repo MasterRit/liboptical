@@ -33,11 +33,6 @@
  * Helper constants
  */
 
-#ifdef _DEBUG
-// Poison value to detect use of deallocated pointers
-#define POISON	((void*)0x12345678)
-#endif
-
 static const unsigned int primes[] = {
 	53, 97, 193, 389,
 	769, 1543, 3079, 6151,
@@ -145,12 +140,6 @@ RESULT optcl_hashtable_clear(optcl_hashtable *hashtable, bool_t deallocate)
 	}
 
 	error = optcl_array_destroy(hashtable->entries, 0);
-
-#ifdef _DEBUG
-	if (SUCCEEDED(error)) {
-		hashtable->entries = POISON;
-	}
-#endif
 
 	return(error);
 }
