@@ -251,7 +251,7 @@ RESULT optcl_list_clear(optcl_list *list, bool_t deallocate)
 	while (current != 0) {
 		next = current->next;
 
-		if (deallocate != 0) {
+		if (deallocate == True) {
 			free((void*)current->data);
 		}
 
