@@ -29,14 +29,6 @@
 #include <memory.h>
 #include <stdlib.h>
 
-/*
- * Helper constants
- */
-
-#ifdef _DEBUG
-// Poison value to detect use of deallocated list elements
-#define POISON	((void*)0x12345678)
-#endif
 
 /*
  * List internal structures
@@ -59,6 +51,7 @@ struct tag_optcl_list {
 	optcl_list_equalfn equalfn;
 };
 
+
 /*
  * Helper functions
  */
@@ -76,6 +69,7 @@ static int8_t compare_data_ptrs(const void *left, const void *right)
 
 	return(result);
 }
+
 
 /*
  * List functions implementation
@@ -225,11 +219,6 @@ RESULT optcl_list_destroy(optcl_list *list, bool_t deallocate)
 	
 	memset(list, 0, sizeof(optcl_list));
 
-#ifdef _DEBUG
-	list->first_node = POISON;
-	list->last_node = POISON;
-#endif
-
 	free(list);
 
 	return(SUCCESS);
@@ -254,12 +243,6 @@ RESULT optcl_list_clear(optcl_list *list, bool_t deallocate)
 		if (deallocate == True) {
 			free((void*)current->data);
 		}
-
-#ifdef _DEBUG		
-		current->data = POISON;
-		current->next = POISON;
-		current->prev = POISON;
-#endif
 
 		free(current);
 		current = next;
@@ -627,13 +610,7 @@ RESULT optcl_list_remove(optcl_list *list, optcl_list_iterator pos)
 		pos->next->prev = pos->prev;
 	}
 
-	--list->node_count;
-
-#ifdef _DEBUG
-	pos->data = POISON;
-	pos->next = POISON;
-	pos->prev = POISON;
-#endif
+	--(list->node_count);
 
 	free(pos);
 
