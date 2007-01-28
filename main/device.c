@@ -70,13 +70,15 @@ static RESULT clear_media_info_list(optcl_list *infos)
 
 	assert(infos);
 
-	if (!infos)
+	if (!infos) {
 		return E_INVALIDARG;
+	}
 
 	error = optcl_list_get_head_pos(infos, &it);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	while(it) {
 		error = optcl_list_get_at_pos(infos, it, &media);
@@ -90,8 +92,9 @@ static RESULT clear_media_info_list(optcl_list *infos)
 
 		error = optcl_list_get_next(infos, it, &it);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 	}
 
 	return optcl_list_clear(infos, 0);
@@ -107,30 +110,35 @@ static RESULT copy_media_info_list(optcl_list *dest, const optcl_list *src)
 	assert(dest);
 	assert(src);
 
-	if (!dest || !src)
+	if (!dest || !src) {
 		return E_INVALIDARG;
+	}
 
 	error = clear_media_info_list(dest);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	error = optcl_list_get_head_pos(src, &it);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	while(it) {
 		error = optcl_list_get_at_pos(src, it, &media);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 
 		if (media) {
 			error = optcl_media_info_create(&nmedia);
 
-			if (FAILED(error))
+			if (FAILED(error)) {
 				break;
+			}
 
 			error = optcl_media_info_copy(nmedia, media);
 
@@ -149,12 +157,14 @@ static RESULT copy_media_info_list(optcl_list *dest, const optcl_list *src)
 
 		error = optcl_list_get_next(src, it, &it);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 	}
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		clear_media_info_list(dest);
+	}
 
 	return error;
 }
@@ -171,18 +181,21 @@ static RESULT copy_features_hashtable(optcl_hashtable *dest,
 	assert(dest);
 	assert(src);
 
-	if (!dest || !src)
+	if (!dest || !src) {
 		return E_INVALIDARG;
+	}
 
 	error = optcl_hashtable_get_pairs(src, &pairs);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	error = optcl_hashtable_clear(dest, 1);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	error = optcl_list_get_head_pos(pairs, &it);
 
@@ -194,8 +207,9 @@ static RESULT copy_features_hashtable(optcl_hashtable *dest,
 	while(it) {
 		error = optcl_list_get_at_pos(pairs, it, &pair);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 
 		assert(pair);
 
@@ -214,8 +228,9 @@ static RESULT copy_features_hashtable(optcl_hashtable *dest,
 
 		error = optcl_feature_copy(&nfeature, pair->value);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 
 		if (!nfeature) {
 			error = E_OUTOFMEMORY;
@@ -241,20 +256,20 @@ static RESULT copy_features_hashtable(optcl_hashtable *dest,
 
 static uint32_t joaat_hash_for_device(const uint8_t key[], uint32_t len)
 {
-     size_t i;
-     uint32_t hash = 0;
+	size_t i;
+	uint32_t hash = 0;
      
-     for (i = 0; i < len; i++) {
-         hash += key[i];
-         hash += (hash << 10);
-         hash ^= (hash >> 6);
-     }
+	for (i = 0; i < len; i++) {
+		hash += key[i];
+		hash += (hash << 10);
+		hash ^= (hash >> 6);
+	}
 
-     hash += (hash << 3);
-     hash ^= (hash >> 11);
-     hash += (hash << 15);
+	hash += (hash << 3);
+	hash ^= (hash >> 11);
+	hash += (hash << 15);
 
-     return hash;
+	return hash;
 }
 
 /*
@@ -269,23 +284,27 @@ RESULT optcl_device_bind2file(optcl_device *device, const char *filename)
 	assert(device);
 	assert(filename);
 
-	if (!device || !filename)
+	if (!device || !filename) {
 		return E_INVALIDARG;
+	}
 
 	error = optcl_device_clear(device);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	devicepath = _strdup(filename);
 
-	if (!devicepath)
+	if (!devicepath) {
 		return E_OUTOFMEMORY;
+	}
 
 	error = optcl_device_set_path(device, devicepath);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	return optcl_device_set_type(device, DEVICE_TYPE_IMAGE);
 }
@@ -296,8 +315,9 @@ RESULT optcl_device_clear(optcl_device *device)
 
 	assert(device);
 
-	if (!device)
+	if (!device) {
 		return E_INVALIDARG;
+	}
 
 	device->type = 0;
 
@@ -307,16 +327,18 @@ RESULT optcl_device_clear(optcl_device *device)
 	if (device->adapter) {
 		error = optcl_adapter_clear(device->adapter);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			return error;
+		}
 	}
 
 	if (device->info) {
 		if (device->info->features) {
 			error = optcl_hashtable_clear(device->info->features, 1);
 
-			if (FAILED(error))
+			if (FAILED(error)) {
 				return error;
+			}
 		}
 
 		free(device->info->product);
@@ -333,8 +355,9 @@ RESULT optcl_device_clear(optcl_device *device)
 	if (device->medias) {
 		error = clear_media_info_list(device->medias);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			return error;
+		}
 	}
 
 	return SUCCESS;
@@ -347,36 +370,42 @@ RESULT optcl_device_copy(optcl_device *dest, const optcl_device *src)
 	assert(dest);
 	assert(src);
 
-	if (!dest || !src)
+	if (!dest || !src) {
 		return E_INVALIDARG;
+	}
 
 	error = optcl_device_clear(dest);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	dest->type = src->type;
 	dest->path = _strdup(src->path);
 
-	if (src->path && !dest->path)
+	if (src->path && !dest->path) {
 		return E_OUTOFMEMORY;
+	}
 
 	assert(src->adapter);
 	assert(dest->adapter);
 
-	if (!src->adapter || !dest->adapter)
+	if (!src->adapter || !dest->adapter) {
 		return E_UNEXPECTED;
+	}
 
 	error = optcl_adapter_copy(dest->adapter, src->adapter);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	assert(src->info);
 	assert(dest->info);
 
-	if (!src->info || !dest->info)
+	if (!src->info || !dest->info) {
 		return E_UNEXPECTED;
+	}
 
 	dest->info->product = _strdup(src->info->product);
 
@@ -446,13 +475,15 @@ RESULT optcl_device_create(optcl_device **device)
 
 	assert(device);
 
-	if (!device)
+	if (!device) {
 		return E_INVALIDARG;
+	}
 
 	newdev = (optcl_device*)malloc(sizeof(optcl_device));
 
-	if (!newdev)
+	if (!newdev) {
 		return E_OUTOFMEMORY;
+	}
 
 	memset(newdev, 0, sizeof(optcl_device));
 
@@ -501,16 +532,18 @@ RESULT optcl_device_destroy(optcl_device *device)
 
 	assert(device);
 
-	if (!device)
+	if (!device) {
 		return E_INVALIDARG;
+	}
 
 	optcl_device_clear(device);
 
 	if (device->adapter) {
 		error = optcl_adapter_destroy(device->adapter);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			return error;
+		}
 	}
 
 #ifdef _DEBUG
@@ -521,8 +554,9 @@ RESULT optcl_device_destroy(optcl_device *device)
 		if (device->info->features) {
 			error = optcl_hashtable_destroy(device->info->features, 1);
 
-			if (FAILED(error))
+			if (FAILED(error)) {
 				return error;
+			}
 		}
 
 #ifdef _DEBUG
@@ -538,8 +572,9 @@ RESULT optcl_device_destroy(optcl_device *device)
 	if (device->medias) {
 		error = optcl_list_destroy(device->medias, 1);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			return error;
+		}
 	}
 
 #ifdef _DEBUG
@@ -559,24 +594,27 @@ RESULT optcl_device_get_adapter(const optcl_device *device,
 	assert(device);
 	assert(adapter);
 
-	if (!device || !adapter)
+	if (!device || !adapter) {
 		return E_INVALIDARG;
+	}
 
 	assert(device->adapter);
 
-	if (!device->adapter)
+	if (!device->adapter) {
 		return E_UNEXPECTED;
-
+	}
 
 	error = optcl_adapter_create(adapter);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	error = optcl_adapter_copy(*adapter, device->adapter);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		optcl_adapter_destroy(*adapter);
+	}
 	
 	return error;
 }
@@ -588,18 +626,21 @@ RESULT optcl_device_get_feature(const optcl_device *device,
 	assert(device);
 	assert(feature);
 
-	if (!device || !feature)
+	if (!device || !feature) {
 		return E_INVALIDARG;
+	}
 
 	assert(device->info);
 
-	if (!device->info)
+	if (!device->info) {
 		return E_UNEXPECTED;
+	}
 
 	assert(device->info->features);
 
-	if (!device->info->features)
+	if (!device->info->features) {
 		return E_UNEXPECTED;
+	}
 
 	/*
 	 * NOTE:
@@ -619,13 +660,15 @@ RESULT optcl_device_get_media_count(const optcl_device *device,
 	assert(device);
 	assert(count);
 
-	if (!device || !count)
+	if (!device || !count) {
 		return E_INVALIDARG;
+	}
 
 	assert(device->medias);
 
-	if (!device->medias)
+	if (!device->medias) {
 		return E_UNEXPECTED;
+	}
 
 	return optcl_list_get_count(device->medias, count);
 }
@@ -643,34 +686,41 @@ RESULT optcl_get_media_info(const optcl_device *device,
 	assert(media);
 	assert(media_index >= 0);
 
-	if (!device || !media)
+	if (!device || !media) {
 		return E_INVALIDARG;
+	}
 
 	error = optcl_device_get_media_count(device, &count);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
-	if (media_index < 0 || media_index >= count)
+	if (media_index < 0 || media_index >= count) {
 		return E_OUTOFRANGE;
+	}
 
 	assert(device->medias);
 
-	if (!device->medias)
+	if (!device->medias) {
 		return E_UNEXPECTED;
+	}
 
 	error = optcl_list_get_at_index(device->medias, media_index, &info);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
-	if (!info)
+	if (!info) {
 		return E_UNEXPECTED;
+	}
 
 	error = optcl_media_info_create(&nmedia);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	error = optcl_media_info_copy(nmedia, info);
 
@@ -689,13 +739,15 @@ RESULT optcl_device_get_path(const optcl_device *device, char **path)
 	assert(device);
 	assert(path);
 
-	if (!device || !path)
+	if (!device || !path) {
 		return E_INVALIDARG;
+	}
 
 	*path = _strdup(device->path);
 
-	if (!*path && device->path)
+	if (!*path && device->path) {
 		return E_OUTOFMEMORY;
+	}
 	
 	return SUCCESS;
 }
@@ -705,18 +757,21 @@ RESULT optcl_device_get_product(const optcl_device *device, char **product)
 	assert(device);
 	assert(product);
 
-	if (!device || !product)
+	if (!device || !product) {
 		return E_INVALIDARG;
+	}
 
 	assert(device->info);
 
-	if (!device->info)
+	if (!device->info) {
 		return E_UNEXPECTED;
+	}
 
 	*product = _strdup(device->info->product);
 
-	if (!*product && device->info->product)
+	if (!*product && device->info->product) {
 		return E_OUTOFMEMORY;
+	}
 
 	return SUCCESS;
 }
@@ -726,18 +781,21 @@ RESULT optcl_device_get_revision(const optcl_device *device, char **revision)
 	assert(device);
 	assert(revision);
 
-	if (!device || !revision)
+	if (!device || !revision) {
 		return E_INVALIDARG;
+	}
 
 	assert(device->info);
 
-	if (!device->info)
+	if (!device->info) {
 		return E_UNEXPECTED;
+	}
 
 	*revision = _strdup(device->info->revision);
 
-	if (!*revision && device->info->revision)
+	if (!*revision && device->info->revision) {
 		return E_OUTOFMEMORY;
+	}
 
 	return SUCCESS;
 }
@@ -747,8 +805,9 @@ RESULT optcl_device_get_type(const optcl_device *device, uint16_t *type)
 	assert(device);
 	assert(type);
 
-	if (!device || !type)
+	if (!device || !type) {
 		return E_INVALIDARG;
+	}
 
 	*type = device->type;
 
@@ -760,18 +819,21 @@ RESULT optcl_device_get_vendor(const optcl_device *device, char **vendor)
 	assert(device);
 	assert(vendor);
 
-	if (!device || !vendor)
+	if (!device || !vendor) {
 		return E_INVALIDARG;
+	}
 
 	assert(device->info);
 
-	if (!device->info)
+	if (!device->info) {
 		return E_UNEXPECTED;
+	}
 
 	*vendor = _strdup(device->info->vendor);
 
-	if (!*vendor && device->info->vendor)
+	if (!*vendor && device->info->vendor) {
 		return E_OUTOFMEMORY;
+	}
 
 	return SUCCESS;
 }
@@ -782,18 +844,21 @@ RESULT optcl_device_get_vendor_string(const optcl_device *device,
 	assert(device);
 	assert(vendor_string);
 
-	if (!device || !vendor_string)
+	if (!device || !vendor_string) {
 		return E_INVALIDARG;
+	}
 
 	assert(device->info);
 
-	if (!device->info)
+	if (!device->info) {
 		return E_UNEXPECTED;
+	}
 
 	*vendor_string = _strdup(device->info->vendor_string);
 
-	if (!*vendor_string && device->info->vendor_string)
+	if (!*vendor_string && device->info->vendor_string) {
 		return E_OUTOFMEMORY;
+	}
 
 	return SUCCESS;
 }
@@ -804,13 +869,15 @@ RESULT optcl_device_add_media_info(optcl_device *device,
 	assert(device);
 	assert(info);
 
-	if (!device || !info)
+	if (!device || !info) {
 		return E_INVALIDARG;
+	}
 
 	assert(device->medias);
 
-	if (!device->medias)
+	if (!device->medias) {
 		return E_UNEXPECTED;
+	}
 
 	return optcl_list_add_tail(device->medias, info);
 }
@@ -822,18 +889,21 @@ RESULT optcl_device_set_adapter(optcl_device *device, optcl_adapter *adapter)
 	assert(device);
 	assert(adapter);
 
-	if (!device || !adapter)
+	if (!device || !adapter) {
 		return E_INVALIDARG;
+	}
 
 	assert(device->adapter);
 
-	if (!device->adapter)
+	if (!device->adapter) {
 		return E_UNEXPECTED;
+	}
 
 	error = optcl_adapter_destroy(device->adapter);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	device->adapter = adapter;
 
@@ -847,18 +917,21 @@ RESULT optcl_device_set_feature(optcl_device *device,
 	assert(device);
 	assert(feature);
 
-	if (!device || !feature)
+	if (!device || !feature) {
 		return E_INVALIDARG;
+	}
 
 	assert(device->info);
 
-	if (!device->info)
+	if (!device->info) {
 		return E_UNEXPECTED;
+	}
 
 	assert(device->info->features);
 
-	if (!device->info->features)
+	if (!device->info->features) {
 		return E_INVALIDARG;
+	}
 
 	/*
 	 * NOTE:
@@ -876,8 +949,9 @@ RESULT optcl_device_set_path(optcl_device *device, char *path)
 {
 	assert(device);
 	
-	if (!device)
+	if (!device) {
 		return E_INVALIDARG;
+	}
 
 	free(device->path);
 
@@ -890,13 +964,15 @@ RESULT optcl_device_set_product(optcl_device *device, char *product)
 {
 	assert(device);
 
-	if (!device)
+	if (!device) {
 		return E_INVALIDARG;
+	}
 
 	assert(device->info);
 
-	if (!device->info)
+	if (!device->info) {
 		return E_UNEXPECTED;
+	}
 
 	free(device->info->product);
 
@@ -909,13 +985,15 @@ RESULT optcl_device_set_revision(optcl_device *device, char *revision)
 {
 	assert(device);
 
-	if (!device)
+	if (!device) {
 		return E_INVALIDARG;
+	}
 
 	assert(device->info);
 
-	if (!device->info)
+	if (!device->info) {
 		return E_UNEXPECTED;
+	}
 
 	free(device->info->revision);
 
@@ -928,8 +1006,9 @@ RESULT optcl_device_set_type(optcl_device *device, uint16_t type)
 {
 	assert(device);
 
-	if (!device)
+	if (!device) {
 		return E_INVALIDARG;
+	}
 
 	device->type = type;
 
@@ -940,13 +1019,15 @@ RESULT optcl_device_set_vendor(optcl_device *device, char *vendor)
 {
 	assert(device);
 
-	if (!device)
+	if (!device) {
 		return E_INVALIDARG;
+	}
 
 	assert(device->info);
 
-	if (!device->info)
+	if (!device->info) {
 		return E_UNEXPECTED;
+	}
 
 	free(device->info->vendor);
 
@@ -960,13 +1041,15 @@ RESULT optcl_device_set_vendor_string(optcl_device *device,
 {
 	assert(device);
 
-	if (!device)
+	if (!device) {
 		return E_INVALIDARG;
+	}
 
 	assert(device->info);
 
-	if (!device->info)
+	if (!device->info) {
 		return E_UNEXPECTED;
+	}
 
 	free(device->info->vendor_string);
 
