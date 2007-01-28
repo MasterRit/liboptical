@@ -50,8 +50,8 @@ typedef struct tag_device_info optcl_device_info;
 
 /* Device descriptor */
 typedef struct tag_device {
-	int type;
 	char *path;
+	uint16_t type;
 	optcl_list *medias;
 	optcl_adapter *adapter;
 	optcl_device_info *info;
@@ -62,9 +62,9 @@ typedef struct tag_device {
  * Helpers
  */
 
-static int clear_media_info_list(optcl_list *infos)
+static RESULT clear_media_info_list(optcl_list *infos)
 {
-	int error;
+	RESULT error;
 	optcl_list_iterator it;
 	optcl_media_info *media;
 
@@ -97,9 +97,9 @@ static int clear_media_info_list(optcl_list *infos)
 	return optcl_list_clear(infos, 0);
 }
 
-static int copy_media_info_list(optcl_list *dest, const optcl_list *src)
+static RESULT copy_media_info_list(optcl_list *dest, const optcl_list *src)
 {
-	int error;
+	RESULT error;
 	optcl_list_iterator it;
 	optcl_media_info *media;
 	optcl_media_info *nmedia;
@@ -159,9 +159,10 @@ static int copy_media_info_list(optcl_list *dest, const optcl_list *src)
 	return error;
 }
 
-static int copy_features_hashtable(optcl_hashtable *dest, const optcl_hashtable *src)
+static RESULT copy_features_hashtable(optcl_hashtable *dest, 
+				      const optcl_hashtable *src)
 {
-	int error;
+	RESULT error;
 	optcl_list *pairs;
 	optcl_list_iterator it;
 	struct pair *pair;
@@ -238,13 +239,13 @@ static int copy_features_hashtable(optcl_hashtable *dest, const optcl_hashtable 
 	return optcl_list_destroy(pairs, 1);	
 }
 
-static uint32_t joaat_hash_for_device(const void *key, size_t len)
+static uint32_t joaat_hash_for_device(const uint8_t key[], uint32_t len)
 {
      size_t i;
      uint32_t hash = 0;
      
      for (i = 0; i < len; i++) {
-         hash += ((unsigned char*)&key)[i];
+         hash += key[i];
          hash += (hash << 10);
          hash ^= (hash >> 6);
      }
@@ -260,9 +261,9 @@ static uint32_t joaat_hash_for_device(const void *key, size_t len)
  * Device functions
  */
 
-int optcl_device_bind2file(optcl_device *device, const char *filename)
+RESULT optcl_device_bind2file(optcl_device *device, const char *filename)
 {
-	int error;
+	RESULT error;
 	char *devicepath;
 
 	assert(device);
@@ -289,9 +290,9 @@ int optcl_device_bind2file(optcl_device *device, const char *filename)
 	return optcl_device_set_type(device, DEVICE_TYPE_IMAGE);
 }
 
-int optcl_device_clear(optcl_device *device)
+RESULT optcl_device_clear(optcl_device *device)
 {
-	int error;
+	RESULT error;
 
 	assert(device);
 
@@ -339,9 +340,9 @@ int optcl_device_clear(optcl_device *device)
 	return SUCCESS;
 }
 
-int optcl_device_copy(optcl_device *dest, const optcl_device *src)
+RESULT optcl_device_copy(optcl_device *dest, const optcl_device *src)
 {
-	int error;
+	RESULT error;
 
 	assert(dest);
 	assert(src);
@@ -438,9 +439,9 @@ int optcl_device_copy(optcl_device *dest, const optcl_device *src)
 	return error;
 }
 
-int optcl_device_create(optcl_device **device)
+RESULT optcl_device_create(optcl_device **device)
 {
-	int error;
+	RESULT error;
 	optcl_device *newdev;
 
 	assert(device);
@@ -494,9 +495,9 @@ int optcl_device_create(optcl_device **device)
 	return error;
 }
 
-int optcl_device_destroy(optcl_device *device)
+RESULT optcl_device_destroy(optcl_device *device)
 {
-	int error;
+	RESULT error;
 
 	assert(device);
 
@@ -550,10 +551,10 @@ int optcl_device_destroy(optcl_device *device)
 	return SUCCESS;
 }
 
-int optcl_device_get_adapter(const optcl_device *device,
-			     optcl_adapter **adapter)
+RESULT optcl_device_get_adapter(const optcl_device *device,
+				optcl_adapter **adapter)
 {
-	int error;
+	RESULT error;
 
 	assert(device);
 	assert(adapter);
@@ -580,9 +581,9 @@ int optcl_device_get_adapter(const optcl_device *device,
 	return error;
 }
 
-int optcl_device_get_feature(const optcl_device *device, 
-			     int feature_code, 
-			     optcl_feature **feature)
+RESULT optcl_device_get_feature(const optcl_device *device, 
+				uint16_t feature_code, 
+				optcl_feature **feature)
 {
 	assert(device);
 	assert(feature);
@@ -612,8 +613,8 @@ int optcl_device_get_feature(const optcl_device *device,
 		);
 }
 
-int optcl_device_get_media_count(const optcl_device *device,
-				 int *count)
+RESULT optcl_device_get_media_count(const optcl_device *device,
+				    uint32_t *count)
 {
 	assert(device);
 	assert(count);
@@ -629,12 +630,12 @@ int optcl_device_get_media_count(const optcl_device *device,
 	return optcl_list_get_count(device->medias, count);
 }
 
-int optcl_get_media_info(const optcl_device *device,
-			 int media_index,
-			 optcl_media_info **media)
+RESULT optcl_get_media_info(const optcl_device *device,
+			    uint32_t media_index,
+			    optcl_media_info **media)
 {
-	int error;
-	int count;
+	RESULT error;
+	uint32_t count;
 	optcl_media_info *info;
 	optcl_media_info *nmedia;
 
@@ -683,7 +684,7 @@ int optcl_get_media_info(const optcl_device *device,
 	return SUCCESS;
 }
 
-int optcl_device_get_path(const optcl_device *device, char **path)
+RESULT optcl_device_get_path(const optcl_device *device, char **path)
 {
 	assert(device);
 	assert(path);
@@ -699,7 +700,7 @@ int optcl_device_get_path(const optcl_device *device, char **path)
 	return SUCCESS;
 }
 
-int optcl_device_get_product(const optcl_device *device, char **product)
+RESULT optcl_device_get_product(const optcl_device *device, char **product)
 {
 	assert(device);
 	assert(product);
@@ -720,7 +721,7 @@ int optcl_device_get_product(const optcl_device *device, char **product)
 	return SUCCESS;
 }
 
-int optcl_device_get_revision(const optcl_device *device, char **revision)
+RESULT optcl_device_get_revision(const optcl_device *device, char **revision)
 {
 	assert(device);
 	assert(revision);
@@ -741,7 +742,7 @@ int optcl_device_get_revision(const optcl_device *device, char **revision)
 	return SUCCESS;
 }
 
-int optcl_device_get_type(const optcl_device *device, int *type)
+RESULT optcl_device_get_type(const optcl_device *device, uint16_t *type)
 {
 	assert(device);
 	assert(type);
@@ -754,7 +755,7 @@ int optcl_device_get_type(const optcl_device *device, int *type)
 	return SUCCESS;
 }
 
-int optcl_device_get_vendor(const optcl_device *device, char **vendor)
+RESULT optcl_device_get_vendor(const optcl_device *device, char **vendor)
 {
 	assert(device);
 	assert(vendor);
@@ -775,8 +776,8 @@ int optcl_device_get_vendor(const optcl_device *device, char **vendor)
 	return SUCCESS;
 }
 
-int optcl_device_get_vendor_string(const optcl_device *device, 
-				   char **vendor_string)
+RESULT optcl_device_get_vendor_string(const optcl_device *device, 
+				      char **vendor_string)
 {
 	assert(device);
 	assert(vendor_string);
@@ -797,8 +798,8 @@ int optcl_device_get_vendor_string(const optcl_device *device,
 	return SUCCESS;
 }
 
-int optcl_device_add_media_info(optcl_device *device,
-				optcl_media_info *info)
+RESULT optcl_device_add_media_info(optcl_device *device, 
+				   optcl_media_info *info)
 {
 	assert(device);
 	assert(info);
@@ -814,9 +815,9 @@ int optcl_device_add_media_info(optcl_device *device,
 	return optcl_list_add_tail(device->medias, info);
 }
 
-int optcl_device_set_adapter(optcl_device *device, optcl_adapter *adapter)
+RESULT optcl_device_set_adapter(optcl_device *device, optcl_adapter *adapter)
 {
-	int error;
+	RESULT error;
 
 	assert(device);
 	assert(adapter);
@@ -839,9 +840,9 @@ int optcl_device_set_adapter(optcl_device *device, optcl_adapter *adapter)
 	return SUCCESS;	
 }
 
-int optcl_device_set_feature(optcl_device *device, 
-			     int feature_code, 
-			     optcl_feature *feature)
+RESULT optcl_device_set_feature(optcl_device *device, 
+				uint16_t feature_code, 
+				optcl_feature *feature)
 {
 	assert(device);
 	assert(feature);
@@ -871,7 +872,7 @@ int optcl_device_set_feature(optcl_device *device,
 		);
 }
 
-int optcl_device_set_path(optcl_device *device, char *path)
+RESULT optcl_device_set_path(optcl_device *device, char *path)
 {
 	assert(device);
 	
@@ -885,7 +886,7 @@ int optcl_device_set_path(optcl_device *device, char *path)
 	return SUCCESS;
 }
 
-int optcl_device_set_product(optcl_device *device, char *product)
+RESULT optcl_device_set_product(optcl_device *device, char *product)
 {
 	assert(device);
 
@@ -904,7 +905,7 @@ int optcl_device_set_product(optcl_device *device, char *product)
 	return SUCCESS;
 }
 
-int optcl_device_set_revision(optcl_device *device, char *revision)
+RESULT optcl_device_set_revision(optcl_device *device, char *revision)
 {
 	assert(device);
 
@@ -923,7 +924,7 @@ int optcl_device_set_revision(optcl_device *device, char *revision)
 	return SUCCESS;
 }
 
-int optcl_device_set_type(optcl_device *device, int type)
+RESULT optcl_device_set_type(optcl_device *device, uint16_t type)
 {
 	assert(device);
 
@@ -935,7 +936,7 @@ int optcl_device_set_type(optcl_device *device, int type)
 	return SUCCESS;
 }
 
-int optcl_device_set_vendor(optcl_device *device, char *vendor)
+RESULT optcl_device_set_vendor(optcl_device *device, char *vendor)
 {
 	assert(device);
 
@@ -954,7 +955,8 @@ int optcl_device_set_vendor(optcl_device *device, char *vendor)
 	return SUCCESS;
 }
 
-int optcl_device_set_vendor_string(optcl_device *device, char *vendor_string)
+RESULT optcl_device_set_vendor_string(optcl_device *device, 
+				      char *vendor_string)
 {
 	assert(device);
 
