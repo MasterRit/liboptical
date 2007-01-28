@@ -293,7 +293,7 @@ static RESULT enumerate_device(int index,
 	status = SetupDiEnumDeviceInterfaces( 
                 hDevInfo,				/* Interface Device Info handle */
                 0,					/* Device Info data */
-                (LPGUID)&GUID_DEVINTERFACE_CDROM,	/* Interface registered by driver */
+                &GUID_DEVINTERFACE_CDROM,		/* Interface registered by driver */
                 index,					/* Member */
                 &interfaceData				/* Device Interface Data */
                 );
