@@ -70,13 +70,13 @@ static RESULT clear_media_info_list(optcl_list *infos)
 	assert(infos != 0);
 
 	if (infos == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	error = optcl_list_get_head_pos(infos, &it);
 
 	if (FAILED(error)) {
-		return error;
+		return(error);
 	}
 
 	while (it != 0) {
@@ -96,7 +96,7 @@ static RESULT clear_media_info_list(optcl_list *infos)
 		}
 	}
 
-	return optcl_list_clear(infos, 0);
+	return(optcl_list_clear(infos, 0));
 }
 
 static RESULT copy_media_info_list(optcl_list *dest, const optcl_list *src)
@@ -110,19 +110,19 @@ static RESULT copy_media_info_list(optcl_list *dest, const optcl_list *src)
 	assert(src != 0);
 
 	if (dest == 0 || src == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	error = clear_media_info_list(dest);
 
 	if (FAILED(error)) {
-		return error;
+		return(error);
 	}
 
 	error = optcl_list_get_head_pos(src, &it);
 
 	if (FAILED(error)) {
-		return error;
+		return(error);
 	}
 
 	while (it != 0) {
@@ -165,7 +165,7 @@ static RESULT copy_media_info_list(optcl_list *dest, const optcl_list *src)
 		clear_media_info_list(dest);
 	}
 
-	return error;
+	return(error);
 }
 
 static RESULT copy_features_hashtable(optcl_hashtable *dest, 
@@ -181,26 +181,26 @@ static RESULT copy_features_hashtable(optcl_hashtable *dest,
 	assert(src != 0);
 
 	if (dest == 0 || src == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	error = optcl_hashtable_get_pairs(src, &pairs);
 
 	if (FAILED(error)) {
-		return error;
+		return(error);
 	}
 
 	error = optcl_hashtable_clear(dest, 1);
 
 	if (FAILED(error)) {
-		return error;
+		return(error);
 	}
 
 	error = optcl_list_get_head_pos(pairs, &it);
 
 	if (FAILED(error)) {
 		optcl_list_destroy(pairs, 1);
-		return error;
+		return(error);
 	}
 
 	while (it != 0) {
@@ -247,10 +247,10 @@ static RESULT copy_features_hashtable(optcl_hashtable *dest,
 	if (FAILED(error)) {
 		optcl_hashtable_clear(dest, 1);
 		optcl_list_destroy(pairs, 1);
-		return error;
+		return(error);
 	}
 
-	return optcl_list_destroy(pairs, 1);	
+	return(optcl_list_destroy(pairs, 1));	
 }
 
 static uint32_t joaat_hash_for_device(const uint8_t key[], uint32_t len)
@@ -268,7 +268,7 @@ static uint32_t joaat_hash_for_device(const uint8_t key[], uint32_t len)
 	hash ^= (hash >> 11);
 	hash += (hash << 15);
 
-	return hash;
+	return(hash);
 }
 
 /*
@@ -284,28 +284,28 @@ RESULT optcl_device_bind2file(optcl_device *device, const char *filename)
 	assert(filename != 0);
 
 	if (device == 0 || filename == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	error = optcl_device_clear(device);
 
 	if (FAILED(error)) {
-		return error;
+		return(error);
 	}
 
 	devicepath = _strdup(filename);
 
 	if (devicepath == 0) {
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
 	error = optcl_device_set_path(device, devicepath);
 
 	if (FAILED(error)) {
-		return error;
+		return(error);
 	}
 
-	return optcl_device_set_type(device, DEVICE_TYPE_IMAGE);
+	return(optcl_device_set_type(device, DEVICE_TYPE_IMAGE));
 }
 
 RESULT optcl_device_clear(optcl_device *device)
@@ -315,7 +315,7 @@ RESULT optcl_device_clear(optcl_device *device)
 	assert(device != 0);
 
 	if (device == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	device->type = 0;
@@ -327,7 +327,7 @@ RESULT optcl_device_clear(optcl_device *device)
 		error = optcl_adapter_clear(device->adapter);
 
 		if (FAILED(error)) {
-			return error;
+			return(error);
 		}
 	}
 
@@ -336,7 +336,7 @@ RESULT optcl_device_clear(optcl_device *device)
 			error = optcl_hashtable_clear(device->info->features, 1);
 
 			if (FAILED(error)) {
-				return error;
+				return(error);
 			}
 		}
 
@@ -355,11 +355,11 @@ RESULT optcl_device_clear(optcl_device *device)
 		error = clear_media_info_list(device->medias);
 
 		if (FAILED(error)) {
-			return error;
+			return(error);
 		}
 	}
 
-	return SUCCESS;
+	return(SUCCESS);
 }
 
 RESULT optcl_device_copy(optcl_device *dest, const optcl_device *src)
@@ -370,68 +370,68 @@ RESULT optcl_device_copy(optcl_device *dest, const optcl_device *src)
 	assert(src != 0);
 
 	if (dest == 0 || src == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	error = optcl_device_clear(dest);
 
 	if (FAILED(error)) {
-		return error;
+		return(error);
 	}
 
 	dest->type = src->type;
 	dest->path = _strdup(src->path);
 
 	if (src->path != 0 && dest->path == 0) {
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
 	assert(src->adapter != 0);
 	assert(dest->adapter != 0);
 
 	if (src->adapter == 0 || dest->adapter == 0) {
-		return E_UNEXPECTED;
+		return(E_UNEXPECTED);
 	}
 
 	error = optcl_adapter_copy(dest->adapter, src->adapter);
 
 	if (FAILED(error)) {
-		return error;
+		return(error);
 	}
 
 	assert(src->info != 0);
 	assert(dest->info != 0);
 
 	if (src->info == 0 || dest->info == 0) {
-		return E_UNEXPECTED;
+		return(E_UNEXPECTED);
 	}
 
 	dest->info->product = _strdup(src->info->product);
 
 	if (src->info->product != 0 && dest->info->product == 0) {
 		optcl_device_clear(dest);
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
 	dest->info->revision = _strdup(src->info->revision);
 
 	if (src->info->revision != 0 && dest->info->revision == 0) {
 		optcl_device_clear(dest);
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
 	dest->info->vendor = _strdup(src->info->vendor);
 
 	if (src->info->vendor && !dest->info->vendor) {
 		optcl_device_clear(dest);
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
 	dest->info->vendor_string = _strdup(src->info->vendor_string);
 
 	if (src->info->vendor_string != dest->info->vendor_string) {
 		optcl_device_clear(dest);
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
 	assert(src->info->features != 0);
@@ -439,14 +439,14 @@ RESULT optcl_device_copy(optcl_device *dest, const optcl_device *src)
 
 	if (src->info->features == 0 || dest->info->features == 0) {
 		optcl_device_clear(dest);
-		return E_UNEXPECTED;
+		return(E_UNEXPECTED);
 	}
 
 	error = copy_features_hashtable(dest->info->features, src->info->features);
 
 	if (FAILED(error)) {
 		optcl_device_clear(dest);
-		return error;
+		return(error);
 	}
 
 	assert(src->medias != 0);
@@ -454,17 +454,17 @@ RESULT optcl_device_copy(optcl_device *dest, const optcl_device *src)
 
 	if (src->medias == 0 || dest->medias == 0) {
 		optcl_device_clear(dest);
-		return E_UNEXPECTED;
+		return(E_UNEXPECTED);
 	}
 
 	error = copy_media_info_list(dest->medias, src->medias);
 
 	if (FAILED(error)) {
 		optcl_device_clear(dest);
-		return error;
+		return(error);
 	}
 
-	return error;
+	return(error);
 }
 
 RESULT optcl_device_create(optcl_device **device)
@@ -475,13 +475,13 @@ RESULT optcl_device_create(optcl_device **device)
 	assert(device != 0);
 
 	if (device == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	newdev = (optcl_device*)malloc(sizeof(optcl_device));
 
 	if (newdev == 0) {
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
 	memset(newdev, 0, sizeof(optcl_device));
@@ -490,14 +490,14 @@ RESULT optcl_device_create(optcl_device **device)
 
 	if (FAILED(error)) {
 		free(newdev);
-		return error;
+		return(error);
 	}
 
 	newdev->info = (optcl_device_info*)malloc(sizeof(optcl_device_info));
 
 	if (newdev->info == 0) {
 		optcl_device_destroy(newdev);
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
 	memset(newdev->info, 0, sizeof(optcl_device_info));
@@ -510,19 +510,19 @@ RESULT optcl_device_create(optcl_device **device)
 
 	if (FAILED(error)) {
 		optcl_device_destroy(newdev);
-		return error;
+		return(error);
 	}
 
 	error = optcl_list_create(0, &newdev->medias);
 
 	if (FAILED(error)) {
 		optcl_device_destroy(newdev);
-		return error;
+		return(error);
 	}
 
 	*device = newdev;
 
-	return error;
+	return(error);
 }
 
 RESULT optcl_device_destroy(optcl_device *device)
@@ -532,7 +532,7 @@ RESULT optcl_device_destroy(optcl_device *device)
 	assert(device != 0);
 
 	if (device == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	optcl_device_clear(device);
@@ -541,7 +541,7 @@ RESULT optcl_device_destroy(optcl_device *device)
 		error = optcl_adapter_destroy(device->adapter);
 
 		if (FAILED(error)) {
-			return error;
+			return(error);
 		}
 	}
 
@@ -550,7 +550,7 @@ RESULT optcl_device_destroy(optcl_device *device)
 			error = optcl_hashtable_destroy(device->info->features, 1);
 
 			if (FAILED(error)) {
-				return error;
+				return(error);
 			}
 		}
 
@@ -561,13 +561,13 @@ RESULT optcl_device_destroy(optcl_device *device)
 		error = optcl_list_destroy(device->medias, 1);
 
 		if (FAILED(error)) {
-			return error;
+			return(error);
 		}
 	}
 
 	free(device);
 
-	return SUCCESS;
+	return(SUCCESS);
 }
 
 RESULT optcl_device_get_adapter(const optcl_device *device,
@@ -579,19 +579,19 @@ RESULT optcl_device_get_adapter(const optcl_device *device,
 	assert(adapter != 0);
 
 	if (device == 0 || adapter == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	assert(device->adapter != 0);
 
 	if (device->adapter == 0) {
-		return E_UNEXPECTED;
+		return(E_UNEXPECTED);
 	}
 
 	error = optcl_adapter_create(adapter);
 
 	if (FAILED(error)) {
-		return error;
+		return(error);
 	}
 
 	error = optcl_adapter_copy(*adapter, device->adapter);
@@ -600,7 +600,7 @@ RESULT optcl_device_get_adapter(const optcl_device *device,
 		optcl_adapter_destroy(*adapter);
 	}
 	
-	return error;
+	return(error);
 }
 
 RESULT optcl_device_get_feature(const optcl_device *device, 
@@ -611,19 +611,19 @@ RESULT optcl_device_get_feature(const optcl_device *device,
 	assert(feature != 0);
 
 	if (device == 0 || feature == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	assert(device->info != 0);
 
 	if (device->info == 0) {
-		return E_UNEXPECTED;
+		return(E_UNEXPECTED);
 	}
 
 	assert(device->info->features != 0);
 
 	if (device->info->features == 0) {
-		return E_UNEXPECTED;
+		return(E_UNEXPECTED);
 	}
 
 	/*
@@ -631,11 +631,11 @@ RESULT optcl_device_get_feature(const optcl_device *device,
 	 * feature_code is intentionly cast to size_t 
 	 * to resolve 64-bit portability warning.
 	 */
-	return optcl_hashtable_lookup(
+	return(optcl_hashtable_lookup(
 		device->info->features, 
 		(void*)(size_t)feature_code, 
 		feature
-		);
+		));
 }
 
 RESULT optcl_device_get_media_count(const optcl_device *device,
@@ -645,16 +645,16 @@ RESULT optcl_device_get_media_count(const optcl_device *device,
 	assert(count != 0);
 
 	if (device == 0 || count == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	assert(device->medias != 0);
 
 	if (device->medias == 0) {
-		return E_UNEXPECTED;
+		return(E_UNEXPECTED);
 	}
 
-	return optcl_list_get_count(device->medias, count);
+	return(optcl_list_get_count(device->medias, count));
 }
 
 RESULT optcl_get_media_info(const optcl_device *device,
@@ -671,51 +671,51 @@ RESULT optcl_get_media_info(const optcl_device *device,
 	assert(media_index >= 0);
 
 	if (device == 0 || media == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	error = optcl_device_get_media_count(device, &count);
 
 	if (FAILED(error)) {
-		return error;
+		return(error);
 	}
 
 	if (media_index < 0 || media_index >= count) {
-		return E_OUTOFRANGE;
+		return(E_OUTOFRANGE);
 	}
 
 	assert(device->medias != 0);
 
 	if (device->medias == 0) {
-		return E_UNEXPECTED;
+		return(E_UNEXPECTED);
 	}
 
 	error = optcl_list_get_at_index(device->medias, media_index, &info);
 
 	if (FAILED(error)) {
-		return error;
+		return(error);
 	}
 
 	if (info == 0) {
-		return E_UNEXPECTED;
+		return(E_UNEXPECTED);
 	}
 
 	error = optcl_media_info_create(&nmedia);
 
 	if (FAILED(error)) {
-		return error;
+		return(error);
 	}
 
 	error = optcl_media_info_copy(nmedia, info);
 
 	if (FAILED(error)) {
 		optcl_media_info_destroy(nmedia);
-		return error;
+		return(error);
 	}
 
 	*media = nmedia;
 
-	return SUCCESS;
+	return(SUCCESS);
 }
 
 RESULT optcl_device_get_path(const optcl_device *device, char **path)
@@ -724,16 +724,16 @@ RESULT optcl_device_get_path(const optcl_device *device, char **path)
 	assert(path != 0);
 
 	if (device == 0 || path == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	*path = _strdup(device->path);
 
 	if (*path == 0 && device->path != 0) {
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 	
-	return SUCCESS;
+	return(SUCCESS);
 }
 
 RESULT optcl_device_get_product(const optcl_device *device, char **product)
@@ -742,22 +742,22 @@ RESULT optcl_device_get_product(const optcl_device *device, char **product)
 	assert(product != 0);
 
 	if (device == 0 || product == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	assert(device->info != 0);
 
 	if (device->info == 0) {
-		return E_UNEXPECTED;
+		return(E_UNEXPECTED);
 	}
 
 	*product = _strdup(device->info->product);
 
 	if (*product == 0 && device->info->product != 0) {
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
-	return SUCCESS;
+	return(SUCCESS);
 }
 
 RESULT optcl_device_get_revision(const optcl_device *device, char **revision)
@@ -766,22 +766,22 @@ RESULT optcl_device_get_revision(const optcl_device *device, char **revision)
 	assert(revision != 0);
 
 	if (device == 0 || revision == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	assert(device->info != 0);
 
 	if (device->info == 0) {
-		return E_UNEXPECTED;
+		return(E_UNEXPECTED);
 	}
 
 	*revision = _strdup(device->info->revision);
 
 	if (*revision == 0 && device->info->revision != 0) {
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
-	return SUCCESS;
+	return(SUCCESS);
 }
 
 RESULT optcl_device_get_type(const optcl_device *device, uint16_t *type)
@@ -790,12 +790,12 @@ RESULT optcl_device_get_type(const optcl_device *device, uint16_t *type)
 	assert(type != 0);
 
 	if (device == 0 || type == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	*type = device->type;
 
-	return SUCCESS;
+	return(SUCCESS);
 }
 
 RESULT optcl_device_get_vendor(const optcl_device *device, char **vendor)
@@ -804,22 +804,22 @@ RESULT optcl_device_get_vendor(const optcl_device *device, char **vendor)
 	assert(vendor != 0);
 
 	if (device == 0 || vendor == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	assert(device->info != 0);
 
 	if (device->info == 0) {
-		return E_UNEXPECTED;
+		return(E_UNEXPECTED);
 	}
 
 	*vendor = _strdup(device->info->vendor);
 
 	if (*vendor == 0 && device->info->vendor != 0) {
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
-	return SUCCESS;
+	return(SUCCESS);
 }
 
 RESULT optcl_device_get_vendor_string(const optcl_device *device, 
@@ -829,22 +829,22 @@ RESULT optcl_device_get_vendor_string(const optcl_device *device,
 	assert(vendor_string != 0);
 
 	if (device == 0 || vendor_string == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	assert(device->info != 0);
 
 	if (device->info == 0) {
-		return E_UNEXPECTED;
+		return(E_UNEXPECTED);
 	}
 
 	*vendor_string = _strdup(device->info->vendor_string);
 
 	if (*vendor_string == 0 && device->info->vendor_string != 0) {
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
-	return SUCCESS;
+	return(SUCCESS);
 }
 
 RESULT optcl_device_add_media_info(optcl_device *device, 
@@ -854,16 +854,16 @@ RESULT optcl_device_add_media_info(optcl_device *device,
 	assert(info != 0);
 
 	if (device == 0 || info == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	assert(device->medias != 0);
 
 	if (device->medias == 0) {
-		return E_UNEXPECTED;
+		return(E_UNEXPECTED);
 	}
 
-	return optcl_list_add_tail(device->medias, info);
+	return(optcl_list_add_tail(device->medias, info));
 }
 
 RESULT optcl_device_set_adapter(optcl_device *device, optcl_adapter *adapter)
@@ -874,24 +874,24 @@ RESULT optcl_device_set_adapter(optcl_device *device, optcl_adapter *adapter)
 	assert(adapter != 0);
 
 	if (device == 0 || adapter == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	assert(device->adapter != 0);
 
 	if (device->adapter == 0) {
-		return E_UNEXPECTED;
+		return(E_UNEXPECTED);
 	}
 
 	error = optcl_adapter_destroy(device->adapter);
 
 	if (FAILED(error)) {
-		return error;
+		return(error);
 	}
 
 	device->adapter = adapter;
 
-	return SUCCESS;	
+	return(SUCCESS);	
 }
 
 RESULT optcl_device_set_feature(optcl_device *device, 
@@ -902,19 +902,19 @@ RESULT optcl_device_set_feature(optcl_device *device,
 	assert(feature != 0);
 
 	if (device == 0 || feature == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	assert(device->info != 0);
 
 	if (device->info == 0) {
-		return E_UNEXPECTED;
+		return(E_UNEXPECTED);
 	}
 
 	assert(device->info->features != 0);
 
 	if (device->info->features == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	/*
@@ -922,11 +922,11 @@ RESULT optcl_device_set_feature(optcl_device *device,
 	 * feature_code is intentionly cast to size_t 
 	 * to resolve 64-bit portability warning.
 	 */
-	return optcl_hashtable_set(
+	return(optcl_hashtable_set(
 		device->info->features, 
 		(void*)(size_t)feature_code, 
 		feature
-		);
+		));
 }
 
 RESULT optcl_device_set_path(optcl_device *device, char *path)
@@ -934,14 +934,14 @@ RESULT optcl_device_set_path(optcl_device *device, char *path)
 	assert(device != 0);
 	
 	if (device == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	free(device->path);
 
 	device->path = path;
 
-	return SUCCESS;
+	return(SUCCESS);
 }
 
 RESULT optcl_device_set_product(optcl_device *device, char *product)
@@ -949,20 +949,20 @@ RESULT optcl_device_set_product(optcl_device *device, char *product)
 	assert(device != 0);
 
 	if (device == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	assert(device->info != 0);
 
 	if (device->info == 0) {
-		return E_UNEXPECTED;
+		return(E_UNEXPECTED);
 	}
 
 	free(device->info->product);
 
 	device->info->product = product;
 
-	return SUCCESS;
+	return(SUCCESS);
 }
 
 RESULT optcl_device_set_revision(optcl_device *device, char *revision)
@@ -970,20 +970,20 @@ RESULT optcl_device_set_revision(optcl_device *device, char *revision)
 	assert(device != 0);
 
 	if (device == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	assert(device->info != 0);
 
 	if (device->info == 0) {
-		return E_UNEXPECTED;
+		return(E_UNEXPECTED);
 	}
 
 	free(device->info->revision);
 
 	device->info->revision = revision;
 
-	return SUCCESS;
+	return(SUCCESS);
 }
 
 RESULT optcl_device_set_type(optcl_device *device, uint16_t type)
@@ -991,12 +991,12 @@ RESULT optcl_device_set_type(optcl_device *device, uint16_t type)
 	assert(device != 0);
 
 	if (device == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	device->type = type;
 
-	return SUCCESS;
+	return(SUCCESS);
 }
 
 RESULT optcl_device_set_vendor(optcl_device *device, char *vendor)
@@ -1004,20 +1004,20 @@ RESULT optcl_device_set_vendor(optcl_device *device, char *vendor)
 	assert(device != 0);
 
 	if (device == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	assert(device->info != 0);
 
 	if (device->info == 0) {
-		return E_UNEXPECTED;
+		return(E_UNEXPECTED);
 	}
 
 	free(device->info->vendor);
 
 	device->info->vendor = vendor;
 
-	return SUCCESS;
+	return(SUCCESS);
 }
 
 RESULT optcl_device_set_vendor_string(optcl_device *device, 
@@ -1026,18 +1026,18 @@ RESULT optcl_device_set_vendor_string(optcl_device *device,
 	assert(device != 0);
 
 	if (device == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	assert(device->info != 0);
 
 	if (device->info == 0) {
-		return E_UNEXPECTED;
+		return(E_UNEXPECTED);
 	}
 
 	free(device->info->vendor_string);
 
 	device->info->vendor_string = vendor_string;
 
-	return SUCCESS;
+	return(SUCCESS);
 }
