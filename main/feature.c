@@ -107,10 +107,10 @@ static int32_t get_feature_size(uint16_t feature_code)
 	}
 
 	if (i >= elements) {
-		return -1;
+		return(-1);
 	}
 
-	return __feature_struct_sizes[i].size;
+	return(__feature_struct_sizes[i].size);
 }
 
 /*
@@ -125,13 +125,13 @@ RESULT optcl_feature_copy(optcl_feature **dest, const optcl_feature *src)
 	assert(src != 0);
 
 	if (dest == 0 || src == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	size = get_feature_size(src->feature_code);
 
 	if (size <= 0) {
-		return E_DEVUNKNFEATURE;
+		return(E_DEVUNKNFEATURE);
 	}
 
 	free(*dest);
@@ -139,12 +139,12 @@ RESULT optcl_feature_copy(optcl_feature **dest, const optcl_feature *src)
 	*dest = malloc(size);
 
 	if (*dest == 0) {
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
 	memcpy(*dest, src, size);
 
-	return SUCCESS;
+	return(SUCCESS);
 }
 
 RESULT optcl_feature_create(optcl_feature **feature, uint16_t feature_code)
@@ -154,26 +154,26 @@ RESULT optcl_feature_create(optcl_feature **feature, uint16_t feature_code)
 	assert(feature != 0);
 
 	if (feature == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	size = get_feature_size(feature_code);
 
 	if (size <= 0) {
-		return E_DEVUNKNFEATURE;
+		return(E_DEVUNKNFEATURE);
 	}
 
 	*feature = malloc(size);
 
 	if (*feature == 0) {
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
 	memset(*feature, 0, size);
 
 	(*feature)->feature_code = feature_code;
 
-	return SUCCESS;
+	return(SUCCESS);
 }
 
 RESULT optcl_feature_destroy(optcl_feature *feature)
@@ -181,10 +181,10 @@ RESULT optcl_feature_destroy(optcl_feature *feature)
 	assert(feature != 0);
 
 	if (feature == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	free(feature);
 
-	return SUCCESS;
+	return(SUCCESS);
 }
