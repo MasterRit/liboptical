@@ -158,6 +158,7 @@ static RESULT enumerate_device_adapter(const char *path,
 				       optcl_adapter **adapter)
 {
 	RESULT error;
+	RESULT destroy_error;
 	ULONG bytes;
 	BOOL success;
 	HANDLE hDevice;
@@ -226,8 +227,8 @@ static RESULT enumerate_device_adapter(const char *path,
 	error = optcl_adapter_set_bus_type(nadapter, adpDesc->BusType);
 
 	if (FAILED(error)) {
-		optcl_adapter_destroy(nadapter);
-		return(error);
+		destroy_error = optcl_adapter_destroy(nadapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
 	error = optcl_adapter_set_max_alignment_mask(
@@ -236,8 +237,8 @@ static RESULT enumerate_device_adapter(const char *path,
 		);
 
 	if (FAILED(error)) {
-		optcl_adapter_destroy(nadapter);
-		return(error);
+		destroy_error = optcl_adapter_destroy(nadapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
 	error = optcl_adapter_set_max_physical_pages(
@@ -246,8 +247,8 @@ static RESULT enumerate_device_adapter(const char *path,
 		);
 
 	if (FAILED(error)) {
-		optcl_adapter_destroy(nadapter);
-		return(error);
+		destroy_error = optcl_adapter_destroy(nadapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
 	error = optcl_adapter_set_max_transfer_length(
@@ -256,8 +257,8 @@ static RESULT enumerate_device_adapter(const char *path,
 		);
 
 	if (FAILED(error)) {
-		optcl_adapter_destroy(nadapter);
-		return(error);
+		destroy_error = optcl_adapter_destroy(nadapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
 	*adapter = nadapter;
@@ -281,6 +282,7 @@ static RESULT enumerate_device(int index,
 			       optcl_device **device)
 {
 	RESULT error;
+	RESULT destroy_error;
 	BOOL status;
 	char *tmp;
 	char *devicepath;
@@ -402,22 +404,22 @@ static RESULT enumerate_device(int index,
 
 	if (FAILED(error)) {
 		free(devicepath);
-		optcl_device_destroy(ndevice);
-		return(error);
+		destroy_error = optcl_device_destroy(ndevice);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
 	error = enumerate_device_adapter(devicepath, &adapter);
 
 	if (FAILED(error)) {
-		optcl_device_destroy(ndevice);
-		return(error);
+		destroy_error = optcl_device_destroy(ndevice);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
 	error = optcl_device_set_adapter(ndevice, adapter);
 
 	if (FAILED(error)) {
-		optcl_device_destroy(ndevice);
-		return(error);
+		destroy_error = optcl_device_destroy(ndevice);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
 	memset(&command, 0, sizeof(command));
@@ -425,64 +427,64 @@ static RESULT enumerate_device(int index,
 	error = optcl_command_inquiry(ndevice, &command, &response);
 
 	if (FAILED(error)) {
-		optcl_device_destroy(ndevice);
-		return(error);
+		destroy_error = optcl_device_destroy(ndevice);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
 	error = optcl_device_set_type(ndevice, response->device_type);
 
 	if (FAILED(error)) {
-		optcl_device_destroy(ndevice);
 		free(response);
-		return(error);
+		destroy_error = optcl_device_destroy(ndevice);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
 	tmp = _strdup((char*)response->product);
 
 	if (tmp == 0 && response->product != 0) {
-		optcl_device_destroy(ndevice);
 		free(response);
-		return(E_OUTOFMEMORY);
+		destroy_error = optcl_device_destroy(ndevice);
+		return(SUCCEEDED(destroy_error) ? E_OUTOFMEMORY : destroy_error);
 	}
 
 	error = optcl_device_set_product(ndevice, tmp);
 
 	if (FAILED(error)) {
-		optcl_device_destroy(ndevice);
 		free(response);
-		return(error);
+		destroy_error = optcl_device_destroy(ndevice);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
 	tmp = _strdup((char*)response->vendor);
 
 	if (tmp == 0 && response->vendor != 0) {
-		optcl_device_destroy(ndevice);
 		free(response);
-		return(E_OUTOFMEMORY);
+		destroy_error = optcl_device_destroy(ndevice);
+		return(SUCCEEDED(destroy_error) ? error : E_OUTOFMEMORY);
 	}
 
 	error = optcl_device_set_vendor(ndevice, tmp);
 
 	if (FAILED(error)) {
-		optcl_device_destroy(ndevice);
 		free(response);
-		return(error);
+		destroy_error = optcl_device_destroy(ndevice);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
 	tmp = _strdup((char*)response->vendor_string);
 
 	if (tmp == 0 && response->vendor_string != 0) {
-		optcl_device_destroy(ndevice);
 		free(response);
-		return(E_OUTOFMEMORY);
+		destroy_error = optcl_device_destroy(ndevice);
+		return(SUCCEEDED(destroy_error) ? error : E_OUTOFMEMORY);
 	}
 
 	error = optcl_device_set_vendor_string(ndevice, tmp);
 
 	if (FAILED(error)) {
-		optcl_device_destroy(ndevice);
 		free(response);
-		return(error);
+		destroy_error = optcl_device_destroy(ndevice);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
 	free(response);
@@ -490,8 +492,8 @@ static RESULT enumerate_device(int index,
 	error = enumerate_device_features(ndevice);
 
 	if (FAILED(error)) {
-		optcl_device_destroy(ndevice);
-		return(error);
+		destroy_error = optcl_device_destroy(ndevice);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
 	*device = ndevice;
@@ -507,6 +509,7 @@ RESULT optcl_device_enumerate(optcl_list **devices)
 {
 	int index;
 	RESULT error;
+	RESULT destroy_error;
 	HDEVINFO hIntDevInfo;
 	optcl_device *ndevice;
 
@@ -554,11 +557,13 @@ RESULT optcl_device_enumerate(optcl_list **devices)
 		}
 	}
 
+	destroy_error = SUCCESS;
+
 	if (FAILED(error)) {
-		optcl_list_destroy(*devices, 1);
+		destroy_error = optcl_list_destroy(*devices, 1);
 	}
 
-	return(error);
+	return(SUCCEEDED(destroy_error) ? error : destroy_error);
 }
 
 RESULT optcl_device_command_execute(const optcl_device *device, 
@@ -621,7 +626,7 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 	sptdwb.sptd.SenseInfoLength = sizeof(sptdwb.ucSenseBuf);
 	sptdwb.sptd.SenseInfoOffset = offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER, ucSenseBuf);
 	sptdwb.sptd.TargetId = 1;
-	sptdwb.sptd.TimeOutValue = 2L;
+	sptdwb.sptd.TimeOutValue = 2;
 
 	OPTCL_TRACE_ARRAY_MSG("CDB bytes:", cdb, cdb_size);
 	OPTCL_TRACE_ARRAY_MSG("CDB parameter bytes:", param, param_size);
