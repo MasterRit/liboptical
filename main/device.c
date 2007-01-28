@@ -30,11 +30,10 @@
 #include <malloc.h>
 #include <string.h>
 
-#ifdef _DEBUG
-// Poison value to detect use of deallocated list elements
-#define POISON	((void*)0x12345678)
-#endif
 
+/*
+ * Internal device structures
+ */
 
 /* Device info */
 typedef struct tag_device_info {
@@ -59,7 +58,7 @@ typedef struct tag_device {
 
 
 /*
- * Helpers
+ * Helper functions
  */
 
 static RESULT clear_media_info_list(optcl_list *infos)
@@ -546,10 +545,6 @@ RESULT optcl_device_destroy(optcl_device *device)
 		}
 	}
 
-#ifdef _DEBUG
-	device->adapter = POISON;
-#endif
-
 	if (device->info != 0) {
 		if (device->info->features != 0) {
 			error = optcl_hashtable_destroy(device->info->features, 1);
@@ -559,13 +554,6 @@ RESULT optcl_device_destroy(optcl_device *device)
 			}
 		}
 
-#ifdef _DEBUG
-		device->info->product = POISON;
-		device->info->features = POISON;
-		device->info->revision = POISON;
-		device->info->vendor = POISON;
-		device->info->vendor_string = POISON;
-#endif
 		free(device->info);
 	}
 
@@ -576,10 +564,6 @@ RESULT optcl_device_destroy(optcl_device *device)
 			return error;
 		}
 	}
-
-#ifdef _DEBUG
-	device->path = POISON;
-#endif
 
 	free(device);
 
