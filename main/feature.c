@@ -121,10 +121,10 @@ RESULT optcl_feature_copy(optcl_feature **dest, const optcl_feature *src)
 {
 	int size;
 
-	assert(dest);
-	assert(src);
+	assert(dest != 0);
+	assert(src != 0);
 
-	if (!dest || !src) {
+	if (dest == 0 || src == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -138,7 +138,7 @@ RESULT optcl_feature_copy(optcl_feature **dest, const optcl_feature *src)
 
 	*dest = malloc(size);
 
-	if (!*dest) {
+	if (*dest == 0) {
 		return E_OUTOFMEMORY;
 	}
 
@@ -151,9 +151,9 @@ RESULT optcl_feature_create(optcl_feature **feature, uint16_t feature_code)
 {
 	int size;
 
-	assert(feature);
+	assert(feature != 0);
 
-	if (!feature) {
+	if (feature == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -165,7 +165,7 @@ RESULT optcl_feature_create(optcl_feature **feature, uint16_t feature_code)
 
 	*feature = malloc(size);
 
-	if (!*feature) {
+	if (*feature == 0) {
 		return E_OUTOFMEMORY;
 	}
 
@@ -178,9 +178,9 @@ RESULT optcl_feature_create(optcl_feature **feature, uint16_t feature_code)
 
 RESULT optcl_feature_destroy(optcl_feature *feature)
 {
-	assert(feature);
+	assert(feature != 0);
 
-	if (!feature) {
+	if (feature == 0) {
 		return E_INVALIDARG;
 	}
 
