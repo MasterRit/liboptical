@@ -157,7 +157,7 @@ static RESULT enumerate_device_adapter(const char *path,
 	assert(adapter);
 
 	if (path == 0 || adapter == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	hDevice = CreateFileA(
@@ -171,11 +171,11 @@ static RESULT enumerate_device_adapter(const char *path,
                 );
 
 	if (hDevice == NULL) {
-		return MAKE_ERRORCODE(
+		return(MAKE_ERRORCODE(
 			SEVERITY_ERROR, 
 			FACILITY_DEVICE, 
 			GetLastError()
-			);
+			));
 	}
                 
 	query.PropertyId = StorageAdapterProperty;
@@ -195,11 +195,11 @@ static RESULT enumerate_device_adapter(const char *path,
 	CloseHandle(hDevice);
 
 	if (success == 0) {
-		return MAKE_ERRORCODE(
+		return(MAKE_ERRORCODE(
 			SEVERITY_ERROR, 
 			FACILITY_DEVICE, 
 			GetLastError()
-			);
+			));
 	}
 
 	adpDesc = (PSTORAGE_ADAPTER_DESCRIPTOR)outBuf;
@@ -207,14 +207,14 @@ static RESULT enumerate_device_adapter(const char *path,
 	error = optcl_adapter_create(&nadapter);
 
 	if (FAILED(error)) {
-		return error;
+		return(error);
 	}
 
 	error = optcl_adapter_set_bus_type(nadapter, adpDesc->BusType);
 
 	if (FAILED(error)) {
 		optcl_adapter_destroy(nadapter);
-		return error;
+		return(error);
 	}
 
 	error = optcl_adapter_set_max_alignment_mask(
@@ -224,7 +224,7 @@ static RESULT enumerate_device_adapter(const char *path,
 
 	if (FAILED(error)) {
 		optcl_adapter_destroy(nadapter);
-		return error;
+		return(error);
 	}
 
 	error = optcl_adapter_set_max_physical_pages(
@@ -234,7 +234,7 @@ static RESULT enumerate_device_adapter(const char *path,
 
 	if (FAILED(error)) {
 		optcl_adapter_destroy(nadapter);
-		return error;
+		return(error);
 	}
 
 	error = optcl_adapter_set_max_transfer_length(
@@ -244,12 +244,12 @@ static RESULT enumerate_device_adapter(const char *path,
 
 	if (FAILED(error)) {
 		optcl_adapter_destroy(nadapter);
-		return error;
+		return(error);
 	}
 
 	*adapter = nadapter;
 
-	return SUCCESS;
+	return(SUCCESS);
 }
 
 static RESULT enumerate_device_features(optcl_device *device)
@@ -257,7 +257,7 @@ static RESULT enumerate_device_features(optcl_device *device)
 	assert(device);
 
 	if (device == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 
@@ -285,7 +285,7 @@ static RESULT enumerate_device(int index,
 	assert(index >= 0);
 
 	if (device == 0 || hDevInfo == 0 || index < 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	interfaceData.cbSize = sizeof(interfaceData);
@@ -299,11 +299,11 @@ static RESULT enumerate_device(int index,
                 );
 
 	if (status == 0) {
-		return MAKE_ERRORCODE(
+		return(MAKE_ERRORCODE(
 			SEVERITY_ERROR, 
 			FACILITY_DEVICE, 
 			GetLastError()
-			);
+			));
 	}
 
 	
@@ -326,11 +326,11 @@ static RESULT enumerate_device(int index,
 	dwErrorCode = GetLastError();
 
 	if (status == FALSE && dwErrorCode != ERROR_INSUFFICIENT_BUFFER) {
-		return MAKE_ERRORCODE(
+		return(MAKE_ERRORCODE(
 			SEVERITY_ERROR,
 			FACILITY_DEVICE,
 			dwErrorCode
-			);
+			));
 	}
 
 	/*
@@ -341,7 +341,7 @@ static RESULT enumerate_device(int index,
 	pInterfaceDetailData = malloc(dwReqSize);
 
 	if (pInterfaceDetailData == 0) {
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
 	pInterfaceDetailData->cbSize = sizeof(SP_INTERFACE_DEVICE_DETAIL_DATA_A);
@@ -357,11 +357,11 @@ static RESULT enumerate_device(int index,
 	if (status == 0) {
 		free(pInterfaceDetailData);
 
-		return MAKE_ERRORCODE(
+		return(MAKE_ERRORCODE(
 			SEVERITY_ERROR,
 			FACILITY_DEVICE,
 			GetLastError()
-			);
+			));
 	}
 
 	/*
@@ -373,7 +373,7 @@ static RESULT enumerate_device(int index,
 
 	if (devicepath == 0 && pInterfaceDetailData->DevicePath != 0) {
 		free(pInterfaceDetailData);
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
 	free(pInterfaceDetailData);
@@ -382,7 +382,7 @@ static RESULT enumerate_device(int index,
 
 	if (FAILED(error)) {
 		free(devicepath);
-		return error;
+		return(error);
 	}
 
 	error = optcl_device_set_path(ndevice, devicepath);
@@ -390,21 +390,21 @@ static RESULT enumerate_device(int index,
 	if (FAILED(error)) {
 		free(devicepath);
 		optcl_device_destroy(ndevice);
-		return error;
+		return(error);
 	}
 
 	error = enumerate_device_adapter(devicepath, &adapter);
 
 	if (FAILED(error)) {
 		optcl_device_destroy(ndevice);
-		return error;
+		return(error);
 	}
 
 	error = optcl_device_set_adapter(ndevice, adapter);
 
 	if (FAILED(error)) {
 		optcl_device_destroy(ndevice);
-		return error;
+		return(error);
 	}
 
 	memset(&command, 0, sizeof(command));
@@ -413,7 +413,7 @@ static RESULT enumerate_device(int index,
 
 	if (FAILED(error)) {
 		optcl_device_destroy(ndevice);
-		return error;
+		return(error);
 	}
 
 	error = optcl_device_set_type(ndevice, response->device_type);
@@ -421,7 +421,7 @@ static RESULT enumerate_device(int index,
 	if (FAILED(error)) {
 		optcl_device_destroy(ndevice);
 		free(response);
-		return error;
+		return(error);
 	}
 
 	tmp = _strdup((char*)response->product);
@@ -429,7 +429,7 @@ static RESULT enumerate_device(int index,
 	if (tmp == 0 && response->product != 0) {
 		optcl_device_destroy(ndevice);
 		free(response);
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
 	error = optcl_device_set_product(ndevice, tmp);
@@ -437,7 +437,7 @@ static RESULT enumerate_device(int index,
 	if (FAILED(error)) {
 		optcl_device_destroy(ndevice);
 		free(response);
-		return error;
+		return(error);
 	}
 
 	tmp = _strdup((char*)response->vendor);
@@ -445,7 +445,7 @@ static RESULT enumerate_device(int index,
 	if (tmp == 0 && response->vendor != 0) {
 		optcl_device_destroy(ndevice);
 		free(response);
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
 	error = optcl_device_set_vendor(ndevice, tmp);
@@ -453,7 +453,7 @@ static RESULT enumerate_device(int index,
 	if (FAILED(error)) {
 		optcl_device_destroy(ndevice);
 		free(response);
-		return error;
+		return(error);
 	}
 
 	tmp = _strdup((char*)response->vendor_string);
@@ -461,7 +461,7 @@ static RESULT enumerate_device(int index,
 	if (!tmp && response->vendor_string) {
 		optcl_device_destroy(ndevice);
 		free(response);
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
 	error = optcl_device_set_vendor_string(ndevice, tmp);
@@ -469,7 +469,7 @@ static RESULT enumerate_device(int index,
 	if (FAILED(error)) {
 		optcl_device_destroy(ndevice);
 		free(response);
-		return error;
+		return(error);
 	}
 
 	free(response);
@@ -478,12 +478,12 @@ static RESULT enumerate_device(int index,
 
 	if (FAILED(error)) {
 		optcl_device_destroy(ndevice);
-		return error;
+		return(error);
 	}
 
 	*device = ndevice;
 
-	return SUCCESS;
+	return(SUCCESS);
 }
 
 /*
@@ -500,7 +500,7 @@ RESULT optcl_device_enumerate(optcl_list **devices)
 	assert(devices);
 
 	if (devices == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	hIntDevInfo = SetupDiGetClassDevs(
@@ -512,17 +512,17 @@ RESULT optcl_device_enumerate(optcl_list **devices)
 		);
 
 	if (hIntDevInfo == INVALID_HANDLE_VALUE) {
-		return MAKE_ERRORCODE(
+		return(MAKE_ERRORCODE(
 			SEVERITY_ERROR, 
 			FACILITY_DEVICE, 
 			GetLastError()
-			);
+			));
 	}
 
 	error = optcl_list_create(0, devices);
 
 	if (FAILED(error)) {
-		return error;
+		return(error);
 	}
 
 	for(index = 0; ; ++index) {
@@ -545,7 +545,7 @@ RESULT optcl_device_enumerate(optcl_list **devices)
 		optcl_list_destroy(*devices, 1);
 	}
 
-	return error;
+	return(error);
 }
 
 RESULT optcl_device_command_execute(const optcl_device *device, 
@@ -568,13 +568,13 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 	assert(param_size >= 0);
 
 	if (cdb == 0 || device == 0 || cdb_size < 0 || param_size < 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	error = optcl_device_get_path(device, &path);
 
 	if (FAILED(error)) {
-		return error;
+		return(error);
 	}
 	
 	hDevice = CreateFileA(
@@ -590,11 +590,11 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 	free(path);
 
 	if (hDevice == NULL) {
-		return MAKE_ERRORCODE(
+		return(MAKE_ERRORCODE(
 			SEVERITY_ERROR, 
 			FACILITY_DEVICE, 
 			GetLastError()
-			);
+			));
 	}
 
 	memset(&sptdwb, 0, sizeof(sptdwb));
@@ -645,5 +645,5 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 
 	CloseHandle(hDevice);
 
-	return error;
+	return(error);
 }
