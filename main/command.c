@@ -77,7 +77,7 @@ RESULT optcl_command_get_config(const optcl_device *device,
 	assert(response != 0);
 
 	if (device == 0 || command == 0 || response == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	assert(
@@ -90,39 +90,39 @@ RESULT optcl_command_get_config(const optcl_device *device,
 		&& command->rt != MMC_GET_CONFIG_RT_CURRENT 
 		&& command->rt != MMC_GET_CONFIG_RT_FROM)
 	{
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	assert(command->start_feature >= 0);
 
 	if (command->start_feature < 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	error = optcl_device_get_adapter(device, &adapter);
 
 	if (FAILED(error)) {
-		return error;
+		return(error);
 	}
 
 	error = optcl_adapter_get_alignment_mask(adapter, &alignment_mask);
 
 	if (FAILED(error)) {
 		optcl_adapter_destroy(adapter);
-		return error;
+		return(error);
 	}
 
 	error = optcl_adapter_get_max_transfer_len(adapter, &max_transfer_len);
 
 	if (FAILED(error)) {
 		optcl_adapter_destroy(adapter);
-		return error;
+		return(error);
 	}
 
 	error = optcl_adapter_destroy(adapter);
 
 	if (FAILED(error)) {
-		return error;
+		return(error);
 	}
 
 	/*
@@ -143,7 +143,7 @@ RESULT optcl_command_get_config(const optcl_device *device,
 	mmc_response = _aligned_malloc(cdb[8], alignment_mask);
 
 	if (mmc_response == 0) {
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
 	error = optcl_device_command_execute(
@@ -156,14 +156,14 @@ RESULT optcl_command_get_config(const optcl_device *device,
 
 	if (FAILED(error)) {
 		_aligned_free(mmc_response);
-		return error;
+		return(error);
 	}
 
 	nresponse0 = malloc(sizeof(optcl_mmc_response_get_config));
 
 	if (nresponse0 == 0) {
 		_aligned_free(mmc_response);
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
 	memset(&nresponse0, 0, sizeof(nresponse0));
@@ -173,7 +173,7 @@ RESULT optcl_command_get_config(const optcl_device *device,
 	if (FAILED(error)) {
 		free(nresponse0);
 		_aligned_free(mmc_response);
-		return error;
+		return(error);
 	}
 
 	/*
@@ -295,12 +295,12 @@ RESULT optcl_command_get_config(const optcl_device *device,
 	if (FAILED(error)) {
 		optcl_list_destroy(nresponse0->descriptors, 1);
 		free(nresponse0);
-		return error;
+		return(error);
 	}
 
 	*response = nresponse0;
 
-	return error;
+	return(error);
 }
 
 RESULT optcl_command_inquiry(const optcl_device *device, 
@@ -319,33 +319,33 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 	assert(response != 0);
 
 	if (device == 0|| command == 0 || response == 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	assert(command->evpd == 0);
 	assert(command->page_code == 0);
 
 	if (command->evpd != 0 || command->page_code != 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	error = optcl_device_get_adapter(device, &adapter);
 
 	if (FAILED(error)) {
-		return error;
+		return(error);
 	}
 
 	error = optcl_adapter_get_alignment_mask(adapter, &alignment_mask);
 
 	if (FAILED(error)) {
 		optcl_adapter_destroy(adapter);
-		return error;
+		return(error);
 	}
 
 	error = optcl_adapter_destroy(adapter);
 
 	if (FAILED(error)) {
-		return error;
+		return(error);
 	}
 
 	/*
@@ -360,7 +360,7 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 	mmc_response = _aligned_malloc(cdb[4], alignment_mask);
 
 	if (mmc_response == 0) {
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
 	/* Get standard inquiry data additional length */
@@ -374,7 +374,7 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 
 	if (FAILED(error)) {
 		_aligned_free(mmc_response);
-		return error;
+		return(error);
 	}
 
 	/* Set standard inquiry data length */
@@ -385,7 +385,7 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 	mmc_response = _aligned_malloc((size_t)cdb[4], alignment_mask);
 
 	if (mmc_response == 0) {
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
 	/* Get standard inquiry data */
@@ -399,7 +399,7 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 
 	if (FAILED(error)) {
 		_aligned_free(mmc_response);
-		return error;
+		return(error);
 	}
 
 	error = optcl_parse_inquiry_data(mmc_response, cdb[4], &nresponse);
@@ -410,5 +410,5 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 
 	_aligned_free(mmc_response);
 
-	return error;
+	return(error);
 }
