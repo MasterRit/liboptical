@@ -518,7 +518,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\profile.c"
+				RelativePath=".\parsers.c"
 				>
 			</File>
 			<File
@@ -628,7 +628,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\profile.h"
+				RelativePath=".\parsers.h"
 				>
 			</File>
 			<File
