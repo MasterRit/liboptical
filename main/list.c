@@ -79,7 +79,7 @@ RESULT optcl_list_add_head(optcl_list *list, const void *data)
 {
 	optcl_list_node *nnode = 0;
 
-	assert(list);
+	assert(list != 0);
 
 	if (list == 0) {
 		return(E_INVALIDARG);
@@ -112,7 +112,7 @@ RESULT optcl_list_add_tail(optcl_list *list, const void *data)
 {
 	optcl_list_node *nnode = 0;
 
-	assert(list);
+	assert(list != 0);
 
 	if (list == 0) {
 		return(E_INVALIDARG);
@@ -146,8 +146,8 @@ RESULT optcl_list_append(optcl_list *dest, const optcl_list *src)
 	RESULT error;
 	optcl_list_iterator it = 0;
 
-	assert(src);
-	assert(dest);
+	assert(src != 0);
+	assert(dest != 0);
 
 	if (dest == 0 || src == 0) {
 		return(E_INVALIDARG);
@@ -181,7 +181,7 @@ RESULT optcl_list_create(const optcl_list_equalfn equalfn,
 {
 	optcl_list *newlist = 0;
 
-	assert(list);
+	assert(list != 0);
 
 	if (list == 0) {
 		return(E_INVALIDARG);
@@ -205,7 +205,7 @@ RESULT optcl_list_destroy(optcl_list *list, bool_t deallocate)
 {
 	RESULT error;
 
-	assert(list);
+	assert(list != 0);
 
 	if (list == 0) {
 		return(E_INVALIDARG);
@@ -229,7 +229,7 @@ RESULT optcl_list_clear(optcl_list *list, bool_t deallocate)
 	optcl_list_iterator next = 0;
 	optcl_list_iterator current = 0;
 
-	assert(list);
+	assert(list != 0);
 
 	if (list == 0) {
 		return(E_INVALIDARG);
@@ -259,8 +259,8 @@ RESULT optcl_list_copy(optcl_list *dest, const optcl_list *src)
 {
 	RESULT error;
 
-	assert(src);
-	assert(dest);
+	assert(src != 0);
+	assert(dest != 0);
 
 	if (dest == 0 || src == 0) {
 		return(E_INVALIDARG);
@@ -285,14 +285,14 @@ RESULT optcl_list_find(const optcl_list *list,
 	void *element = 0;
 	optcl_list_iterator it = 0;
 
-	assert(list);
-	assert(pos);
+	assert(list != 0);
+	assert(pos != 0);
 
 	if (list == 0 || pos == 0) {
 		return(E_INVALIDARG);
 	}
 
-	assert(list->equalfn);
+	assert(list->equalfn != 0);
 
 	if (list->equalfn == 0) {
 		return(E_UNEXPECTED);
@@ -333,8 +333,8 @@ RESULT optcl_list_find(const optcl_list *list,
 RESULT optcl_list_get_equalfn(const optcl_list *list, 
 			      optcl_list_equalfn *equalfn)
 {
-	assert(list);
-	assert(equalfn);
+	assert(list != 0);
+	assert(equalfn != 0);
 
 	if (list == 0 || equalfn == 0) {
 		return(E_INVALIDARG);
@@ -355,8 +355,8 @@ RESULT optcl_list_get_at_index(const optcl_list *list,
 	uint32_t i = 0;
 	optcl_list_iterator it = 0;
 
-	assert(data);
-	assert(list);
+	assert(data != 0);
+	assert(list != 0);
 
 	if (data == 0|| list == 0) {
 		return(E_INVALIDARG);
@@ -411,9 +411,9 @@ RESULT optcl_list_get_at_pos(const optcl_list *list,
 			     const optcl_list_iterator pos, 
 			     const void **data)
 {
-	assert(pos);
-	assert(list);
-	assert(data);
+	assert(pos != 0);
+	assert(list != 0);
+	assert(data != 0);
 
 	if (list == 0 || pos == 0 || data == 0) {
 		return(E_INVALIDARG);
@@ -426,8 +426,8 @@ RESULT optcl_list_get_at_pos(const optcl_list *list,
 
 RESULT optcl_list_get_count(const optcl_list *list, uint32_t *count)
 {
-	assert(list);
-	assert(count);
+	assert(list != 0);
+	assert(count != 0);
 
 	if (list == 0 || count == 0) {
 		return(E_INVALIDARG);
@@ -441,8 +441,8 @@ RESULT optcl_list_get_count(const optcl_list *list, uint32_t *count)
 RESULT optcl_list_get_head_pos(const optcl_list *list, 
 			       optcl_list_iterator *pos)
 {
-	assert(list);
-	assert(pos);
+	assert(list != 0);
+	assert(pos != 0);
 
 	if (list == 0 || pos == 0) {
 		return(E_INVALIDARG);
@@ -456,8 +456,8 @@ RESULT optcl_list_get_head_pos(const optcl_list *list,
 RESULT optcl_list_get_tail_pos(const optcl_list *list,
 			       optcl_list_iterator *pos)
 {
-	assert(list);
-	assert(pos);
+	assert(list != 0);
+	assert(pos != 0);
 
 	if (list == 0 || pos == 0) {
 		return(E_INVALIDARG);
@@ -472,9 +472,9 @@ RESULT optcl_list_get_next(const optcl_list *list,
 			   const optcl_list_iterator pos,
 			   optcl_list_iterator *next)
 {
-	assert(list);
-	assert(pos);
-	assert(next);
+	assert(list != 0);
+	assert(pos != 0);
+	assert(next != 0);
 
 	if (list == 0 || pos == 0 || next == 0) {
 		return(E_INVALIDARG);
@@ -489,9 +489,9 @@ RESULT optcl_list_get_previous(const optcl_list *list,
 			       const optcl_list_iterator pos,
 			       optcl_list_iterator *previous)
 {
-	assert(list);
-	assert(pos);
-	assert(previous);
+	assert(list != 0);
+	assert(pos != 0);
+	assert(previous != 0);
 
 	if (list == 0 || pos == 0 || previous == 0) {
 		return(E_INVALIDARG);
@@ -508,9 +508,9 @@ RESULT optcl_list_insert_after(const optcl_list *list,
 {
 	optcl_list_node *nnode = 0;
 
-	assert(pos);
-	assert(list);
-	assert(data);
+	assert(pos != 0);
+	assert(list != 0);
+	assert(data != 0);
 
 	if (pos == 0 || list == 0 || data == 0) {
 		return(E_INVALIDARG);
@@ -541,9 +541,9 @@ RESULT optcl_list_insert_before(const optcl_list *list,
 {
 	optcl_list_node *nnode = 0;
 
-	assert(pos);
-	assert(list);
-	assert(data);
+	assert(pos != 0);
+	assert(list != 0);
+	assert(data != 0);
 
 	if (pos == 0 || list == 0 || data == 0) {
 		return(E_INVALIDARG);
@@ -570,8 +570,8 @@ RESULT optcl_list_insert_before(const optcl_list *list,
 
 RESULT optcl_list_remove(optcl_list *list, optcl_list_iterator pos)
 {
-	assert(list);
-	assert(pos);
+	assert(list != 0);
+	assert(pos != 0);
 
 	if (list == 0 || pos == 0) {
 		return(E_INVALIDARG);
@@ -621,8 +621,8 @@ RESULT optcl_list_set_at_pos(const optcl_list *list,
 			     optcl_list_iterator pos, 
 			     const void *element)
 {
-	assert(list);
-	assert(pos);
+	assert(list != 0);
+	assert(pos != 0);
 
 	if (list == 0 || pos == 0) {
 		return(E_INVALIDARG);
@@ -636,8 +636,8 @@ RESULT optcl_list_set_at_pos(const optcl_list *list,
 RESULT optcl_list_set_equalfn(optcl_list *list, 
 			      optcl_list_equalfn equalfn)
 {
-	assert(list);
-	assert(equalfn);
+	assert(list != 0);
+	assert(equalfn != 0);
 
 	if (list == 0 || equalfn == 0) {
 		return(E_INVALIDARG);
@@ -658,13 +658,13 @@ RESULT optcl_list_sort(optcl_list *list)
 	optcl_array *array = 0;
 	optcl_list_iterator it = 0;
 	
-	assert(list);
+	assert(list != 0);
 
 	if (list == 0) {
 		return(E_INVALIDARG);
 	}
 
-	assert(list->equalfn);
+	assert(list->equalfn != 0);
 
 	if (list->equalfn == 0) {
 		return(E_UNEXPECTED);
@@ -726,7 +726,7 @@ RESULT optcl_list_sort(optcl_list *list)
 		return(SUCCEEDED(destroy_error)) ? error : destroy_error;
 	}
 
-	assert(list->equalfn);
+	assert(list->equalfn != 0);
 
 	if (list->equalfn == 0) {
 		destroy_error = optcl_array_destroy(array, 0);
