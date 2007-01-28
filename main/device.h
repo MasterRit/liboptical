@@ -21,9 +21,9 @@
 #define _DEVICE_H
 
 #include "adapter.h"
+#include "feature.h"
 #include "list.h"
 #include "media.h"
-#include "profile.h"
 #include "transport.h"
 
 
