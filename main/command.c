@@ -76,8 +76,9 @@ RESULT optcl_command_get_config(const optcl_device *device,
 	assert(command);
 	assert(response);
 
-	if (!device || !command || !response)
+	if (!device || !command || !response) {
 		return E_INVALIDARG;
+	}
 
 	assert(
 		command->rt == MMC_GET_CONFIG_RT_ALL 
@@ -94,13 +95,15 @@ RESULT optcl_command_get_config(const optcl_device *device,
 
 	assert(command->start_feature >= 0);
 
-	if (command->start_feature < 0)
+	if (command->start_feature < 0) {
 		return E_INVALIDARG;
+	}
 
 	error = optcl_device_get_adapter(device, &adapter);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	error = optcl_adapter_get_alignment_mask(adapter, &alignment_mask);
 
@@ -118,8 +121,9 @@ RESULT optcl_command_get_config(const optcl_device *device,
 
 	error = optcl_adapter_destroy(adapter);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	/*
 	 * Execute command just to get data length
@@ -138,8 +142,9 @@ RESULT optcl_command_get_config(const optcl_device *device,
 
 	mmc_response = _aligned_malloc(cdb[8], alignment_mask);
 
-	if (!mmc_response)
+	if (!mmc_response) {
 		return E_OUTOFMEMORY;
+	}
 
 	error = optcl_device_command_execute(
 		device, 
@@ -313,19 +318,22 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 	assert(command);
 	assert(response);
 
-	if (!device || !command || !response)
+	if (!device || !command || !response) {
 		return E_INVALIDARG;
+	}
 
 	assert(command->evpd == 0);
 	assert(command->page_code == 0);
 
-	if (command->evpd != 0 || command->page_code != 0)
+	if (command->evpd != 0 || command->page_code != 0) {
 		return E_INVALIDARG;
+	}
 
 	error = optcl_device_get_adapter(device, &adapter);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	error = optcl_adapter_get_alignment_mask(adapter, &alignment_mask);
 
@@ -336,8 +344,9 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 
 	error = optcl_adapter_destroy(adapter);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	/*
 	 * Execute command just to get additional length
@@ -350,8 +359,9 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 
 	mmc_response = _aligned_malloc(cdb[4], alignment_mask);
 
-	if (!mmc_response)
+	if (!mmc_response) {
 		return E_OUTOFMEMORY;
+	}
 
 	/* Get standard inquiry data additional length */
 	error = optcl_device_command_execute(
@@ -374,8 +384,9 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 
 	mmc_response = _aligned_malloc((size_t)cdb[4], alignment_mask);
 
-	if (!mmc_response)
+	if (!mmc_response) {
 		return E_OUTOFMEMORY;
+	}
 
 	/* Get standard inquiry data */
 	error = optcl_device_command_execute(
@@ -393,8 +404,9 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 
 	error = optcl_parse_inquiry_data(mmc_response, cdb[4], &nresponse);
 
-	if (SUCCEEDED(error))
+	if (SUCCEEDED(error)) {
 		*response = nresponse;
+	}
 
 	_aligned_free(mmc_response);
 
