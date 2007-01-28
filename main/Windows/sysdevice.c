@@ -156,8 +156,9 @@ static RESULT enumerate_device_adapter(const char *path,
 	assert(path);
 	assert(adapter);
 
-	if (!path || !adapter)
+	if (!path || !adapter) {
 		return E_INVALIDARG;
+	}
 
 	hDevice = CreateFileA(
                 path,					// device interface name
@@ -205,8 +206,9 @@ static RESULT enumerate_device_adapter(const char *path,
 
 	error = optcl_adapter_create(&nadapter);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	error = optcl_adapter_set_bus_type(nadapter, adpDesc->BusType);
 
@@ -254,8 +256,9 @@ static RESULT enumerate_device_features(optcl_device *device)
 {
 	assert(device);
 
-	if (!device)
+	if (!device) {
 		return E_INVALIDARG;
+	}
 
 
 }
@@ -281,8 +284,9 @@ static RESULT enumerate_device(int index,
 	assert(hDevInfo);
 	assert(index >= 0);
 
-	if (!device || !hDevInfo || index < 0)
+	if (!device || !hDevInfo || index < 0) {
 		return E_INVALIDARG;
+	}
 
 	interfaceData.cbSize = sizeof(interfaceData);
 
@@ -336,8 +340,9 @@ static RESULT enumerate_device(int index,
 
 	pInterfaceDetailData = malloc(dwReqSize);
 
-	if (!pInterfaceDetailData)
+	if (!pInterfaceDetailData) {
 		return E_OUTOFMEMORY;
+	}
 
 	pInterfaceDetailData->cbSize = sizeof(SP_INTERFACE_DEVICE_DETAIL_DATA_A);
 
@@ -494,8 +499,9 @@ RESULT optcl_device_enumerate(optcl_list **devices)
 
 	assert(devices);
 
-	if (!devices)
+	if (!devices) {
 		return E_INVALIDARG;
+	}
 
 	hIntDevInfo = SetupDiGetClassDevs(
 		&GUID_DEVINTERFACE_CDROM,
@@ -515,8 +521,9 @@ RESULT optcl_device_enumerate(optcl_list **devices)
 
 	error = optcl_list_create(0, devices);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 
 	for(index = 0; ; ++index) {
 		error = enumerate_device(index, hIntDevInfo, &ndevice);
@@ -529,12 +536,14 @@ RESULT optcl_device_enumerate(optcl_list **devices)
 
 		error = optcl_list_add_tail(*devices, ndevice);
 
-		if (FAILED(error))
+		if (FAILED(error)) {
 			break;
+		}
 	}
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		optcl_list_destroy(*devices, 1);
+	}
 
 	return error;
 }
@@ -558,13 +567,15 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 	assert(cdb_size > 0);
 	assert(param_size >= 0);
 
-	if (!cdb || !device || cdb_size < 0 || param_size < 0)
+	if (!cdb || !device || cdb_size < 0 || param_size < 0) {
 		return E_INVALIDARG;
+	}
 
 	error = optcl_device_get_path(device, &path);
 
-	if (FAILED(error))
+	if (FAILED(error)) {
 		return error;
+	}
 	
 	hDevice = CreateFileA(
 		path,					/* device interface name */
@@ -626,8 +637,9 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 			);
 	}
 
-	if (!success && bytes != 0)
+	if (!success && bytes != 0) {
 		error = E_UNEXPECTED;
+	}
 
 	OPTCL_TRACE_ARRAY_MSG("Device response bytes:", param, bytes);
 
