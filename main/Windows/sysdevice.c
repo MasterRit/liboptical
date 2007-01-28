@@ -79,8 +79,8 @@
  * SCSI pass through structures *mostly copy-pasted from winioctl.h
  */
 
-#define SPT_SENSE_LENGTH	32
-#define SPTWB_DATA_LENGTH	512
+#define SPT_SENSE_LENGTH	32U
+#define SPTWB_DATA_LENGTH	512U
 
 
 typedef struct _SCSI_PASS_THROUGH_WITH_BUFFERS {
