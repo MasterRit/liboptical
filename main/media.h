@@ -21,7 +21,6 @@
 #define _MEDIA_H
 
 #include "list.h"
-#include "profile.h"
 
 
 /* Media info */
