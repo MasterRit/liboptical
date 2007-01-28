@@ -458,7 +458,7 @@ static RESULT enumerate_device(int index,
 
 	tmp = _strdup((char*)response->vendor_string);
 
-	if (!tmp && response->vendor_string) {
+	if (tmp == 0 && response->vendor_string != 0) {
 		optcl_device_destroy(ndevice);
 		free(response);
 		return(E_OUTOFMEMORY);
