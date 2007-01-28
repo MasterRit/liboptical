@@ -20,18 +20,19 @@
 #ifndef _SYSDEVICE_H
 #define _SYSDEVICE_H
 
+#include "errors.h"
 #include "list.h"
 
 
 /* Enumerates all supported optical devices */
-int optcl_device_enumerate(optcl_list **devices);
+extern RESULT optcl_device_enumerate(optcl_list **devices);
 
 /* Execute SCSI command */
-int optcl_device_command_execute(const optcl_device *device, 
-				 const void *cdb,
-				 int cdb_size,
-				 void *param,
-				 int param_size);
+extern RESULT optcl_device_command_execute(const optcl_device *device, 
+					   const void *cdb,
+					   uint32_t cdb_size,
+					   void *param,
+					   uint32_t param_size);
 
 
 #endif /* _SYSDEVICE_H */

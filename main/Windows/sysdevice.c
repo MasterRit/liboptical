@@ -22,6 +22,7 @@
 #include "command.h"
 #include "debug.h"
 #include "device.h"
+#include "errors.h"
 #include "sysdevice.h"
 #include "transport.h"
 
@@ -30,6 +31,14 @@
 #include <memory.h>
 #include <stddef.h>
 #include <string.h>
+
+#pragma warning(push)
+/* 
+ * warning C4005: macro redefinitions of macros defined in errors.h
+ * NOTE that we must include our errors.h after all standard Win32
+ *	headers.
+ */
+#pragma warning(disable: 4005)
 
 #include <windows.h>
 #include <ntddscsi.h>
@@ -51,16 +60,7 @@
 #include <setupapi.h>
 #pragma warning(pop)
 
-#pragma warning(push)
-/* 
- * warning C4005: macro redefinitions of macros defined in errors.h
- * NOTE that we must include our errors.h after all standard Win32
- *	headers.
- */
-#pragma warning(disable: 4005)
-#include "errors.h"
-#pragma warning(pop)
-
+#pragma warning(pop) /* #pragma warning(disable: 4005) */
 
 /*
  * SCSI pass through structures *mostly copy-pasted from winioctl.h
@@ -141,7 +141,8 @@ typedef struct _STORAGE_ADAPTER_DESCRIPTOR {
  * Helper functions
  */
 
-static int enumerate_device_adapter(const char *path, optcl_adapter **adapter)
+static RESULT enumerate_device_adapter(const char *path, 
+				       optcl_adapter **adapter)
 {
 	int error;
 	ULONG bytes;
@@ -249,7 +250,7 @@ static int enumerate_device_adapter(const char *path, optcl_adapter **adapter)
 	return SUCCESS;
 }
 
-static int enumerate_device_features(optcl_device *device)
+static RESULT enumerate_device_features(optcl_device *device)
 {
 	assert(device);
 
@@ -259,7 +260,9 @@ static int enumerate_device_features(optcl_device *device)
 
 }
 
-static int enumerate_device(int index, HDEVINFO hDevInfo, optcl_device **device)
+static RESULT enumerate_device(int index, 
+			       HDEVINFO hDevInfo, 
+			       optcl_device **device)
 {
 	int error;
 	BOOL status;
@@ -482,7 +485,7 @@ static int enumerate_device(int index, HDEVINFO hDevInfo, optcl_device **device)
  * System device functions
  */
 
-int optcl_device_enumerate(optcl_list **devices)
+RESULT optcl_device_enumerate(optcl_list **devices)
 {
 	int index;
 	int error;
@@ -536,11 +539,11 @@ int optcl_device_enumerate(optcl_list **devices)
 	return error;
 }
 
-int optcl_device_command_execute(const optcl_device *device, 
-				 const void *cdb,
-				 int cdb_size,
-				 void *param,
-				 int param_size)
+RESULT optcl_device_command_execute(const optcl_device *device, 
+				    const void *cdb,
+				    uint32_t cdb_size,
+				    void *param,
+				    uint32_t param_size)
 {
 	int error;
 	char *path;
