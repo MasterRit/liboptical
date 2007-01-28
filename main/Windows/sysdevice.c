@@ -167,8 +167,8 @@ static RESULT enumerate_device_adapter(const char *path,
 	STORAGE_PROPERTY_QUERY query;
 	PSTORAGE_ADAPTER_DESCRIPTOR adpDesc;
 
-	assert(path);
-	assert(adapter);
+	assert(path != 0);
+	assert(adapter != 0);
 
 	if (path == 0 || adapter == 0) {
 		return(E_INVALIDARG);
@@ -268,7 +268,7 @@ static RESULT enumerate_device_adapter(const char *path,
 
 static RESULT enumerate_device_features(optcl_device *device)
 {
-	assert(device);
+	assert(device != 0);
 
 	if (device == 0) {
 		return(E_INVALIDARG);
@@ -295,8 +295,8 @@ static RESULT enumerate_device(int index,
 	SP_DEVICE_INTERFACE_DATA interfaceData;
 	PSP_DEVICE_INTERFACE_DETAIL_DATA_A pInterfaceDetailData;
 
-	assert(device);
-	assert(hDevInfo);
+	assert(device != 0);
+	assert(hDevInfo != 0);
 	assert(index >= 0);
 
 	if (device == 0 || hDevInfo == 0 || index < 0) {
@@ -513,7 +513,7 @@ RESULT optcl_device_enumerate(optcl_list **devices)
 	HDEVINFO hIntDevInfo;
 	optcl_device *ndevice;
 
-	assert(devices);
+	assert(devices != 0);
 
 	if (devices == 0) {
 		return(E_INVALIDARG);
@@ -580,8 +580,8 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 	DWORD dwErrorCode;
 	SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER sptdwb;
 
-	assert(cdb);
-	assert(device);
+	assert(cdb != 0);
+	assert(device != 0);
 	assert(cdb_size > 0);
 	assert(param_size >= 0);
 
