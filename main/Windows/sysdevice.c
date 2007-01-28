@@ -608,7 +608,7 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 	sptdwb.sptd.SenseInfoLength = sizeof(sptdwb.ucSenseBuf);
 	sptdwb.sptd.SenseInfoOffset = offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER, ucSenseBuf);
 	sptdwb.sptd.TargetId = 1;
-	sptdwb.sptd.TimeOutValue = 2;
+	sptdwb.sptd.TimeOutValue = 2L;
 
 	OPTCL_TRACE_ARRAY_MSG("CDB bytes:", cdb, cdb_size);
 	OPTCL_TRACE_ARRAY_MSG("CDB parameter bytes:", param, param_size);
