@@ -74,7 +74,7 @@ static uint32_t joaat_hash(const uint8_t key[], uint32_t len)
 	uint32_t i;
 	uint32_t hash = 0U;
 
-	assert(key);
+	assert(key != 0);
 
 	if (key == 0)
 		return(0);
@@ -103,7 +103,7 @@ RESULT optcl_hashtable_clear(optcl_hashtable *hashtable, bool_t deallocate)
 	uint32_t entrycount;
 	struct entry *entry = 0;
 
-	assert(hashtable);
+	assert(hashtable != 0);
 
 	if (hashtable == 0) {
 		return(E_INVALIDARG);
@@ -158,8 +158,8 @@ RESULT optcl_hashtable_copy(optcl_hashtable *dest, const optcl_hashtable *src)
 	optcl_list *nbucket = 0;
 	optcl_list_equalfn equalfn = 0;
 
-	assert(src);
-	assert(dest);
+	assert(src != 0);
+	assert(dest != 0);
 
 	if (dest == 0 || src == 0) {
 		return(E_INVALIDARG);
@@ -231,8 +231,8 @@ RESULT optcl_hashtable_create(uint32_t keysize,
 {
 	optcl_hashtable *nhashtable = 0;
 
-	assert(hashtable);
-	assert(keysize >0);
+	assert(hashtable != 0);
+	assert(keysize > 0);
 
 	if (hashtable == 0 || keysize <= 0) {
 		return(E_INVALIDARG);
@@ -258,7 +258,7 @@ RESULT optcl_hashtable_destroy(optcl_hashtable *hashtable, bool_t deallocate)
 {
 	RESULT error;
 
-	assert(hashtable);
+	assert(hashtable != 0);
 
 	if (hashtable == 0) {
 		return(E_INVALIDARG);
@@ -286,8 +286,8 @@ RESULT optcl_hashtable_get_pairs(const optcl_hashtable *hashtable,
 	optcl_list *pair_list = 0;
 	optcl_list_iterator it = 0;
 
-	assert(hashtable);
-	assert(pairs);
+	assert(hashtable != 0);
+	assert(pairs != 0);
 
 	if (hashtable == 0 || pairs == 0) {
 		return(E_INVALIDARG);
@@ -425,9 +425,9 @@ RESULT optcl_hashtable_lookup(const optcl_hashtable *hashtable,
 	optcl_list_iterator it = 0;
 	optcl_hashtable_hashfn hashfn = 0;
 
-	assert(key);
-	assert(value);
-	assert(hashtable);
+	assert(key != 0);
+	assert(value != 0);
+	assert(hashtable != 0);
 
 	if (hashtable == 0 || key == 0 || value == 0) {
 		return(E_INVALIDARG);
@@ -435,7 +435,7 @@ RESULT optcl_hashtable_lookup(const optcl_hashtable *hashtable,
 
 	*value = 0;
 
-	assert(hashtable->hashfn);
+	assert(hashtable->hashfn != 0);
 	assert(hashtable->keysize > 0);
 
 	if (hashtable->hashfn == 0 || hashtable->keysize <= 0) {
@@ -467,14 +467,14 @@ RESULT optcl_hashtable_lookup(const optcl_hashtable *hashtable,
 		return(error);
 	}
 
-	assert(entry);
+	assert(entry != 0);
 
 	if (entry == 0) {
 		return(E_COLLINVLDHASHTABLE);
 	}
 
 	if (hashfn(entry->pair.key, hashtable->keysize) == hash) {
-		assert(!entry->bucket);
+		assert(entry->bucket == 0);
 		*value = entry->pair.value;
 		return(SUCCESS);
 	}
@@ -485,7 +485,7 @@ RESULT optcl_hashtable_lookup(const optcl_hashtable *hashtable,
 		return(error);
 	}
 
-	assert(it);
+	assert(it != 0);
 
 	if (it == 0) {
 		return(E_COLLINVLDHASHTABLE);
@@ -525,21 +525,21 @@ RESULT optcl_hashtable_set(optcl_hashtable *hashtable,
 	struct pair *pair = 0;
 	struct entry *entry = 0;
 
-	assert(key);
-	assert(hashtable);
+	assert(key != 0);
+	assert(hashtable != 0);
 
 	if (key == 0 || hashtable == 0) {
 		return(E_INVALIDARG);
 	}
 
-	assert(hashtable->hashfn);
+	assert(hashtable->hashfn != 0);
 	assert(hashtable->keysize > 0);
 
 	if (hashtable->keysize <= 0) {
 		return(E_COLLINVLDHASHTABLE);
 	}
 
-	assert(hashtable->entries);
+	assert(hashtable->entries != 0);
 
 	if (hashtable->entries == 0) {
 		size = 0;
@@ -634,7 +634,7 @@ RESULT optcl_hashtable_rehash(optcl_hashtable *hashtable)
 	struct entry *entry = 0;
 	optcl_array *nentries = 0;
 
-	assert(hashtable);
+	assert(hashtable != 0);
 
 	if (hashtable == 0) {
 		return(E_INVALIDARG);
