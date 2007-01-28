@@ -28,18 +28,6 @@
 
 
 /*
- * Helper constants
- */
-
-#ifdef _DEBUG
-
-/* Poison value to detect use of deallocated list elements */
-#define POISON		((void*)0x12345678)
-
-#endif
-
-
-/*
  * Array internal structures
  */
 
@@ -272,10 +260,6 @@ RESULT optcl_array_destroy(optcl_array *array, bool_t deallocate)
 	 if (FAILED(error)) {
 		 return(error);
 	 }
-
-#ifdef _DEBUG
-	 array->buffer = POISON;
-#endif
 
 	 free(array);
 
@@ -568,14 +552,8 @@ RESULT optcl_array_set_size(optcl_array *array,
 	
 		/* Deallocate pointers */
 		for(i = 0; i < array->count - size; ++i) {
-			
 			index = array->count - size + i;
-
 			free(*((char**)buffer + index * sizeof(char)));
-#ifdef _DEBUG
-			*((char**)buffer + index * sizeof(char)) = POISON;
-#endif
-
 		}
 	}
 
