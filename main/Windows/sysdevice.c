@@ -156,7 +156,7 @@ static RESULT enumerate_device_adapter(const char *path,
 	assert(path);
 	assert(adapter);
 
-	if (!path || !adapter) {
+	if (path == 0 || adapter == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -194,7 +194,7 @@ static RESULT enumerate_device_adapter(const char *path,
 
 	CloseHandle(hDevice);
 
-	if (!success) {
+	if (success == 0) {
 		return MAKE_ERRORCODE(
 			SEVERITY_ERROR, 
 			FACILITY_DEVICE, 
@@ -256,7 +256,7 @@ static RESULT enumerate_device_features(optcl_device *device)
 {
 	assert(device);
 
-	if (!device) {
+	if (device == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -284,7 +284,7 @@ static RESULT enumerate_device(int index,
 	assert(hDevInfo);
 	assert(index >= 0);
 
-	if (!device || !hDevInfo || index < 0) {
+	if (device == 0 || hDevInfo == 0 || index < 0) {
 		return E_INVALIDARG;
 	}
 
@@ -298,7 +298,7 @@ static RESULT enumerate_device(int index,
                 &interfaceData				/* Device Interface Data */
                 );
 
-	if (!status) {
+	if (status == 0) {
 		return MAKE_ERRORCODE(
 			SEVERITY_ERROR, 
 			FACILITY_DEVICE, 
@@ -325,7 +325,7 @@ static RESULT enumerate_device(int index,
 
 	dwErrorCode = GetLastError();
 
-	if (!status && dwErrorCode != ERROR_INSUFFICIENT_BUFFER) {
+	if (status == FALSE && dwErrorCode != ERROR_INSUFFICIENT_BUFFER) {
 		return MAKE_ERRORCODE(
 			SEVERITY_ERROR,
 			FACILITY_DEVICE,
@@ -340,7 +340,7 @@ static RESULT enumerate_device(int index,
 
 	pInterfaceDetailData = malloc(dwReqSize);
 
-	if (!pInterfaceDetailData) {
+	if (pInterfaceDetailData == 0) {
 		return E_OUTOFMEMORY;
 	}
 
@@ -354,7 +354,7 @@ static RESULT enumerate_device(int index,
 		&dwReqSize,			/* Buffer size required to get the detail data */
 		NULL);				/* Interface device info */
 
-	if (!status) {
+	if (status == 0) {
 		free(pInterfaceDetailData);
 
 		return MAKE_ERRORCODE(
@@ -371,7 +371,7 @@ static RESULT enumerate_device(int index,
 
 	devicepath = _strdup(pInterfaceDetailData->DevicePath);
 
-	if (!devicepath && pInterfaceDetailData->DevicePath) {
+	if (devicepath == 0 && pInterfaceDetailData->DevicePath != 0) {
 		free(pInterfaceDetailData);
 		return E_OUTOFMEMORY;
 	}
@@ -426,7 +426,7 @@ static RESULT enumerate_device(int index,
 
 	tmp = _strdup((char*)response->product);
 
-	if (!tmp && response->product) {
+	if (tmp == 0 && response->product != 0) {
 		optcl_device_destroy(ndevice);
 		free(response);
 		return E_OUTOFMEMORY;
@@ -442,7 +442,7 @@ static RESULT enumerate_device(int index,
 
 	tmp = _strdup((char*)response->vendor);
 
-	if (!tmp && response->vendor) {
+	if (tmp == 0 && response->vendor != 0) {
 		optcl_device_destroy(ndevice);
 		free(response);
 		return E_OUTOFMEMORY;
@@ -499,7 +499,7 @@ RESULT optcl_device_enumerate(optcl_list **devices)
 
 	assert(devices);
 
-	if (!devices) {
+	if (devices == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -567,7 +567,7 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 	assert(cdb_size > 0);
 	assert(param_size >= 0);
 
-	if (!cdb || !device || cdb_size < 0 || param_size < 0) {
+	if (cdb == 0 || device == 0 || cdb_size < 0 || param_size < 0) {
 		return E_INVALIDARG;
 	}
 
@@ -589,7 +589,7 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 
 	free(path);
 
-	if (!hDevice) {
+	if (hDevice == NULL) {
 		return MAKE_ERRORCODE(
 			SEVERITY_ERROR, 
 			FACILITY_DEVICE, 
@@ -629,7 +629,7 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 
 	OPTCL_TRACE_ARRAY_MSG("DeviceIoControl error code:", (uint8_t*)&dwErrorCode, sizeof(dwErrorCode));
 
-	if (!success && dwErrorCode != ERROR_INSUFFICIENT_BUFFER) {
+	if (success == FALSE && dwErrorCode != ERROR_INSUFFICIENT_BUFFER) {
 		error = MAKE_ERRORCODE(
 			SEVERITY_ERROR, 
 			FACILITY_DEVICE, 
@@ -637,7 +637,7 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 			);
 	}
 
-	if (!success && bytes != 0) {
+	if (success == FALSE && bytes != 0) {
 		error = E_UNEXPECTED;
 	}
 
