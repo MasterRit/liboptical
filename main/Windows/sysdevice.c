@@ -170,7 +170,7 @@ static RESULT enumerate_device_adapter(const char *path,
                 NULL					// hTemplateFile
                 );
 
-	if (!hDevice) {
+	if (hDevice == NULL) {
 		return MAKE_ERRORCODE(
 			SEVERITY_ERROR, 
 			FACILITY_DEVICE, 
