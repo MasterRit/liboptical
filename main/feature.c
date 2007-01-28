@@ -27,6 +27,10 @@
 #include <memory.h>
 
 
+/*
+ * Internal feature structures
+ */
+
 struct feature_sizes_entry {
 	uint16_t code;
 	uint16_t size;
@@ -85,8 +89,11 @@ static struct feature_sizes_entry __feature_struct_sizes[] = {
 	{ FEATURE_VCPS,				sizeof(optcl_feature_vcps) }
 };
 
+/*
+ * Helper functions
+ */
 
-static int get_feature_size(uint16_t feature_code)
+static int32_t get_feature_size(uint16_t feature_code)
 {
 	int i;
 	int elements;
@@ -104,7 +111,11 @@ static int get_feature_size(uint16_t feature_code)
 	return __feature_struct_sizes[i].size;
 }
 
-int optcl_feature_copy(optcl_feature **dest, const optcl_feature *src)
+/*
+ * Feature functions
+ */
+
+RESULT optcl_feature_copy(optcl_feature **dest, const optcl_feature *src)
 {
 	int size;
 
@@ -131,7 +142,7 @@ int optcl_feature_copy(optcl_feature **dest, const optcl_feature *src)
 	return SUCCESS;
 }
 
-int optcl_feature_create(optcl_feature **feature, uint16_t feature_code)
+RESULT optcl_feature_create(optcl_feature **feature, uint16_t feature_code)
 {
 	int size;
 
@@ -157,7 +168,7 @@ int optcl_feature_create(optcl_feature **feature, uint16_t feature_code)
 	return SUCCESS;
 }
 
-int optcl_feature_destroy(optcl_feature *feature)
+RESULT optcl_feature_destroy(optcl_feature *feature)
 {
 	assert(feature);
 

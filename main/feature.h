@@ -20,6 +20,7 @@
 #ifndef _FEATURE_H
 #define _FEATURE_H
 
+#include "errors.h"
 #include "profile.h"
 #include "types.h"
 
@@ -173,8 +174,9 @@ typedef optcl_feature_descriptor optcl_feature;
 /* Profile list */
 typedef struct tag_feature_profile_list {
 	optcl_feature_descriptor descriptor;
-	uint16_t profile_number;
-	uint8_t current_profile;
+	uint8_t profile_count;
+	uint16_t profile_numbers[256];
+	uint8_t current_profiles[256];
 } optcl_feature_profile_list;
 
 /* Core feature*/
@@ -567,13 +569,15 @@ typedef struct tag_feature_vcps {
  */
 
 /* Copy feature */
-int optcl_feature_copy(optcl_feature **dest, const optcl_feature *src);
+extern RESULT optcl_feature_copy(optcl_feature **dest, 
+				 const optcl_feature *src);
 
 /* Create feature structure */
-int optcl_feature_create(optcl_feature **feature, uint16_t feature_code);
+extern RESULT optcl_feature_create(optcl_feature **feature, 
+				   uint16_t feature_code);
 
 /* Destroy feature structure */
-int optcl_feature_destroy(optcl_feature *feature);
+extern RESULT optcl_feature_destroy(optcl_feature *feature);
 
 
 #endif /* _FEATURE_H */
