@@ -20,8 +20,10 @@
 #include <stdafx.h>
 
 #include "adapter.h"
-#include "errors.h"
 #include "command.h"
+#include "errors.h"
+#include "feature.h"
+#include "parsers.h"
 #include "sysdevice.h"
 #include "types.h"
 
@@ -35,106 +37,290 @@
  */
 
 #define MMC_OPCODE_INQUIRY	0x0012
+#define MMC_OPCODE_GET_CONFIG	0x0046
 
+/*
+ * Constants used throughout the code
+ */
+
+#define MAX_GET_CONFIG_TRANSFER_LEN	65530
 
 /*
  * Helper functions
  */
 
-static optcl_mmc_result_inquiry* parse_std_inquiry_data(const uint8_t *mmc_result, 
-							int size)
-{
-	optcl_mmc_result_inquiry *result;
-
-	assert(size >= 5);
-	assert(mmc_result);
-
-	if (!mmc_result || size < 5)
-		return 0;
-
-	result = malloc(sizeof(optcl_mmc_result_inquiry));
-
-	if (!result)
-		return 0;
-
-	result->qualifier	= mmc_result[0] & 0xe0;		/* 11100000 */
-	result->device_type	= mmc_result[0] & 0x1f;		/* 00011111 */
-	result->rmb		= mmc_result[1] & 0x80;		/* 10000000 */
-	result->version		= mmc_result[2];
-	result->normaca		= mmc_result[3] & 0x20;		/* 00100000 */
-	result->hisup		= mmc_result[3] & 0x10;		/* 00010000 */
-	result->rdf		= mmc_result[3] & 0x0f;		/* 00001111 */
-	result->additional_len	= mmc_result[4];
-	result->sccs		= mmc_result[5] & 0x80;		/* 10000000 */
-	result->acc		= mmc_result[5] & 0x40;		/* 01000000 */
-	result->tpgs		= mmc_result[5] & 0x30;		/* 00110000 */
-	result->_3pc		= mmc_result[5] & 0x08;		/* 00001000 */
-	result->protect		= mmc_result[5] & 0x01;		/* 00000001 */
-	result->bque		= mmc_result[6] & 0x80;		/* 10000000 */
-	result->encserv		= mmc_result[6] & 0x40;		/* 01000000 */
-	result->vs		= mmc_result[6] & 0x20;		/* 00100000 */
-	result->multip		= mmc_result[6] & 0x10;		/* 00010000 */
-	result->mchngr		= mmc_result[6] & 0x08;		/* 00001000 */
-	result->addr16		= mmc_result[6] & 0x01;		/* 00000001 */
-	result->wbus16		= mmc_result[7] & 0x20;		/* 00100000 */
-	result->sync		= mmc_result[7] & 0x10;		/* 00010000 */
-	result->linked		= mmc_result[7] & 0x08;		/* 00001000 */
-	result->cmdque		= mmc_result[7] & 0x02;		/* 00000010 */
-
-	/* NOTE result->vs is duplicated at mmc_result[7] & 0x01 ?? */
-
-	strncpy_s((char*)result->vendor, 9, (char*)&mmc_result[8], 8);
-	strncpy_s((char*)result->product, 17, (char*)&mmc_result[16], 16);
-	strncpy_s((char*)result->vendor_string, 21, (char*)&mmc_result[36], 20);
-
-	result->revision_level	= uint32_from_be(*(uint32_t*)&mmc_result[32]);
-
-	result->clocking	= mmc_result[56] & 0x0c;	/* 00001100 */
-	result->qas		= mmc_result[56] & 0x02;	/* 00000010 */
-	result->ius		= mmc_result[56] & 0x01;	/* 00000001 */
-
-	result->ver_desc1	= uint16_from_be(*(uint16_t*)&mmc_result[58]);
-	result->ver_desc2	= uint16_from_be(*(uint16_t*)&mmc_result[60]);
-	result->ver_desc3	= uint16_from_be(*(uint16_t*)&mmc_result[62]);
-	result->ver_desc4	= uint16_from_be(*(uint16_t*)&mmc_result[64]);
-	result->ver_desc5	= uint16_from_be(*(uint16_t*)&mmc_result[66]);
-	result->ver_desc6	= uint16_from_be(*(uint16_t*)&mmc_result[68]);
-	result->ver_desc7	= uint16_from_be(*(uint16_t*)&mmc_result[70]);
-	result->ver_desc8	= uint16_from_be(*(uint16_t*)&mmc_result[72]);
-
-	return result;
-}
-
 /*
  * Command functions
  */
 
-int optcl_command_inquiry(const optcl_device *device, 
-			  const optcl_mmc_inquiry *command, 
-			  optcl_mmc_result_inquiry **result)
+RESULT optcl_command_get_config(const optcl_device *device,
+				const optcl_mmc_get_config *command,
+				optcl_mmc_response_get_config **response)
 {
-	int error;
-	uint8_t msg[6];
-	uint8_t *mmc_result;
-	int alignment_mask;
+	RESULT error;
+	uint8_t rt;
+	uint8_t cdb[10];
+	uint32_t data_length;
+	uint16_t start_feature;
+	uint32_t transfer_size;
+	uint32_t alignment_mask;
+	uint32_t max_transfer_len;
+	uint8_t *mmc_response;
 	optcl_adapter *adapter;
-	optcl_mmc_result_inquiry *nresult;
+	optcl_list_iterator it;
+	optcl_feature_descriptor *descriptor;
+	optcl_mmc_response_get_config *nresponse0;
+	optcl_mmc_response_get_config *nresponse1;
 
 	assert(device);
 	assert(command);
-	assert(result);
+	assert(response);
 
-	if (!device || !command || !result)
+	if (!device || !command || !response)
 		return E_INVALIDARG;
 
+	assert(
+		command->rt == MMC_GET_CONFIG_RT_ALL 
+		|| command->rt == MMC_GET_CONFIG_RT_CURRENT 
+		|| command->rt == MMC_GET_CONFIG_RT_FROM
+		);
+
+	if (command->rt != MMC_GET_CONFIG_RT_ALL 
+		&& command->rt != MMC_GET_CONFIG_RT_CURRENT 
+		&& command->rt != MMC_GET_CONFIG_RT_FROM)
+	{
+		return E_INVALIDARG;
+	}
+
+	assert(command->start_feature >= 0);
+
+	if (command->start_feature < 0)
+		return E_INVALIDARG;
+
+	error = optcl_device_get_adapter(device, &adapter);
+
+	if (FAILED(error))
+		return error;
+
+	error = optcl_adapter_get_alignment_mask(adapter, &alignment_mask);
+
+	if (FAILED(error)) {
+		optcl_adapter_destroy(adapter);
+		return error;
+	}
+
+	error = optcl_adapter_get_max_transfer_len(adapter, &max_transfer_len);
+
+	if (FAILED(error)) {
+		optcl_adapter_destroy(adapter);
+		return error;
+	}
+
+	error = optcl_adapter_destroy(adapter);
+
+	if (FAILED(error))
+		return error;
+
 	/*
-	 * Execute command just to get additional length
+	 * Execute command just to get data length
 	 */
 
-	memset(msg, 0, sizeof(msg));
+	rt = command->rt & 0x03;
+	start_feature = command->start_feature;
 
-	msg[0] = MMC_OPCODE_INQUIRY;
-	msg[4] = 5; /* the allocation length should be at least five */
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_GET_CONFIG;
+	cdb[1] = rt;
+	cdb[2] = (uint8_t)(uint16_to_be(start_feature) >> 8);
+	cdb[3] = (uint8_t)((uint16_to_be(start_feature) << 8) >> 8);
+	cdb[8] = 8; /* enough to get feature descriptor header */
+
+	mmc_response = _aligned_malloc(cdb[8], alignment_mask);
+
+	if (!mmc_response)
+		return E_OUTOFMEMORY;
+
+	error = optcl_device_command_execute(
+		device, 
+		cdb, 
+		sizeof(cdb), 
+		mmc_response, 
+		cdb[8]
+		);
+
+	if (FAILED(error)) {
+		_aligned_free(mmc_response);
+		return error;
+	}
+
+	nresponse0 = malloc(sizeof(optcl_mmc_response_get_config));
+
+	if (!nresponse0) {
+		_aligned_free(mmc_response);
+		return E_OUTOFMEMORY;
+	}
+
+	memset(&nresponse0, 0, sizeof(nresponse0));
+
+	error = optcl_list_create(0, &nresponse0->descriptors);
+
+	if (FAILED(error)) {
+		free(nresponse0);
+		_aligned_free(mmc_response);
+		return error;
+	}
+
+	/*
+	 * Set new data length and execute command
+	 * 
+	 * NOTE that in MMC-5 standard, the entire set of defined 
+	 * feature descriptors amounts to less than 1 KB.
+	 */
+
+	data_length = int32_from_be((int32_t)(*mmc_response));
+
+	_aligned_free(mmc_response);
+	
+	nresponse0->data_length = data_length;
+
+	if (max_transfer_len > MAX_GET_CONFIG_TRANSFER_LEN)
+		max_transfer_len = MAX_GET_CONFIG_TRANSFER_LEN;
+
+	do {
+		transfer_size = (data_length > max_transfer_len)
+			? max_transfer_len
+			: data_length;
+
+		data_length -= max_transfer_len;
+
+		/*
+		 * Get the next chunk of data
+		 */
+
+		cdb[1] = rt;
+		cdb[2] = (uint8_t)(uint16_to_be(start_feature) >> 8);
+		cdb[3] = (uint8_t)((uint16_to_be(start_feature) << 8) >> 8);
+		cdb[7] = (uint8_t)(uint16_to_be((uint16_t)transfer_size) >> 8);
+		cdb[8] = (uint8_t)((uint16_to_be((uint16_t)transfer_size) << 8) >> 8);
+
+		mmc_response = _aligned_malloc(transfer_size, alignment_mask);
+
+		if (!mmc_response) {
+			error = E_OUTOFMEMORY;
+			break;
+		}
+
+		memset(mmc_response, 0, transfer_size);
+
+		error = optcl_device_command_execute(
+			device,
+			cdb,
+			sizeof(cdb),
+			mmc_response,
+			transfer_size
+			);
+
+		if (FAILED(error)) {
+			_aligned_free(mmc_response);
+			break;
+		}
+
+		rt = MMC_GET_CONFIG_RT_FROM;
+
+		/*
+		 * Process current chnk of data
+		 */
+
+		error = optcl_parse_get_config_data(
+			mmc_response, 
+			max_transfer_len, 
+			&nresponse1
+			);
+
+		if (FAILED(error)) {
+			_aligned_free(mmc_response);
+			break;
+		}
+
+		error = optcl_list_get_tail_pos(nresponse1->descriptors, &it);
+
+		if (FAILED(error)) {
+			optcl_list_destroy(nresponse1->descriptors, 1);
+			_aligned_free(mmc_response);
+			free(nresponse1);
+			break;
+		}
+
+		error = optcl_list_get_at_pos(nresponse1->descriptors, it, &descriptor);
+
+		if (FAILED(error)) {
+			optcl_list_destroy(nresponse1->descriptors, 1);
+			_aligned_free(mmc_response);
+			free(nresponse1);
+			break;
+		}
+
+		start_feature = descriptor->feature_code + 1;
+
+		nresponse0->current_profile = nresponse1->current_profile;
+		
+		error = optcl_list_append(nresponse0->descriptors, nresponse1->descriptors);
+
+		if (FAILED(error)) {
+			optcl_list_destroy(nresponse1->descriptors, 1);
+			_aligned_free(mmc_response);
+			free(nresponse1);
+			break;
+		}
+
+		error = optcl_list_destroy(nresponse1->descriptors, 1);
+
+		if (FAILED(error)) {
+			_aligned_free(mmc_response);
+			free(nresponse1);
+			break;
+		}
+
+		free(nresponse1);
+		_aligned_free(mmc_response);
+
+	} while(data_length > 0);
+
+	if (FAILED(error)) {
+		optcl_list_destroy(nresponse0->descriptors, 1);
+		free(nresponse0);
+		return error;
+	}
+
+	*response = nresponse0;
+
+	return error;
+}
+
+RESULT optcl_command_inquiry(const optcl_device *device, 
+			     const optcl_mmc_inquiry *command, 
+			     optcl_mmc_response_inquiry **response)
+{
+	RESULT error;
+	uint8_t cdb[6];
+	uint8_t *mmc_response;
+	uint32_t alignment_mask;
+	optcl_adapter *adapter;
+	optcl_mmc_response_inquiry *nresponse;
+
+	assert(device);
+	assert(command);
+	assert(response);
+
+	if (!device || !command || !response)
+		return E_INVALIDARG;
+
+	assert(command->evpd == 0);
+	assert(command->page_code == 0);
+
+	if (command->evpd != 0 || command->page_code != 0)
+		return E_INVALIDARG;
 
 	error = optcl_device_get_adapter(device, &adapter);
 
@@ -153,59 +339,64 @@ int optcl_command_inquiry(const optcl_device *device,
 	if (FAILED(error))
 		return error;
 
-	mmc_result = _aligned_malloc(msg[4], alignment_mask);
+	/*
+	 * Execute command just to get additional length
+	 */
 
-	if (!mmc_result)
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_INQUIRY;
+	cdb[4] = 5; /* the allocation length should be at least five */
+
+	mmc_response = _aligned_malloc(cdb[4], alignment_mask);
+
+	if (!mmc_response)
 		return E_OUTOFMEMORY;
 
 	/* Get standard inquiry data additional length */
 	error = optcl_device_command_execute(
 		device, 
-		msg, 
-		sizeof(msg), 
-		mmc_result,
-		msg[4]
+		cdb, 
+		sizeof(cdb), 
+		mmc_response,
+		cdb[4]
 		);
 
 	if (FAILED(error)) {
-		_aligned_free(mmc_result);
+		_aligned_free(mmc_response);
 		return error;
 	}
 
 	/* Set standard inquiry data length */
-	msg[4] = mmc_result[4] + 4;
+	cdb[4] = mmc_response[4] + 4;
 
-	_aligned_free(mmc_result);
+	_aligned_free(mmc_response);
 
-	mmc_result = _aligned_malloc((size_t)msg[4], alignment_mask);
+	mmc_response = _aligned_malloc((size_t)cdb[4], alignment_mask);
 
-	if (!mmc_result)
+	if (!mmc_response)
 		return E_OUTOFMEMORY;
 
 	/* Get standard inquiry data */
 	error = optcl_device_command_execute(
 		device, 
-		msg, 
-		sizeof(msg), 
-		mmc_result,
-		msg[4]
+		cdb, 
+		sizeof(cdb), 
+		mmc_response,
+		cdb[4]
 		);
 
 	if (FAILED(error)) {
-		_aligned_free(mmc_result);
+		_aligned_free(mmc_response);
 		return error;
 	}
 
-	nresult = parse_std_inquiry_data(mmc_result, msg[4]);
+	error = optcl_parse_inquiry_data(mmc_response, cdb[4], &nresponse);
 
-	if (!nresult) {
-		_aligned_free(mmc_result);
-		return E_OUTOFMEMORY;
-	}
+	if (SUCCEEDED(error))
+		*response = nresponse;
 
-	_aligned_free(mmc_result);
+	_aligned_free(mmc_response);
 
-	*result = nresult;
-
-	return SUCCESS;
+	return error;
 }

@@ -21,16 +21,48 @@
 #define _COMMAND_H
 
 #include "device.h"
+#include "errors.h"
+#include "list.h"
 
+/*
+ * Command field flags
+ */
+
+#define MMC_GET_CONFIG_RT_ALL		0x00
+#define MMC_GET_CONFIG_RT_CURRENT	0x01
+#define MMC_GET_CONFIG_RT_FROM		0x02
+
+
+/*
+ * Command structures
+ */
+
+typedef struct tag_mmc_get_config {
+	uint8_t rt;
+	uint16_t start_feature;
+	/* uint16_t allocation_length; */
+	/* uint8_t control; */
+} optcl_mmc_get_config;
 
 typedef struct tag_mmc_inquiry {
 	uint8_t evpd;
 	uint8_t page_code;
-	uint16_t allocation_length;
-	uint8_t control;
+	/* uint16_t allocation_length; */
+	/* uint8_t control; */
 } optcl_mmc_inquiry;
 
-typedef struct tag_mmc_result_inquiry {
+
+/*
+ * Command result structures
+ */
+
+typedef struct tag_mmc_response_get_config {
+	uint32_t data_length;
+	uint16_t current_profile;
+	optcl_list *descriptors;
+} optcl_mmc_response_get_config;
+
+typedef struct tag_mmc_response_inquiry {
 	uint8_t qualifier;	/* Peripheral qualifier */
 	uint8_t device_type;
 	uint8_t rmb;
@@ -69,14 +101,18 @@ typedef struct tag_mmc_result_inquiry {
 	uint16_t ver_desc6;
 	uint16_t ver_desc7;
 	uint16_t ver_desc8;
-} optcl_mmc_result_inquiry;
+} optcl_mmc_response_inquiry;
 
 /*
  * Command functions
  */
 
-int optcl_command_inquiry(const optcl_device *device, 
-			  const optcl_mmc_inquiry *command, 
-			  optcl_mmc_result_inquiry **result);
+extern RESULT optcl_command_get_config(const optcl_device *device,
+				       const optcl_mmc_get_config *command,
+				       optcl_mmc_response_get_config **response);
+
+extern RESULT optcl_command_inquiry(const optcl_device *device, 
+				    const optcl_mmc_inquiry *command, 
+				    optcl_mmc_response_inquiry **response);
 
 #endif /* _COMMAND_H */
