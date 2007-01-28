@@ -19,13 +19,6 @@
 
 #include <stdafx.h>
 
-#include "command.h"
-#include "debug.h"
-#include "device.h"
-#include "errors.h"
-#include "sysdevice.h"
-#include "transport.h"
-
 #include <assert.h>
 #include <malloc.h>
 #include <memory.h>
@@ -61,6 +54,26 @@
 #pragma warning(pop)
 
 #pragma warning(pop) /* #pragma warning(disable: 4005) */
+
+#pragma warning(push)
+/* 
+ * warning C4005: macro redefinitions of macros defined in errors.h
+ * NOTE that we must include our errors.h after all standard Win32
+ *	headers.
+ */
+#pragma warning(disable: 4005)
+
+#undef _ERRORS_H
+
+#include "command.h"
+#include "debug.h"
+#include "device.h"
+#include "errors.h"
+#include "sysdevice.h"
+#include "transport.h"
+
+#pragma warning(pop) /* #pragma warning(disable: 4005) */
+
 
 /*
  * SCSI pass through structures *mostly copy-pasted from winioctl.h
@@ -144,7 +157,7 @@ typedef struct _STORAGE_ADAPTER_DESCRIPTOR {
 static RESULT enumerate_device_adapter(const char *path, 
 				       optcl_adapter **adapter)
 {
-	int error;
+	RESULT error;
 	ULONG bytes;
 	BOOL success;
 	HANDLE hDevice;
@@ -267,7 +280,7 @@ static RESULT enumerate_device(int index,
 			       HDEVINFO hDevInfo, 
 			       optcl_device **device)
 {
-	int error;
+	RESULT error;
 	BOOL status;
 	char *tmp;
 	char *devicepath;
@@ -493,7 +506,7 @@ static RESULT enumerate_device(int index,
 RESULT optcl_device_enumerate(optcl_list **devices)
 {
 	int index;
-	int error;
+	RESULT error;
 	HDEVINFO hIntDevInfo;
 	optcl_device *ndevice;
 
@@ -554,7 +567,7 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 				    void *param,
 				    uint32_t param_size)
 {
-	int error;
+	RESULT error;
 	char *path;
 	DWORD bytes;
 	BOOL success;
