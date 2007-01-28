@@ -150,6 +150,7 @@ RESULT optcl_feature_copy(optcl_feature **dest, const optcl_feature *src)
 RESULT optcl_feature_create(optcl_feature **feature, uint16_t feature_code)
 {
 	int size;
+	optcl_feature *nfeature = 0;
 
 	assert(feature != 0);
 
@@ -163,15 +164,17 @@ RESULT optcl_feature_create(optcl_feature **feature, uint16_t feature_code)
 		return(E_DEVUNKNFEATURE);
 	}
 
-	*feature = malloc(size);
+	nfeature = malloc(size);
 
-	if (*feature == 0) {
+	if (nfeature == 0) {
 		return(E_OUTOFMEMORY);
 	}
 
-	memset(*feature, 0, size);
+	memset(nfeature, 0, size);
 
-	(*feature)->feature_code = feature_code;
+	nfeature->feature_code = feature_code;
+
+	*feature = nfeature;
 
 	return(SUCCESS);
 }
