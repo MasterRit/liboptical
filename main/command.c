@@ -72,11 +72,11 @@ RESULT optcl_command_get_config(const optcl_device *device,
 	optcl_mmc_response_get_config *nresponse0;
 	optcl_mmc_response_get_config *nresponse1;
 
-	assert(device);
-	assert(command);
-	assert(response);
+	assert(device != 0);
+	assert(command != 0);
+	assert(response != 0);
 
-	if (!device || !command || !response) {
+	if (device == 0 || command == 0 || response == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -142,7 +142,7 @@ RESULT optcl_command_get_config(const optcl_device *device,
 
 	mmc_response = _aligned_malloc(cdb[8], alignment_mask);
 
-	if (!mmc_response) {
+	if (mmc_response == 0) {
 		return E_OUTOFMEMORY;
 	}
 
@@ -161,7 +161,7 @@ RESULT optcl_command_get_config(const optcl_device *device,
 
 	nresponse0 = malloc(sizeof(optcl_mmc_response_get_config));
 
-	if (!nresponse0) {
+	if (nresponse0 == 0) {
 		_aligned_free(mmc_response);
 		return E_OUTOFMEMORY;
 	}
@@ -211,7 +211,7 @@ RESULT optcl_command_get_config(const optcl_device *device,
 
 		mmc_response = _aligned_malloc(transfer_size, alignment_mask);
 
-		if (!mmc_response) {
+		if (mmc_response == 0) {
 			error = E_OUTOFMEMORY;
 			break;
 		}
@@ -314,11 +314,11 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 	optcl_adapter *adapter;
 	optcl_mmc_response_inquiry *nresponse;
 
-	assert(device);
-	assert(command);
-	assert(response);
+	assert(device != 0);
+	assert(command != 0);
+	assert(response != 0);
 
-	if (!device || !command || !response) {
+	if (device == 0|| command == 0 || response == 0) {
 		return E_INVALIDARG;
 	}
 
@@ -359,7 +359,7 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 
 	mmc_response = _aligned_malloc(cdb[4], alignment_mask);
 
-	if (!mmc_response) {
+	if (mmc_response == 0) {
 		return E_OUTOFMEMORY;
 	}
 
@@ -384,7 +384,7 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 
 	mmc_response = _aligned_malloc((size_t)cdb[4], alignment_mask);
 
-	if (!mmc_response) {
+	if (mmc_response == 0) {
 		return E_OUTOFMEMORY;
 	}
 
