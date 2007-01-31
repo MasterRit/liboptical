@@ -522,6 +522,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\profile.c"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -629,6 +633,10 @@
 			</File>
 			<File
 				RelativePath=".\parsers.h"
+				>
+			</File>
+			<File
+				RelativePath=".\profile.h"
 				>
 			</File>
 			<File
