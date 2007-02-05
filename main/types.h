@@ -138,6 +138,12 @@ typedef unsigned __int64	uint64_t;
 
 #endif
 
+/*
+ * Helper macros
+ */
 
+#define uint32_from_be_bytes(b0, b1, b2, b3)	((uint32_t)uint32_from_be(		\
+	(uint8_t)b3 << 24 | (uint8_t)b2 << 16 | (uint8_t)b1 << 8 | (uint8_t)b0		\
+	))
 
 #endif /* _TYPES_H */
