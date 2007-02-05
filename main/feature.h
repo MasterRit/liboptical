@@ -21,7 +21,6 @@
 #define _FEATURE_H
 
 #include "errors.h"
-#include "profile.h"
 #include "types.h"
 
 /*
@@ -43,7 +42,7 @@
 #define FEATURE_MULTI_READ			0x001D
 #define FEATURE_CD_READ				0x001E
 #define FEATURE_DVD_READ			0x001F
-#define FEATURE_RANDOM_WRITEABLE		0x0020
+#define FEATURE_RANDOM_WRITABLE			0x0020
 #define FEATURE_INC_STREAMING_WRITABLE		0x0021
 #define FEATURE_SECTOR_ERASABLE			0x0022
 #define FEATURE_FORMATTABLE			0x0023
@@ -175,15 +174,15 @@ typedef optcl_feature_descriptor optcl_feature;
 typedef struct tag_feature_profile_list {
 	optcl_feature_descriptor descriptor;
 	uint8_t profile_count;
-	uint16_t profile_numbers[256];
-	uint8_t current_profiles[256];
+	uint16_t profile_numbers[64];
+	bool_t current_profiles[64];
 } optcl_feature_profile_list;
 
 /* Core feature*/
 typedef struct tag_feature_core {
 	optcl_feature_descriptor descriptor;
 	uint32_t phys_i_standard;
-	uint8_t inq;
+	uint8_t inq2;
 	uint8_t dbe;
 } optcl_feature_core;
 
@@ -223,7 +222,7 @@ typedef struct tag_feature_random_readable {
 /* Multi read feature */
 typedef struct tag_feature_multi_read {
 	optcl_feature_descriptor descriptor;
-} optcl_feature_multy_read;
+} optcl_feature_multi_read;
 
 /* CD read feature */
 typedef struct tag_feature_cd_read {
@@ -573,8 +572,19 @@ extern RESULT optcl_feature_copy(optcl_feature **dest,
 				 const optcl_feature *src);
 
 /* Create feature structure */
-extern RESULT optcl_feature_create(optcl_feature **feature, 
-				   uint16_t feature_code);
+extern RESULT optcl_feature_create(uint16_t feature_code,
+				   optcl_feature **feature);
+
+/* Create feature from raw MMC data */
+extern RESULT optcl_feature_create_from_raw(optcl_feature **feature,
+					    const uint8_t mmc_data[],
+					    uint32_t size);
+
+/* Create feature descriptor from raw MMC data */
+extern RESULT optcl_feature_create_descriptor(optcl_feature_descriptor **descriptor,
+					      const uint8_t mmc_data[],
+					      uint32_t size);
+
 
 /* Destroy feature structure */
 extern RESULT optcl_feature_destroy(optcl_feature *feature);
