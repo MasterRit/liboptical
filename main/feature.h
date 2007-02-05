@@ -430,6 +430,7 @@ typedef struct tag_feature_bd_read {
 /* BD write feature */
 typedef struct tag_feature_bd_write {
 	optcl_feature_descriptor descriptor;
+	uint8_t svnr;
 	uint16_t bd_re_class0_bitmap;
 	uint16_t bd_re_class1_bitmap;
 	uint16_t bd_re_class2_bitmap;
@@ -477,12 +478,12 @@ typedef struct tag_feature_smart {
 } optcl_feature_smart;
 
 /* Embeded changer feature */
-typedef struct tag_feature_changer {
+typedef struct tag_feature_embedded_changer {
 	optcl_feature_descriptor descriptor;
 	uint8_t scc;
 	uint8_t sdp;
 	uint8_t highest_slot_num;
-} optcl_feature_changer;
+} optcl_feature_embedded_changer;
 
 /* Microcode upgrade feature */
 typedef struct tag_feature_microcode_upgrade {
@@ -516,7 +517,7 @@ typedef struct tag_feature_rt_streaming {
 /* Drive serial number feature */
 typedef struct tag_feature_drive_serial_number {
 	optcl_feature_descriptor descriptor;
-	uint8_t serial_number[1024];
+	uint8_t serial_number[257];
 } optcl_feature_drive_serial_number;
 
 /* Media serial number feature */
@@ -527,6 +528,7 @@ typedef struct tag_feature_media_serial_number {
 /* Disc control blocks (DCBs) feature */
 typedef struct tag_feature_dcbs {
 	optcl_feature_descriptor descriptor;
+	uint8_t dcb_entries_num;
 	uint32_t dcb_entries[256];
 } optcl_feature_dcbs;
 

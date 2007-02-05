@@ -25,6 +25,7 @@
 #include <assert.h>
 #include <malloc.h>
 #include <memory.h>
+#include <string.h>
 
 
 /*
@@ -64,7 +65,7 @@ static bool_t check4_feature_descriptor(const optcl_feature_descriptor *descript
 		return(True);
 	}
 
-	return((bool_t)(uint16_from_be(descriptor->feature_code) == feature_code
+	return((bool_t)(uint16_from_le(descriptor->feature_code) == feature_code
 		&& descriptor->additional_length == additional_length
 		&& descriptor->version == version));
 }
@@ -82,7 +83,7 @@ static bool_t check6_feature_descriptor(const optcl_feature_descriptor *descript
 		return(True);
 	}
 
-	return((bool_t)(uint16_from_be(descriptor->feature_code) == feature_code
+	return((bool_t)(uint16_from_le(descriptor->feature_code) == feature_code
 		&& descriptor->additional_length == additional_length
 		&& descriptor->version == version
 		&& descriptor->persistent == persistent
@@ -119,7 +120,7 @@ static RESULT parse_feature_descriptor(const uint8_t mmc_data[],
 		return(E_OUTOFMEMORY);
 	}
 
-	ndescriptor->feature_code	= uint16_from_be(*(const uint16_t*)mmc_data);
+	ndescriptor->feature_code	= uint16_from_le(*(const uint16_t*)mmc_data);
 	ndescriptor->current		= mmc_data[2] & 0x01;	/* 00000001 */
 	ndescriptor->persistent		= mmc_data[2] & 0x02;	/* 00000010 */
 	ndescriptor->version		= mmc_data[2] & 0x3c;	/* 00111100 */
@@ -193,7 +194,7 @@ static RESULT parse_profile_list(const uint8_t mmc_data[],
 		offset = (i + 1) * 4;
 
 		feature->profile_numbers[i] = 
-			uint16_from_be(*(uint16_t*)&mmc_data[offset]);
+			uint16_from_le(*(uint16_t*)&mmc_data[offset]);
 
 		feature->current_profiles[i] = 
 			(bool_t)(mmc_data[offset + 2] & 0x01);	/* 00000001 */
@@ -261,7 +262,7 @@ static RESULT parse_core(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->phys_i_standard = uint32_from_be(*(uint32_t*)&mmc_data[4]);
+	feature->phys_i_standard = uint32_from_le(*(uint32_t*)&mmc_data[4]);
 	feature->inq2 = mmc_data[8] & 0x02;	/* 00000010 */
 	feature->dbe = mmc_data[8] & 0x01;	/* 00000001 */
 
@@ -518,8 +519,8 @@ static RESULT parse_random_readable(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->logical_block_size = uint32_from_be(*(uint32_t*)&mmc_data[4]);
-	feature->blocking = uint16_from_be(*(uint16_t*)&mmc_data[8]);
+	feature->logical_block_size = uint32_from_le(*(uint32_t*)&mmc_data[4]);
+	feature->blocking = uint16_from_le(*(uint16_t*)&mmc_data[8]);
 	feature->pp = mmc_data[10] & 0x01;	/* 00000001 */
 
 	*response = (optcl_feature_descriptor*)feature;
@@ -748,9 +749,9 @@ static RESULT parse_random_writable(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->last_logical_block = uint32_from_be(*(uint32_t*)&mmc_data[4]);
-	feature->logical_block_size = uint32_from_be(*(uint32_t*)&mmc_data[8]);
-	feature->blocking = uint16_from_be(*(uint16_t*)&mmc_data[12]);
+	feature->last_logical_block = uint32_from_le(*(uint32_t*)&mmc_data[4]);
+	feature->logical_block_size = uint32_from_le(*(uint32_t*)&mmc_data[8]);
+	feature->blocking = uint16_from_le(*(uint16_t*)&mmc_data[12]);
 	feature->pp = mmc_data[14] & 0x01;	/* 00000001 */
 
 	*response = (optcl_feature_descriptor*)feature;
@@ -762,14 +763,73 @@ static RESULT parse_inc_streaming_writable(const uint8_t mmc_data[],
 					   uint32_t size,
 					   optcl_feature_descriptor **response)
 {
+	RESULT error;
+	RESULT destroy_error;
+	bool_t check;
+	optcl_feature_descriptor *descriptor = 0;
+	optcl_feature_inc_streaming_writable *feature = 0;
+
+	assert(size % 4 == 0);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0) {
+	if (mmc_data == 0 || response == 0 || (size % 4 != 0)) {
 		return(E_INVALIDARG);
 	}
-	
-	
+
+	error = parse_feature_descriptor(mmc_data, size, &descriptor);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	check = check4_feature_descriptor(
+		descriptor, 
+		FEATURE_INC_STREAMING_WRITABLE,
+		descriptor->additional_length,
+		3
+		);
+
+	if (check != True) {
+		free(descriptor);
+		return(E_FEATINVHEADER);
+	}
+
+	error = optcl_feature_create(FEATURE_INC_STREAMING_WRITABLE, (optcl_feature**)&feature);
+
+	if (FAILED(error)) {
+		free(descriptor);
+		return(error);
+	}
+
+	if (feature == 0) {
+		free(descriptor);
+		return(E_POINTER);
+	}
+
+	memcpy(&feature->descriptor, descriptor, sizeof(optcl_feature_descriptor));
+
+	free(descriptor);
+
+	feature->supported_dbts = uint16_from_le(*(uint16_t*)&mmc_data[4]);
+	feature->trio = mmc_data[6] & 0x04;		/* 00000100 */
+	feature->arsv = mmc_data[6] & 0x02;		/* 00000010 */
+	feature->buf = mmc_data[6] & 0x01;		/* 00000001 */
+	feature->link_size_number = mmc_data[7];
+
+	assert(feature->link_size_number + 7U < size);
+
+	if (feature->link_size_number + 7U >= size) {
+		destroy_error = optcl_feature_destroy((optcl_feature*)feature);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	memset(&feature->link_sizes, 0, sizeof(feature->link_sizes));
+	memcpy(&feature->link_sizes, &mmc_data[8], feature->link_size_number);
+
+	*response = (optcl_feature_descriptor*)feature;
+
+	return(SUCCESS);
 }
 
 static RESULT parse_sector_erasable(const uint8_t mmc_data[],
@@ -999,8 +1059,8 @@ static RESULT parse_write_once(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->logical_block_size = uint32_from_be(*(uint32_t*)&mmc_data[4]);
-	feature->blocking = uint16_from_be(*(uint16_t*)&mmc_data[8]);
+	feature->logical_block_size = uint32_from_le(*(uint32_t*)&mmc_data[4]);
+	feature->blocking = uint16_from_le(*(uint16_t*)&mmc_data[8]);
 	feature->pp = mmc_data[10] & 0x01;		/* 00000001 */
 
 	*response = (optcl_feature_descriptor*)feature;
@@ -1233,7 +1293,7 @@ static RESULT parse_enh_defect_reporting(const uint8_t mmc_data[],
 
 	feature->drt_dm = mmc_data[4] & 0x01;		/* 00000001 */
 	feature->dbi_cache_zones_num = mmc_data[4];
-	feature->entries_num = uint16_from_be(*(uint16_t*)&mmc_data[6]);
+	feature->entries_num = uint16_from_le(*(uint16_t*)&mmc_data[6]);
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -1476,7 +1536,7 @@ static RESULT parse_cd_tao(const uint8_t mmc_data[],
 	feature->test_write = mmc_data[4] & 0x04;	/* 00000100 */
 	feature->cd_rw = mmc_data[4] & 0x02;		/* 00000010 */
 	feature->rw_subcode = mmc_data[4] & 0x01;	/* 00000001 */
-	feature->data_type_supported = uint16_from_be(*(uint16_t*)&mmc_data[6]);
+	feature->data_type_supported = uint16_from_le(*(uint16_t*)&mmc_data[6]);
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -1541,7 +1601,7 @@ static RESULT parse_cd_mastering(const uint8_t mmc_data[],
 	feature->test_write = mmc_data[4] & 0x04;	/* 00000100 */
 	feature->cd_rw = mmc_data[4] & 0x02;		/* 00000010 */
 	feature->rw = mmc_data[4] & 0x01;		/* 00000001 */
-	feature->max_cue_length = uint32_from_be_bytes((uint8_t)0, mmc_data[5], mmc_data[6], mmc_data[7]);
+	feature->max_cue_length = uint32_from_le_bytes((uint8_t)0, mmc_data[5], mmc_data[6], mmc_data[7]);
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -1613,6 +1673,69 @@ static RESULT parse_layer_jump_recording(const uint8_t mmc_data[],
 					 uint32_t size,
 					 optcl_feature_descriptor **response)
 {
+	RESULT error;
+	RESULT destroy_error;
+	bool_t check;
+	optcl_feature_descriptor *descriptor = 0;
+	optcl_feature_layer_jmp_rec *feature = 0;
+
+	assert(size % 4 == 0);
+	assert(mmc_data != 0);
+	assert(response != 0);
+
+	if (mmc_data == 0 || response == 0 || (size % 4 != 0)) {
+		return(E_INVALIDARG);
+	}
+
+	error = parse_feature_descriptor(mmc_data, size, &descriptor);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	check = check4_feature_descriptor(
+		descriptor, 
+		FEATURE_LAYER_JUMP_RECORDING, 
+		descriptor->additional_length, 
+		0
+		);
+
+	if (check != True) {
+		free(descriptor);
+		return(E_FEATINVHEADER);
+	}
+
+	error = optcl_feature_create(FEATURE_LAYER_JUMP_RECORDING, (optcl_feature**)&feature);
+
+	if (FAILED(error)) {
+		free(descriptor);
+		return(error);
+	}
+
+	if (feature == 0) {
+		free(descriptor);
+		return(error);
+	}
+
+	memcpy(&feature->descriptor, descriptor, sizeof(optcl_feature_descriptor));
+
+	free(descriptor);
+
+	feature->link_sizes_num = mmc_data[7];
+
+	assert(feature->link_sizes_num + 7U < size);
+
+	if (feature->link_sizes_num + 7U >= size) {
+		destroy_error = optcl_feature_destroy((optcl_feature*)feature);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	memset(feature->link_sizes, 0, sizeof(feature->link_sizes));
+	memcpy(feature->link_sizes, &mmc_data[8], feature->link_sizes_num);
+
+	*response = (optcl_feature_descriptor*)feature;
+
+	return(SUCCESS);
 }
 
 static RESULT parse_cdrw_media_write_support(const uint8_t mmc_data[],
@@ -1858,120 +1981,1210 @@ static RESULT parse_bd_read(const uint8_t mmc_data[],
 			    uint32_t size,
 			    optcl_feature_descriptor **response)
 {
+	RESULT error;
+	bool_t check;
+	optcl_feature_descriptor *descriptor = 0;
+	optcl_feature_bd_read *feature = 0;
+
+	assert(size == 32);
+	assert(mmc_data != 0);
+	assert(response != 0);
+
+	if (mmc_data == 0 || response == 0 || size != 32) {
+		return(E_INVALIDARG);
+	}
+
+	error = parse_feature_descriptor(mmc_data, size, &descriptor);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	check = check4_feature_descriptor(
+		descriptor, 
+		FEATURE_BD_READ, 
+		28, 
+		0
+		);
+
+	if (check != True) {
+		free(descriptor);
+		return(E_FEATINVHEADER);
+	}
+
+	error = optcl_feature_create(FEATURE_BD_READ, (optcl_feature**)&feature);
+
+	if (FAILED(error)) {
+		free(descriptor);
+		return(error);
+	}
+
+	if (feature == 0) {
+		free(descriptor);
+		return(error);
+	}
+
+	memcpy(&feature->descriptor, descriptor, sizeof(optcl_feature_descriptor));
+
+	free(descriptor);
+
+	feature->bd_re_class0_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[8]);
+	feature->bd_re_class1_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[10]);
+	feature->bd_re_class2_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[12]);
+	feature->bd_re_class3_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[14]);
+	feature->bd_r_class0_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[16]);
+	feature->bd_r_class1_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[18]);
+	feature->bd_r_class2_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[20]);
+	feature->bd_r_class3_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[22]);
+	feature->bd_rom_class0_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[24]);
+	feature->bd_rom_class1_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[26]);
+	feature->bd_rom_class2_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[28]);
+	feature->bd_rom_class3_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[30]);
+
+	*response = (optcl_feature_descriptor*)feature;
+
+	return(SUCCESS);
 }
 
 static RESULT parse_bd_write(const uint8_t mmc_data[],
 			     uint32_t size,
 			     optcl_feature_descriptor **response)
 {
+	RESULT error;
+	bool_t check;
+	optcl_feature_descriptor *descriptor = 0;
+	optcl_feature_bd_write *feature = 0;
+
+	assert(size == 24);
+	assert(mmc_data != 0);
+	assert(response != 0);
+
+	if (mmc_data == 0 || response == 0 || size != 24) {
+		return(E_INVALIDARG);
+	}
+
+	error = parse_feature_descriptor(mmc_data, size, &descriptor);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	check = check4_feature_descriptor(
+		descriptor, 
+		FEATURE_BD_WRITE, 
+		20, 
+		0
+		);
+
+	if (check != True) {
+		free(descriptor);
+		return(E_FEATINVHEADER);
+	}
+
+	error = optcl_feature_create(FEATURE_BD_WRITE, (optcl_feature**)&feature);
+
+	if (FAILED(error)) {
+		free(descriptor);
+		return(error);
+	}
+
+	if (feature == 0) {
+		free(descriptor);
+		return(error);
+	}
+
+	memcpy(&feature->descriptor, descriptor, sizeof(optcl_feature_descriptor));
+
+	free(descriptor);
+
+	feature->svnr = mmc_data[4] & 0x01;		/* 00000001 */
+	feature->bd_re_class0_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[8]);
+	feature->bd_re_class1_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[10]);
+	feature->bd_re_class2_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[12]);
+	feature->bd_re_class3_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[14]);
+	feature->bd_r_class0_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[16]);
+	feature->bd_r_class1_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[18]);
+	feature->bd_r_class2_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[20]);
+	feature->bd_r_class3_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[22]);
+
+	*response = (optcl_feature_descriptor*)feature;
+
+	return(SUCCESS);
 }
 
 static RESULT parse_tsr(const uint8_t mmc_data[],
 			uint32_t size,
 			optcl_feature_descriptor **response)
 {
+	RESULT error;
+	bool_t check;
+	optcl_feature_descriptor *descriptor = 0;
+	optcl_feature_tsr *feature = 0;
+
+	assert(size == 4);
+	assert(mmc_data != 0);
+	assert(response != 0);
+
+	if (mmc_data == 0 || response == 0 || size != 4) {
+		return(E_INVALIDARG);
+	}
+
+	error = parse_feature_descriptor(mmc_data, size, &descriptor);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	check = check4_feature_descriptor(
+		descriptor, 
+		FEATURE_TSR, 
+		0, 
+		0
+		);
+
+	if (check != True) {
+		free(descriptor);
+		return(E_FEATINVHEADER);
+	}
+
+	error = optcl_feature_create(FEATURE_TSR, (optcl_feature**)&feature);
+
+	if (FAILED(error)) {
+		free(descriptor);
+		return(error);
+	}
+
+	if (feature == 0) {
+		free(descriptor);
+		return(error);
+	}
+
+	memcpy(&feature->descriptor, descriptor, sizeof(optcl_feature_descriptor));
+
+	free(descriptor);
+
+	*response = (optcl_feature_descriptor*)feature;
+
+	return(SUCCESS);
 }
 
 static RESULT parse_hd_dvd_read(const uint8_t mmc_data[],
 				uint32_t size,
 				optcl_feature_descriptor **response)
 {
+	RESULT error;
+	bool_t check;
+	optcl_feature_descriptor *descriptor = 0;
+	optcl_feature_hd_dvd_read *feature = 0;
+
+	assert(size == 8);
+	assert(mmc_data != 0);
+	assert(response != 0);
+
+	if (mmc_data == 0 || response == 0 || size != 8) {
+		return(E_INVALIDARG);
+	}
+
+	error = parse_feature_descriptor(mmc_data, size, &descriptor);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	check = check4_feature_descriptor(
+		descriptor, 
+		FEATURE_HD_DVD_READ, 
+		4, 
+		0
+		);
+
+	if (check != True) {
+		free(descriptor);
+		return(E_FEATINVHEADER);
+	}
+
+	error = optcl_feature_create(FEATURE_HD_DVD_READ, (optcl_feature**)&feature);
+
+	if (FAILED(error)) {
+		free(descriptor);
+		return(error);
+	}
+
+	if (feature == 0) {
+		free(descriptor);
+		return(error);
+	}
+
+	memcpy(&feature->descriptor, descriptor, sizeof(optcl_feature_descriptor));
+
+	free(descriptor);
+
+	feature->hd_dvd_r = mmc_data[4] & 0x01;		/* 00000001 */
+	feature->hd_dvd_ram = mmc_data[6] & 0x01;	/* 00000001 */
+
+	*response = (optcl_feature_descriptor*)feature;
+
+	return(SUCCESS);
 }
 
 static RESULT parse_hd_dvd_write(const uint8_t mmc_data[],
 				 uint32_t size,
 				 optcl_feature_descriptor **response)
 {
+	RESULT error;
+	bool_t check;
+	optcl_feature_descriptor *descriptor = 0;
+	optcl_feature_hd_dvd_write *feature = 0;
+
+	assert(size == 8);
+	assert(mmc_data != 0);
+	assert(response != 0);
+
+	if (mmc_data == 0 || response == 0 || size != 8) {
+		return(E_INVALIDARG);
+	}
+
+	error = parse_feature_descriptor(mmc_data, size, &descriptor);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	check = check4_feature_descriptor(
+		descriptor, 
+		FEATURE_HD_DVD_WRITE, 
+		4, 
+		0
+		);
+
+	if (check != True) {
+		free(descriptor);
+		return(E_FEATINVHEADER);
+	}
+
+	error = optcl_feature_create(FEATURE_HD_DVD_WRITE, (optcl_feature**)&feature);
+
+	if (FAILED(error)) {
+		free(descriptor);
+		return(error);
+	}
+
+	if (feature == 0) {
+		free(descriptor);
+		return(error);
+	}
+
+	memcpy(&feature->descriptor, descriptor, sizeof(optcl_feature_descriptor));
+
+	free(descriptor);
+
+	feature->hd_dvd_r = mmc_data[4] & 0x01;		/* 00000001 */
+	feature->hd_dvd_ram = mmc_data[6] & 0x01;	/* 00000001 */
+
+	*response = (optcl_feature_descriptor*)feature;
+
+	return(SUCCESS);
 }
 
 static RESULT parse_hybrid_disk(const uint8_t mmc_data[],
 				uint32_t size,
 				optcl_feature_descriptor **response)
 {
+	RESULT error;
+	bool_t check;
+	optcl_feature_descriptor *descriptor = 0;
+	optcl_feature_hybrid_disk *feature = 0;
+
+	assert(size == 8);
+	assert(mmc_data != 0);
+	assert(response != 0);
+
+	if (mmc_data == 0 || response == 0 || size != 8) {
+		return(E_INVALIDARG);
+	}
+
+	error = parse_feature_descriptor(mmc_data, size, &descriptor);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	check = check4_feature_descriptor(
+		descriptor, 
+		FEATURE_HYBRID_DISC, 
+		4, 
+		0
+		);
+
+	if (check != True) {
+		free(descriptor);
+		return(E_FEATINVHEADER);
+	}
+
+	error = optcl_feature_create(FEATURE_HYBRID_DISC, (optcl_feature**)&feature);
+
+	if (FAILED(error)) {
+		free(descriptor);
+		return(error);
+	}
+
+	if (feature == 0) {
+		free(descriptor);
+		return(error);
+	}
+
+	memcpy(&feature->descriptor, descriptor, sizeof(optcl_feature_descriptor));
+
+	free(descriptor);
+
+	feature->ri = mmc_data[4] & 0x01;		/* 00000001 */
+
+	*response = (optcl_feature_descriptor*)feature;
+
+	return(SUCCESS);
 }
 
 static RESULT parse_power_management(const uint8_t mmc_data[],
 				     uint32_t size,
 				     optcl_feature_descriptor **response)
 {
+	RESULT error;
+	bool_t check;
+	optcl_feature_descriptor *descriptor = 0;
+	optcl_feature_power_mngmnt *feature = 0;
+
+	assert(size == 4);
+	assert(mmc_data != 0);
+	assert(response != 0);
+
+	if (mmc_data == 0 || response == 0 || size != 4) {
+		return(E_INVALIDARG);
+	}
+
+	error = parse_feature_descriptor(mmc_data, size, &descriptor);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	check = check4_feature_descriptor(
+		descriptor, 
+		FEATURE_POWER_MANAGEMENT, 
+		0, 
+		0
+		);
+
+	if (check != True) {
+		free(descriptor);
+		return(E_FEATINVHEADER);
+	}
+
+	error = optcl_feature_create(FEATURE_POWER_MANAGEMENT, (optcl_feature**)&feature);
+
+	if (FAILED(error)) {
+		free(descriptor);
+		return(error);
+	}
+
+	if (feature == 0) {
+		free(descriptor);
+		return(error);
+	}
+
+	memcpy(&feature->descriptor, descriptor, sizeof(optcl_feature_descriptor));
+
+	free(descriptor);
+
+	*response = (optcl_feature_descriptor*)feature;
+
+	return(SUCCESS);
 }
 
 static RESULT parse_smart(const uint8_t mmc_data[],
 			  uint32_t size,
 			  optcl_feature_descriptor **response)
 {
+	RESULT error;
+	bool_t check;
+	optcl_feature_descriptor *descriptor = 0;
+	optcl_feature_smart *feature = 0;
+
+	assert(size == 8);
+	assert(mmc_data != 0);
+	assert(response != 0);
+
+	if (mmc_data == 0 || response == 0 || size != 8) {
+		return(E_INVALIDARG);
+	}
+
+	error = parse_feature_descriptor(mmc_data, size, &descriptor);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	check = check4_feature_descriptor(
+		descriptor, 
+		FEATURE_SMART, 
+		4, 
+		0
+		);
+
+	if (check != True) {
+		free(descriptor);
+		return(E_FEATINVHEADER);
+	}
+
+	error = optcl_feature_create(FEATURE_SMART, (optcl_feature**)&feature);
+
+	if (FAILED(error)) {
+		free(descriptor);
+		return(error);
+	}
+
+	if (feature == 0) {
+		free(descriptor);
+		return(error);
+	}
+
+	memcpy(&feature->descriptor, descriptor, sizeof(optcl_feature_descriptor));
+
+	free(descriptor);
+
+	feature->pp = mmc_data[4] & 0x01;		/* 00000001 */
+
+	*response = (optcl_feature_descriptor*)feature;
+
+	return(SUCCESS);
 }
 
 static RESULT parse_embedded_changer(const uint8_t mmc_data[],
 				     uint32_t size,
 				     optcl_feature_descriptor **response)
 {
+	RESULT error;
+	bool_t check;
+	optcl_feature_descriptor *descriptor = 0;
+	optcl_feature_embedded_changer *feature = 0;
+
+	assert(size == 8);
+	assert(mmc_data != 0);
+	assert(response != 0);
+
+	if (mmc_data == 0 || response == 0 || size != 8) {
+		return(E_INVALIDARG);
+	}
+
+	error = parse_feature_descriptor(mmc_data, size, &descriptor);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	check = check4_feature_descriptor(
+		descriptor, 
+		FEATURE_EMBEDDED_CHANGER, 
+		4, 
+		0
+		);
+
+	if (check != True) {
+		free(descriptor);
+		return(E_FEATINVHEADER);
+	}
+
+	error = optcl_feature_create(FEATURE_EMBEDDED_CHANGER, (optcl_feature**)&feature);
+
+	if (FAILED(error)) {
+		free(descriptor);
+		return(error);
+	}
+
+	if (feature == 0) {
+		free(descriptor);
+		return(error);
+	}
+
+	memcpy(&feature->descriptor, descriptor, sizeof(optcl_feature_descriptor));
+
+	free(descriptor);
+
+	feature->scc = mmc_data[4] & 0x10;		/* 00010000 */
+	feature->sdp = mmc_data[4] & 0x04;		/* 00000100 */
+	feature->highest_slot_num = mmc_data[7] & 0x1F;	/* 00001111 */
+
+	*response = (optcl_feature_descriptor*)feature;
+
+	return(SUCCESS);
 }
 
 static RESULT parse_microcode_upgrade(const uint8_t mmc_data[],
 				      uint32_t size,
 				      optcl_feature_descriptor **response)
 {
+	RESULT error;
+	bool_t check;
+	optcl_feature_descriptor *descriptor = 0;
+	optcl_feature_microcode_upgrade *feature = 0;
+
+	assert(size == 8);
+	assert(mmc_data != 0);
+	assert(response != 0);
+
+	if (mmc_data == 0 || response == 0 || size != 8) {
+		return(E_INVALIDARG);
+	}
+
+	error = parse_feature_descriptor(mmc_data, size, &descriptor);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	check = check4_feature_descriptor(
+		descriptor, 
+		FEATURE_MICROCODE_UPGRADE, 
+		4, 
+		1
+		);
+
+	if (check != True) {
+		free(descriptor);
+		return(E_FEATINVHEADER);
+	}
+
+	error = optcl_feature_create(FEATURE_MICROCODE_UPGRADE, (optcl_feature**)&feature);
+
+	if (FAILED(error)) {
+		free(descriptor);
+		return(error);
+	}
+
+	if (feature == 0) {
+		free(descriptor);
+		return(error);
+	}
+
+	memcpy(&feature->descriptor, descriptor, sizeof(optcl_feature_descriptor));
+
+	free(descriptor);
+
+	feature->m5 = mmc_data[4] & 0x01;		/* 00000001 */
+
+	*response = (optcl_feature_descriptor*)feature;
+
+	return(SUCCESS);
 }
 
 static RESULT parse_timeout(const uint8_t mmc_data[],
 			    uint32_t size,
 			    optcl_feature_descriptor **response)
 {
+	RESULT error;
+	bool_t check;
+	optcl_feature_descriptor *descriptor = 0;
+	optcl_feature_timeout *feature = 0;
+
+	assert(size == 8);
+	assert(mmc_data != 0);
+	assert(response != 0);
+
+	if (mmc_data == 0 || response == 0 || size != 8) {
+		return(E_INVALIDARG);
+	}
+
+	error = parse_feature_descriptor(mmc_data, size, &descriptor);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	check = check4_feature_descriptor(
+		descriptor, 
+		FEATURE_TIMEOUT, 
+		4, 
+		1
+		);
+
+	if (check != True) {
+		free(descriptor);
+		return(E_FEATINVHEADER);
+	}
+
+	error = optcl_feature_create(FEATURE_TIMEOUT, (optcl_feature**)&feature);
+
+	if (FAILED(error)) {
+		free(descriptor);
+		return(error);
+	}
+
+	if (feature == 0) {
+		free(descriptor);
+		return(error);
+	}
+
+	memcpy(&feature->descriptor, descriptor, sizeof(optcl_feature_descriptor));
+
+	free(descriptor);
+
+	feature->group3 = mmc_data[4] & 0x01;		/* 00000001 */
+	feature->unit_length = uint16_from_le(*(uint16_t*)&mmc_data[6]);
+
+	*response = (optcl_feature_descriptor*)feature;
+
+	return(SUCCESS);
 }
 
 static RESULT parse_dvd_css(const uint8_t mmc_data[],
 			    uint32_t size,
 			    optcl_feature_descriptor **response)
 {
+	RESULT error;
+	bool_t check;
+	optcl_feature_descriptor *descriptor = 0;
+	optcl_feature_dvd_css *feature = 0;
+
+	assert(size == 8);
+	assert(mmc_data != 0);
+	assert(response != 0);
+
+	if (mmc_data == 0 || response == 0 || size != 8) {
+		return(E_INVALIDARG);
+	}
+
+	error = parse_feature_descriptor(mmc_data, size, &descriptor);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	check = check4_feature_descriptor(
+		descriptor, 
+		FEATURE_DVD_CSS, 
+		4, 
+		0
+		);
+
+	if (check != True) {
+		free(descriptor);
+		return(E_FEATINVHEADER);
+	}
+
+	error = optcl_feature_create(FEATURE_DVD_CSS, (optcl_feature**)&feature);
+
+	if (FAILED(error)) {
+		free(descriptor);
+		return(error);
+	}
+
+	if (feature == 0) {
+		free(descriptor);
+		return(error);
+	}
+
+	memcpy(&feature->descriptor, descriptor, sizeof(optcl_feature_descriptor));
+
+	free(descriptor);
+
+	feature->css_version = mmc_data[7];
+
+	*response = (optcl_feature_descriptor*)feature;
+
+	return(SUCCESS);
 }
 
 static RESULT parse_rt_streaming(const uint8_t mmc_data[],
 				 uint32_t size,
 				 optcl_feature_descriptor **response)
 {
+	RESULT error;
+	bool_t check;
+	optcl_feature_descriptor *descriptor = 0;
+	optcl_feature_rt_streaming *feature = 0;
+
+	assert(size == 8);
+	assert(mmc_data != 0);
+	assert(response != 0);
+
+	if (mmc_data == 0 || response == 0 || size != 8) {
+		return(E_INVALIDARG);
+	}
+
+	error = parse_feature_descriptor(mmc_data, size, &descriptor);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	check = check4_feature_descriptor(
+		descriptor, 
+		FEATURE_RT_STREAMING, 
+		4, 
+		4
+		);
+
+	if (check != True) {
+		free(descriptor);
+		return(E_FEATINVHEADER);
+	}
+
+	error = optcl_feature_create(FEATURE_RT_STREAMING, (optcl_feature**)&feature);
+
+	if (FAILED(error)) {
+		free(descriptor);
+		return(error);
+	}
+
+	if (feature == 0) {
+		free(descriptor);
+		return(error);
+	}
+
+	memcpy(&feature->descriptor, descriptor, sizeof(optcl_feature_descriptor));
+
+	free(descriptor);
+
+	feature->rbcb = mmc_data[4] & 0x10;		/* 00010000 */
+	feature->scs = mmc_data[4] & 0x08;		/* 00001000 */
+	feature->mp2a = mmc_data[4] & 0x04;		/* 00000100 */
+	feature->wspd = mmc_data[4] & 0x02;		/* 00000010 */
+	feature->sw = mmc_data[4] & 0x01;		/* 00000001 */
+
+	*response = (optcl_feature_descriptor*)feature;
+
+	return(SUCCESS);
 }
 
 static RESULT parse_drive_serial_number(const uint8_t mmc_data[],
 					uint32_t size,
 					optcl_feature_descriptor **response)
 {
+	RESULT error;
+	bool_t check;
+	optcl_feature_descriptor *descriptor = 0;
+	optcl_feature_drive_serial_number *feature = 0;
+
+	assert(size % 4 == 0);
+	assert(mmc_data != 0);
+	assert(response != 0);
+
+	if (mmc_data == 0 || response == 0 || (size % 4 != 0)) {
+		return(E_INVALIDARG);
+	}
+
+	error = parse_feature_descriptor(mmc_data, size, &descriptor);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	check = check4_feature_descriptor(
+		descriptor, 
+		FEATURE_DRIVE_SERIAL_NUMBER, 
+		descriptor->additional_length, 
+		0
+		);
+
+	if (check != True) {
+		free(descriptor);
+		return(E_FEATINVHEADER);
+	}
+
+	assert(descriptor->additional_length < sizeof(feature->descriptor));
+
+	if (descriptor->additional_length >= sizeof(feature->descriptor)) {
+		free(descriptor);
+		return(E_FEATINVHEADER);
+	}
+
+	error = optcl_feature_create(FEATURE_DRIVE_SERIAL_NUMBER, (optcl_feature**)&feature);
+
+	if (FAILED(error)) {
+		free(descriptor);
+		return(error);
+	}
+
+	if (feature == 0) {
+		free(descriptor);
+		return(error);
+	}
+
+	memcpy(&feature->descriptor, descriptor, sizeof(optcl_feature_descriptor));
+
+	free(descriptor);
+
+	memset(feature->serial_number, 0, sizeof(feature->serial_number));
+
+	strncpy_s(
+		(char*)&feature->serial_number,
+		sizeof(feature->serial_number),
+		(const char*)&mmc_data[4], 
+		feature->descriptor.additional_length
+		);
+
+	*response = (optcl_feature_descriptor*)feature;
+
+	return(SUCCESS);
 }
 
 static RESULT parse_media_serial_number(const uint8_t mmc_data[],
 					uint32_t size,
 					optcl_feature_descriptor **response)
 {
+	RESULT error;
+	bool_t check;
+	optcl_feature_descriptor *descriptor = 0;
+	optcl_feature_media_serial_number *feature = 0;
+
+	assert(size == 4);
+	assert(mmc_data != 0);
+	assert(response != 0);
+
+	if (mmc_data == 0 || response == 0 || size != 4) {
+		return(E_INVALIDARG);
+	}
+
+	error = parse_feature_descriptor(mmc_data, size, &descriptor);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	check = check4_feature_descriptor(
+		descriptor, 
+		FEATURE_MEDIA_SERIAL_NUMBER, 
+		0, 
+		0
+		);
+
+	if (check != True) {
+		free(descriptor);
+		return(E_FEATINVHEADER);
+	}
+
+	error = optcl_feature_create(FEATURE_MEDIA_SERIAL_NUMBER, (optcl_feature**)&feature);
+
+	if (FAILED(error)) {
+		free(descriptor);
+		return(error);
+	}
+
+	if (feature == 0) {
+		free(descriptor);
+		return(error);
+	}
+
+	memcpy(&feature->descriptor, descriptor, sizeof(optcl_feature_descriptor));
+
+	free(descriptor);
+
+	*response = (optcl_feature_descriptor*)feature;
+
+	return(SUCCESS);
 }
 
 static RESULT parse_dcbs(const uint8_t mmc_data[],
 			 uint32_t size,
 			 optcl_feature_descriptor **response)
 {
+	int i;
+	RESULT error;
+	bool_t check;
+	optcl_feature_descriptor *descriptor = 0;
+	optcl_feature_dcbs *feature = 0;
+
+	assert(size % 4 == 0);
+	assert(mmc_data != 0);
+	assert(response != 0);
+
+	if (mmc_data == 0 || response == 0 || (size % 4 != 0)) {
+		return(E_INVALIDARG);
+	}
+
+	error = parse_feature_descriptor(mmc_data, size, &descriptor);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	check = check4_feature_descriptor(
+		descriptor, 
+		FEATURE_DCBS, 
+		descriptor->additional_length, 
+		0
+		);
+
+	if (check != True) {
+		free(descriptor);
+		return(E_FEATINVHEADER);
+	}
+
+	error = optcl_feature_create(FEATURE_DCBS, (optcl_feature**)&feature);
+
+	if (FAILED(error)) {
+		free(descriptor);
+		return(error);
+	}
+
+	if (feature == 0) {
+		free(descriptor);
+		return(error);
+	}
+
+	memcpy(&feature->descriptor, descriptor, sizeof(optcl_feature_descriptor));
+
+	free(descriptor);
+
+	memset(feature->dcb_entries, 0, sizeof(feature->dcb_entries));
+
+	feature->dcb_entries_num = feature->descriptor.additional_length / 4;
+
+	for(i = 0; i < feature->dcb_entries_num; ++i) {
+		feature->dcb_entries[i] = uint32_from_le(*(uint32_t*)&mmc_data[(i + 1) * 4]);
+	}
+
+	*response = (optcl_feature_descriptor*)feature;
+
+	return(SUCCESS);
 }
 
 static RESULT parse_dvd_cprm(const uint8_t mmc_data[],
 			     uint32_t size,
 			     optcl_feature_descriptor **response)
 {
+	RESULT error;
+	bool_t check;
+	optcl_feature_descriptor *descriptor = 0;
+	optcl_feature_dvd_cprm *feature = 0;
+
+	assert(size == 8);
+	assert(mmc_data != 0);
+	assert(response != 0);
+
+	if (mmc_data == 0 || response == 0 || size != 8) {
+		return(E_INVALIDARG);
+	}
+
+	error = parse_feature_descriptor(mmc_data, size, &descriptor);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	check = check4_feature_descriptor(
+		descriptor, 
+		FEATURE_DVD_CPRM, 
+		4, 
+		0
+		);
+
+	if (check != True) {
+		free(descriptor);
+		return(E_FEATINVHEADER);
+	}
+
+	error = optcl_feature_create(FEATURE_DVD_CPRM, (optcl_feature**)&feature);
+
+	if (FAILED(error)) {
+		free(descriptor);
+		return(error);
+	}
+
+	if (feature == 0) {
+		free(descriptor);
+		return(error);
+	}
+
+	memcpy(&feature->descriptor, descriptor, sizeof(optcl_feature_descriptor));
+
+	free(descriptor);
+
+	feature->cprm_version = mmc_data[7];
+
+	*response = (optcl_feature_descriptor*)feature;
+
+	return(SUCCESS);
 }
 
 static RESULT parse_firmware_info(const uint8_t mmc_data[],
 				  uint32_t size,
 				  optcl_feature_descriptor **response)
 {
+	RESULT error;
+	bool_t check;
+	optcl_feature_descriptor *descriptor = 0;
+	optcl_feature_firmware_info *feature = 0;
+
+	assert(size == 20);
+	assert(mmc_data != 0);
+	assert(response != 0);
+
+	if (mmc_data == 0 || response == 0 || size != 20) {
+		return(E_INVALIDARG);
+	}
+
+	error = parse_feature_descriptor(mmc_data, size, &descriptor);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	check = check4_feature_descriptor(
+		descriptor, 
+		FEATURE_FIRMWARE_INFO, 
+		16, 
+		0
+		);
+
+	if (check != True) {
+		free(descriptor);
+		return(E_FEATINVHEADER);
+	}
+
+	error = optcl_feature_create(FEATURE_FIRMWARE_INFO, (optcl_feature**)&feature);
+
+	if (FAILED(error)) {
+		free(descriptor);
+		return(error);
+	}
+
+	if (feature == 0) {
+		free(descriptor);
+		return(error);
+	}
+
+	memcpy(&feature->descriptor, descriptor, sizeof(optcl_feature_descriptor));
+
+	free(descriptor);
+
+	feature->century = uint16_from_le(*(uint16_t*)&mmc_data[4]);
+	feature->year = uint16_from_le(*(uint16_t*)&mmc_data[6]);
+	feature->month = uint16_from_le(*(uint16_t*)&mmc_data[8]);
+	feature->day = uint16_from_le(*(uint16_t*)&mmc_data[10]);
+	feature->hour = uint16_from_le(*(uint16_t*)&mmc_data[12]);
+	feature->minute = uint16_from_le(*(uint16_t*)&mmc_data[14]);
+	feature->second = uint16_from_le(*(uint16_t*)&mmc_data[16]);
+
+	*response = (optcl_feature_descriptor*)feature;
+
+	return(SUCCESS);
 }
 
 static RESULT parse_aacs(const uint8_t mmc_data[],
 			 uint32_t size,
 			 optcl_feature_descriptor **response)
 {
+	RESULT error;
+	bool_t check;
+	optcl_feature_descriptor *descriptor = 0;
+	optcl_feature_aacs *feature = 0;
+
+	assert(size == 8);
+	assert(mmc_data != 0);
+	assert(response != 0);
+
+	if (mmc_data == 0 || response == 0 || size != 8) {
+		return(E_INVALIDARG);
+	}
+
+	error = parse_feature_descriptor(mmc_data, size, &descriptor);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	check = check4_feature_descriptor(
+		descriptor, 
+		FEATURE_AACS, 
+		4, 
+		0
+		);
+
+	if (check != True) {
+		free(descriptor);
+		return(E_FEATINVHEADER);
+	}
+
+	error = optcl_feature_create(FEATURE_AACS, (optcl_feature**)&feature);
+
+	if (FAILED(error)) {
+		free(descriptor);
+		return(error);
+	}
+
+	if (feature == 0) {
+		free(descriptor);
+		return(error);
+	}
+
+	memcpy(&feature->descriptor, descriptor, sizeof(optcl_feature_descriptor));
+
+	free(descriptor);
+
+	feature->bng = mmc_data[4] & 0x01;		/* 00000001 */
+	feature->block_count = mmc_data[5];
+	feature->agids_num = mmc_data[6] & 0x0F;	/* 00001111 */
+	feature->aacs_version = mmc_data[7];
+
+	*response = (optcl_feature_descriptor*)feature;
+
+	return(SUCCESS);
 }
 
 static RESULT parse_vcps(const uint8_t mmc_data[],
 			 uint32_t size,
 			 optcl_feature_descriptor **response)
 {
+	RESULT error;
+	bool_t check;
+	optcl_feature_descriptor *descriptor = 0;
+	optcl_feature_vcps *feature = 0;
+
+	assert(size == 8);
+	assert(mmc_data != 0);
+	assert(response != 0);
+
+	if (mmc_data == 0 || response == 0 || size != 8) {
+		return(E_INVALIDARG);
+	}
+
+	error = parse_feature_descriptor(mmc_data, size, &descriptor);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	check = check4_feature_descriptor(
+		descriptor, 
+		FEATURE_VCPS, 
+		4, 
+		0
+		);
+
+	if (check != True) {
+		free(descriptor);
+		return(E_FEATINVHEADER);
+	}
+
+	error = optcl_feature_create(FEATURE_VCPS, (optcl_feature**)&feature);
+
+	if (FAILED(error)) {
+		free(descriptor);
+		return(error);
+	}
+
+	if (feature == 0) {
+		free(descriptor);
+		return(error);
+	}
+
+	memcpy(&feature->descriptor, descriptor, sizeof(optcl_feature_descriptor));
+
+	free(descriptor);
+
+	*response = (optcl_feature_descriptor*)feature;
+
+	return(SUCCESS);
 }
 
 
@@ -2152,7 +3365,7 @@ static struct feature_sizes_entry __feature_table[] = {
 	{ FEATURE_HYBRID_DISC,			sizeof(optcl_feature_hybrid_disk),		parse_hybrid_disk			},
 	{ FEATURE_POWER_MANAGEMENT,		sizeof(optcl_feature_power_mngmnt),		parse_power_management			},
 	{ FEATURE_SMART,			sizeof(optcl_feature_smart),			parse_smart				},
-	{ FEATURE_EMBEDDED_CHANGER,		sizeof(optcl_feature_changer),			parse_embedded_changer			},
+	{ FEATURE_EMBEDDED_CHANGER,		sizeof(optcl_feature_embedded_changer),		parse_embedded_changer			},
 	{ FEATURE_MICROCODE_UPGRADE,		sizeof(optcl_feature_microcode_upgrade),	parse_microcode_upgrade			},
 	{ FEATURE_TIMEOUT,			sizeof(optcl_feature_timeout),			parse_timeout				},
 	{ FEATURE_DVD_CSS,			sizeof(optcl_feature_dvd_css),			parse_dvd_css				},
