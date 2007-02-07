@@ -53,9 +53,9 @@
  * Command functions
  */
 
-RESULT optcl_command_get_config(const optcl_device *device,
-				const optcl_mmc_get_config *command,
-				optcl_mmc_response_get_config **response)
+RESULT optcl_command_get_configuration(const optcl_device *device,
+				       const optcl_mmc_get_configuration *command,
+				       optcl_mmc_response_get_configuration **response)
 {
 	RESULT error;
 	uint8_t rt;
@@ -69,8 +69,8 @@ RESULT optcl_command_get_config(const optcl_device *device,
 	optcl_adapter *adapter;
 	optcl_list_iterator it;
 	optcl_feature_descriptor *descriptor;
-	optcl_mmc_response_get_config *nresponse0;
-	optcl_mmc_response_get_config *nresponse1;
+	optcl_mmc_response_get_configuration *nresponse0;
+	optcl_mmc_response_get_configuration *nresponse1;
 
 	assert(device != 0);
 	assert(command != 0);
@@ -136,8 +136,8 @@ RESULT optcl_command_get_config(const optcl_device *device,
 
 	cdb[0] = MMC_OPCODE_GET_CONFIG;
 	cdb[1] = rt;
-	cdb[2] = (uint8_t)(uint16_to_be(start_feature) >> 8);
-	cdb[3] = (uint8_t)((uint16_to_be(start_feature) << 8) >> 8);
+	cdb[2] = (uint8_t)(uint16_to_le(start_feature) >> 8);
+	cdb[3] = (uint8_t)((uint16_to_le(start_feature) << 8) >> 8);
 	cdb[8] = 8; /* enough to get feature descriptor header */
 
 	mmc_response = _aligned_malloc(cdb[8], alignment_mask);
@@ -159,14 +159,14 @@ RESULT optcl_command_get_config(const optcl_device *device,
 		return(error);
 	}
 
-	nresponse0 = malloc(sizeof(optcl_mmc_response_get_config));
+	nresponse0 = malloc(sizeof(optcl_mmc_response_get_configuration));
 
 	if (nresponse0 == 0) {
 		_aligned_free(mmc_response);
 		return(E_OUTOFMEMORY);
 	}
 
-	memset(&nresponse0, 0, sizeof(nresponse0));
+	memset(nresponse0, 0, sizeof(nresponse0));
 
 	error = optcl_list_create(0, &nresponse0->descriptors);
 
@@ -183,7 +183,7 @@ RESULT optcl_command_get_config(const optcl_device *device,
 	 * feature descriptors amounts to less than 1 KB.
 	 */
 
-	data_length = int32_from_be((int32_t)(*mmc_response));
+	data_length = int32_from_le((int32_t)(*mmc_response));
 
 	_aligned_free(mmc_response);
 	
@@ -204,10 +204,10 @@ RESULT optcl_command_get_config(const optcl_device *device,
 		 */
 
 		cdb[1] = rt;
-		cdb[2] = (uint8_t)(uint16_to_be(start_feature) >> 8);
-		cdb[3] = (uint8_t)((uint16_to_be(start_feature) << 8) >> 8);
-		cdb[7] = (uint8_t)(uint16_to_be((uint16_t)transfer_size) >> 8);
-		cdb[8] = (uint8_t)((uint16_to_be((uint16_t)transfer_size) << 8) >> 8);
+		cdb[2] = (uint8_t)(uint16_to_le(start_feature) >> 8);
+		cdb[3] = (uint8_t)((uint16_to_le(start_feature) << 8) >> 8);
+		cdb[7] = (uint8_t)(uint16_to_le((uint16_t)transfer_size) >> 8);
+		cdb[8] = (uint8_t)((uint16_to_le((uint16_t)transfer_size) << 8) >> 8);
 
 		mmc_response = _aligned_malloc(transfer_size, alignment_mask);
 
@@ -237,7 +237,7 @@ RESULT optcl_command_get_config(const optcl_device *device,
 		 * Process current chnk of data
 		 */
 
-		error = optcl_parse_get_config_data(
+		error = optcl_parse_get_configuration_data(
 			mmc_response, 
 			max_transfer_len, 
 			&nresponse1

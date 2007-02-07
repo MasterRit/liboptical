@@ -37,12 +37,12 @@
  * Command structures
  */
 
-typedef struct tag_mmc_get_config {
+typedef struct tag_mmc_get_configuration {
 	uint8_t rt;
 	uint16_t start_feature;
 	/* uint16_t allocation_length; */
 	/* uint8_t control; */
-} optcl_mmc_get_config;
+} optcl_mmc_get_configuration;
 
 typedef struct tag_mmc_inquiry {
 	uint8_t evpd;
@@ -56,11 +56,11 @@ typedef struct tag_mmc_inquiry {
  * Command result structures
  */
 
-typedef struct tag_mmc_response_get_config {
+typedef struct tag_mmc_response_get_configuration {
 	uint32_t data_length;
 	uint16_t current_profile;
 	optcl_list *descriptors;
-} optcl_mmc_response_get_config;
+} optcl_mmc_response_get_configuration;
 
 typedef struct tag_mmc_response_inquiry {
 	uint8_t qualifier;	/* Peripheral qualifier */
@@ -107,9 +107,9 @@ typedef struct tag_mmc_response_inquiry {
  * Command functions
  */
 
-extern RESULT optcl_command_get_config(const optcl_device *device,
-				       const optcl_mmc_get_config *command,
-				       optcl_mmc_response_get_config **response);
+extern RESULT optcl_command_get_configuration(const optcl_device *device,
+					      const optcl_mmc_get_configuration *command,
+					      optcl_mmc_response_get_configuration **response);
 
 extern RESULT optcl_command_inquiry(const optcl_device *device, 
 				    const optcl_mmc_inquiry *command, 
