@@ -268,13 +268,85 @@ static RESULT enumerate_device_adapter(const char *path,
 
 static RESULT enumerate_device_features(optcl_device *device)
 {
+	RESULT error;
+	RESULT destroy_error;
+	optcl_list_iterator it = 0;
+	optcl_feature *feature = 0;
+	optcl_feature *feature_copy = 0;
+	optcl_mmc_get_configuration command;
+	optcl_mmc_response_get_configuration *response = 0;
+
 	assert(device != 0);
 
 	if (device == 0) {
 		return(E_INVALIDARG);
 	}
 
+	command.rt = MMC_GET_CONFIG_RT_ALL;
+	command.start_feature = 0;
 
+	error = optcl_command_get_configuration(device, &command, &response);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	if (response == 0) {
+		return(E_POINTER);
+	}
+
+	error = optcl_list_get_head_pos(response->descriptors, &it);
+
+	if (FAILED(error)) {
+		destroy_error = optcl_list_destroy(response->descriptors, 1);
+		free(response);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	while (it != 0) {
+		error = optcl_list_get_at_pos(response->descriptors, it, &feature);
+
+		if (FAILED(error)) {
+			break;
+		}
+
+		if (feature == 0) {
+			error = E_POINTER;
+			break;
+		}
+
+		error = optcl_feature_create(feature->feature_code, &feature_copy);
+
+		if (FAILED(error)) {
+			break;
+		}
+
+		if (feature_copy == 0) {
+			error = E_POINTER;
+			break;
+		}
+
+		error = optcl_device_set_feature(device, feature->feature_code, feature_copy);
+
+		if (FAILED(error)) {
+			break;
+		}
+
+		error = optcl_list_get_next(response->descriptors, it, &it);
+
+		if (FAILED(error)) {
+			break;
+		}
+	}
+
+	free(response);
+
+	if (FAILED(error)) {
+		destroy_error = optcl_list_destroy(response->descriptors, 1);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	return(SUCCESS);
 }
 
 static RESULT enumerate_device(int index, 
