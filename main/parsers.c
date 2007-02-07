@@ -104,16 +104,16 @@ static RESULT parse_raw_profile_list(const uint8_t mmc_data[],
  * Parser functions
  */ 
 
-int optcl_parse_get_config_data(const uint8_t *mmc_response, 
-				uint32_t size,
-				optcl_mmc_response_get_config **response)
+int optcl_parse_get_configuration_data(const uint8_t *mmc_response, 
+				       uint32_t size,
+				       optcl_mmc_response_get_configuration **response)
 {
 	RESULT error;
 	uint32_t offset;
 	uint8_t *raw_feature;
 	uint16_t feature_code;
 	optcl_feature_descriptor *feature;
-	optcl_mmc_response_get_config *nresponse;
+	optcl_mmc_response_get_configuration *nresponse;
 
 	assert(mmc_response);
 	assert(size >= 8);
@@ -128,14 +128,14 @@ int optcl_parse_get_config_data(const uint8_t *mmc_response,
 		return E_FEATINVHEADER;
 	}
 
-	nresponse = malloc(sizeof(optcl_mmc_response_get_config));
+	nresponse = malloc(sizeof(optcl_mmc_response_get_configuration));
 
 	if (nresponse == 0) {
 		return E_OUTOFMEMORY;
 	}
 
-	nresponse->data_length = uint32_from_be(*(uint32_t*)&mmc_response[0]);
-	nresponse->current_profile = uint16_from_be(*(uint16_t*)&mmc_response[6]);
+	nresponse->data_length = uint32_from_le(*(uint32_t*)&mmc_response[0]);
+	nresponse->current_profile = uint16_from_le(*(uint16_t*)&mmc_response[6]);
 
 	error = optcl_list_create(&equalfn_descriptors, &nresponse->descriptors);
 
@@ -154,7 +154,7 @@ int optcl_parse_get_config_data(const uint8_t *mmc_response,
 
 		feature = 0;
 		raw_feature = (uint8_t*)&mmc_response[offset];
-		feature_code = uint16_from_be(*(uint16_t*)raw_feature);
+		feature_code = uint16_from_le(*(uint16_t*)raw_feature);
 
 		error = optcl_feature_create_from_raw(&feature, raw_feature, size - offset);
 
@@ -240,20 +240,20 @@ int optcl_parse_inquiry_data(const uint8_t *mmc_response,
 	strncpy_s((char*)nresponse->product, 17, (char*)&mmc_response[16], 16);
 	strncpy_s((char*)nresponse->vendor_string, 21, (char*)&mmc_response[36], 20);
 
-	nresponse->revision_level= uint32_from_be(*(uint32_t*)&mmc_response[32]);
+	nresponse->revision_level	= uint32_from_le(*(uint32_t*)&mmc_response[32]);
 
 	nresponse->clocking		= mmc_response[56] & 0x0c;	/* 00001100 */
 	nresponse->qas			= mmc_response[56] & 0x02;	/* 00000010 */
 	nresponse->ius			= mmc_response[56] & 0x01;	/* 00000001 */
 
-	nresponse->ver_desc1		= uint16_from_be(*(uint16_t*)&mmc_response[58]);
-	nresponse->ver_desc2		= uint16_from_be(*(uint16_t*)&mmc_response[60]);
-	nresponse->ver_desc3		= uint16_from_be(*(uint16_t*)&mmc_response[62]);
-	nresponse->ver_desc4		= uint16_from_be(*(uint16_t*)&mmc_response[64]);
-	nresponse->ver_desc5		= uint16_from_be(*(uint16_t*)&mmc_response[66]);
-	nresponse->ver_desc6		= uint16_from_be(*(uint16_t*)&mmc_response[68]);
-	nresponse->ver_desc7		= uint16_from_be(*(uint16_t*)&mmc_response[70]);
-	nresponse->ver_desc8		= uint16_from_be(*(uint16_t*)&mmc_response[72]);
+	nresponse->ver_desc1		= uint16_from_le(*(uint16_t*)&mmc_response[58]);
+	nresponse->ver_desc2		= uint16_from_le(*(uint16_t*)&mmc_response[60]);
+	nresponse->ver_desc3		= uint16_from_le(*(uint16_t*)&mmc_response[62]);
+	nresponse->ver_desc4		= uint16_from_le(*(uint16_t*)&mmc_response[64]);
+	nresponse->ver_desc5		= uint16_from_le(*(uint16_t*)&mmc_response[66]);
+	nresponse->ver_desc6		= uint16_from_le(*(uint16_t*)&mmc_response[68]);
+	nresponse->ver_desc7		= uint16_from_le(*(uint16_t*)&mmc_response[70]);
+	nresponse->ver_desc8		= uint16_from_le(*(uint16_t*)&mmc_response[72]);
 
 	*response = nresponse;
 

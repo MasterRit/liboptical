@@ -24,9 +24,9 @@
 
 
 /* MMC_OPCODE_GET_CONFIG data parser */
-extern RESULT optcl_parse_get_config_data(const uint8_t *mmc_response, 
-					  uint32_t size,
-					  optcl_mmc_response_get_config **response);
+extern RESULT optcl_parse_get_configuration_data(const uint8_t *mmc_response, 
+						 uint32_t size,
+						 optcl_mmc_response_get_configuration **response);
 
 /* MMC_OPCODE_INQUIRY data parser */
 extern RESULT optcl_parse_inquiry_data(const uint8_t *mmc_response, 
