@@ -239,7 +239,7 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 
 		error = optcl_parse_get_configuration_data(
 			mmc_response, 
-			max_transfer_len, 
+			transfer_size, 
 			&nresponse1
 			);
 
