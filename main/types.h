@@ -150,4 +150,6 @@ typedef unsigned __int64	uint64_t;
 	(uint8_t)b3 << 24 | (uint8_t)b2 << 16 | (uint8_t)b1 << 8 | (uint8_t)b0		\
 	))
 
+#define bool_from_uint8(val)	((bool_t)((val) == 1))
+
 #endif /* _TYPES_H */
