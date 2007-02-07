@@ -154,7 +154,7 @@ int optcl_parse_get_configuration_data(const uint8_t *mmc_response,
 
 		feature = 0;
 		raw_feature = (uint8_t*)&mmc_response[offset];
-		feature_code = uint16_from_le(*(uint16_t*)raw_feature);
+		feature_code = uint16_from_be(*(uint16_t*)&raw_feature[0]);
 
 		error = optcl_feature_create_from_raw(&feature, raw_feature, size - offset);
 
