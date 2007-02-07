@@ -60,7 +60,7 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 	RESULT error;
 	uint8_t rt;
 	uint8_t cdb[10];
-	uint32_t data_length;
+	int32_t data_length;
 	uint16_t start_feature;
 	uint32_t transfer_size;
 	uint32_t alignment_mask;
@@ -183,7 +183,7 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 	 * feature descriptors amounts to less than 1 KB.
 	 */
 
-	data_length = int32_from_be(*(int32_t*)&mmc_response[0]);
+	data_length = uint32_from_be(*(int32_t*)&mmc_response[0]);
 
 	_aligned_free(mmc_response);
 	
@@ -193,7 +193,7 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 		max_transfer_len = MAX_GET_CONFIG_TRANSFER_LEN;
 
 	do {
-		transfer_size = (data_length > max_transfer_len)
+		transfer_size = (data_length > (int32_t)max_transfer_len)
 			? max_transfer_len
 			: data_length;
 
