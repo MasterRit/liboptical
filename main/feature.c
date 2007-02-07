@@ -262,7 +262,7 @@ static RESULT parse_core(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->phys_i_standard = uint32_from_le(*(uint32_t*)&mmc_data[4]);
+	feature->phys_i_standard = uint32_from_be(*(uint32_t*)&mmc_data[4]);
 	feature->inq2 = mmc_data[8] & 0x02;	/* 00000010 */
 	feature->dbe = mmc_data[8] & 0x01;	/* 00000001 */
 
@@ -519,8 +519,8 @@ static RESULT parse_random_readable(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->logical_block_size = uint32_from_le(*(uint32_t*)&mmc_data[4]);
-	feature->blocking = uint16_from_le(*(uint16_t*)&mmc_data[8]);
+	feature->logical_block_size = uint32_from_be(*(uint32_t*)&mmc_data[4]);
+	feature->blocking = uint16_from_be(*(uint16_t*)&mmc_data[8]);
 	feature->pp = mmc_data[10] & 0x01;	/* 00000001 */
 
 	*response = (optcl_feature_descriptor*)feature;
@@ -749,9 +749,9 @@ static RESULT parse_random_writable(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->last_logical_block = uint32_from_le(*(uint32_t*)&mmc_data[4]);
-	feature->logical_block_size = uint32_from_le(*(uint32_t*)&mmc_data[8]);
-	feature->blocking = uint16_from_le(*(uint16_t*)&mmc_data[12]);
+	feature->last_logical_block = uint32_from_be(*(uint32_t*)&mmc_data[4]);
+	feature->logical_block_size = uint32_from_be(*(uint32_t*)&mmc_data[8]);
+	feature->blocking = uint16_from_be(*(uint16_t*)&mmc_data[12]);
 	feature->pp = mmc_data[14] & 0x01;	/* 00000001 */
 
 	*response = (optcl_feature_descriptor*)feature;
@@ -1059,8 +1059,8 @@ static RESULT parse_write_once(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->logical_block_size = uint32_from_le(*(uint32_t*)&mmc_data[4]);
-	feature->blocking = uint16_from_le(*(uint16_t*)&mmc_data[8]);
+	feature->logical_block_size = uint32_from_be(*(uint32_t*)&mmc_data[4]);
+	feature->blocking = uint16_from_be(*(uint16_t*)&mmc_data[8]);
 	feature->pp = mmc_data[10] & 0x01;		/* 00000001 */
 
 	*response = (optcl_feature_descriptor*)feature;
@@ -1601,7 +1601,7 @@ static RESULT parse_cd_mastering(const uint8_t mmc_data[],
 	feature->test_write = mmc_data[4] & 0x04;	/* 00000100 */
 	feature->cd_rw = mmc_data[4] & 0x02;		/* 00000010 */
 	feature->rw = mmc_data[4] & 0x01;		/* 00000001 */
-	feature->max_cue_length = uint32_from_le_bytes((uint8_t)0, mmc_data[5], mmc_data[6], mmc_data[7]);
+	feature->max_cue_length = uint32_from_be_bytes((uint8_t)0, mmc_data[5], mmc_data[6], mmc_data[7]);
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -2940,7 +2940,7 @@ static RESULT parse_dcbs(const uint8_t mmc_data[],
 	feature->dcb_entries_num = feature->descriptor.additional_length / 4;
 
 	for(i = 0; i < feature->dcb_entries_num; ++i) {
-		feature->dcb_entries[i] = uint32_from_le(*(uint32_t*)&mmc_data[(i + 1) * 4]);
+		feature->dcb_entries[i] = uint32_from_be(*(uint32_t*)&mmc_data[(i + 1) * 4]);
 	}
 
 	*response = (optcl_feature_descriptor*)feature;

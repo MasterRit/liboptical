@@ -183,7 +183,7 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 	 * feature descriptors amounts to less than 1 KB.
 	 */
 
-	data_length = int32_from_le(*(int32_t*)&mmc_response[0]);
+	data_length = int32_from_be(*(int32_t*)&mmc_response[0]);
 
 	_aligned_free(mmc_response);
 	

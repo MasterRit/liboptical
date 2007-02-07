@@ -134,8 +134,8 @@ int optcl_parse_get_configuration_data(const uint8_t *mmc_response,
 		return E_OUTOFMEMORY;
 	}
 
-	nresponse->data_length = uint32_from_le(*(uint32_t*)&mmc_response[0]);
-	nresponse->current_profile = uint16_from_le(*(uint16_t*)&mmc_response[6]);
+	nresponse->data_length = uint32_from_be(*(uint32_t*)&mmc_response[0]);
+	nresponse->current_profile = uint16_from_be(*(uint16_t*)&mmc_response[6]);
 
 	error = optcl_list_create(&equalfn_descriptors, &nresponse->descriptors);
 
