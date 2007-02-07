@@ -3283,13 +3283,13 @@ RESULT optcl_feature_create_from_raw(optcl_feature **feature,
 
 	parser = get_feature_parser(nfeature->feature_code);
 
-	free(nfeature);
-
 	if (parser == 0) {
 		return(E_FEATUNKCODE);
 	}
 
-	error = parser(mmc_data, size, &nfeature);
+	error = parser(mmc_data, nfeature->additional_length + 4, &nfeature);
+
+	free(nfeature);
 
 	if (FAILED(error)) {
 		return(error);
