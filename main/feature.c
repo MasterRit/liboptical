@@ -65,7 +65,7 @@ static bool_t check4_feature_descriptor(const optcl_feature_descriptor *descript
 		return(True);
 	}
 
-	return((bool_t)(uint16_from_le(descriptor->feature_code) == feature_code
+	return((bool_t)(uint16_from_be(descriptor->feature_code) == feature_code
 		&& descriptor->additional_length == additional_length
 		&& descriptor->version == version));
 }
@@ -83,7 +83,7 @@ static bool_t check6_feature_descriptor(const optcl_feature_descriptor *descript
 		return(True);
 	}
 
-	return((bool_t)(uint16_from_le(descriptor->feature_code) == feature_code
+	return((bool_t)(uint16_from_be(descriptor->feature_code) == feature_code
 		&& descriptor->additional_length == additional_length
 		&& descriptor->version == version
 		&& descriptor->persistent == persistent
@@ -120,7 +120,7 @@ static RESULT parse_feature_descriptor(const uint8_t mmc_data[],
 		return(E_OUTOFMEMORY);
 	}
 
-	ndescriptor->feature_code	= uint16_from_le(*(const uint16_t*)mmc_data);
+	ndescriptor->feature_code	= uint16_from_be(*(const uint16_t*)&mmc_data[0]);
 	ndescriptor->current		= mmc_data[2] & 0x01;	/* 00000001 */
 	ndescriptor->persistent		= mmc_data[2] & 0x02;	/* 00000010 */
 	ndescriptor->version		= mmc_data[2] & 0x3c;	/* 00111100 */
@@ -194,7 +194,7 @@ static RESULT parse_profile_list(const uint8_t mmc_data[],
 		offset = (i + 1) * 4;
 
 		feature->profile_numbers[i] = 
-			uint16_from_le(*(uint16_t*)&mmc_data[offset]);
+			uint16_from_be(*(uint16_t*)&mmc_data[offset]);
 
 		feature->current_profiles[i] = 
 			(bool_t)(mmc_data[offset + 2] & 0x01);	/* 00000001 */
@@ -811,7 +811,7 @@ static RESULT parse_inc_streaming_writable(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->supported_dbts = uint16_from_le(*(uint16_t*)&mmc_data[4]);
+	feature->supported_dbts = uint16_from_be(*(uint16_t*)&mmc_data[4]);
 	feature->trio = mmc_data[6] & 0x04;		/* 00000100 */
 	feature->arsv = mmc_data[6] & 0x02;		/* 00000010 */
 	feature->buf = mmc_data[6] & 0x01;		/* 00000001 */
@@ -1293,7 +1293,7 @@ static RESULT parse_enh_defect_reporting(const uint8_t mmc_data[],
 
 	feature->drt_dm = mmc_data[4] & 0x01;		/* 00000001 */
 	feature->dbi_cache_zones_num = mmc_data[4];
-	feature->entries_num = uint16_from_le(*(uint16_t*)&mmc_data[6]);
+	feature->entries_num = uint16_from_be(*(uint16_t*)&mmc_data[6]);
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -1536,7 +1536,7 @@ static RESULT parse_cd_tao(const uint8_t mmc_data[],
 	feature->test_write = mmc_data[4] & 0x04;	/* 00000100 */
 	feature->cd_rw = mmc_data[4] & 0x02;		/* 00000010 */
 	feature->rw_subcode = mmc_data[4] & 0x01;	/* 00000001 */
-	feature->data_type_supported = uint16_from_le(*(uint16_t*)&mmc_data[6]);
+	feature->data_type_supported = uint16_from_be(*(uint16_t*)&mmc_data[6]);
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -2028,18 +2028,18 @@ static RESULT parse_bd_read(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->bd_re_class0_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[8]);
-	feature->bd_re_class1_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[10]);
-	feature->bd_re_class2_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[12]);
-	feature->bd_re_class3_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[14]);
-	feature->bd_r_class0_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[16]);
-	feature->bd_r_class1_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[18]);
-	feature->bd_r_class2_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[20]);
-	feature->bd_r_class3_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[22]);
-	feature->bd_rom_class0_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[24]);
-	feature->bd_rom_class1_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[26]);
-	feature->bd_rom_class2_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[28]);
-	feature->bd_rom_class3_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[30]);
+	feature->bd_re_class0_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[8]);
+	feature->bd_re_class1_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[10]);
+	feature->bd_re_class2_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[12]);
+	feature->bd_re_class3_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[14]);
+	feature->bd_r_class0_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[16]);
+	feature->bd_r_class1_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[18]);
+	feature->bd_r_class2_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[20]);
+	feature->bd_r_class3_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[22]);
+	feature->bd_rom_class0_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[24]);
+	feature->bd_rom_class1_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[26]);
+	feature->bd_rom_class2_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[28]);
+	feature->bd_rom_class3_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[30]);
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -2098,14 +2098,14 @@ static RESULT parse_bd_write(const uint8_t mmc_data[],
 	free(descriptor);
 
 	feature->svnr = mmc_data[4] & 0x01;		/* 00000001 */
-	feature->bd_re_class0_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[8]);
-	feature->bd_re_class1_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[10]);
-	feature->bd_re_class2_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[12]);
-	feature->bd_re_class3_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[14]);
-	feature->bd_r_class0_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[16]);
-	feature->bd_r_class1_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[18]);
-	feature->bd_r_class2_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[20]);
-	feature->bd_r_class3_bitmap = uint16_from_le(*(uint16_t*)&mmc_data[22]);
+	feature->bd_re_class0_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[8]);
+	feature->bd_re_class1_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[10]);
+	feature->bd_re_class2_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[12]);
+	feature->bd_re_class3_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[14]);
+	feature->bd_r_class0_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[16]);
+	feature->bd_r_class1_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[18]);
+	feature->bd_r_class2_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[20]);
+	feature->bd_r_class3_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[22]);
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -2628,7 +2628,7 @@ static RESULT parse_timeout(const uint8_t mmc_data[],
 	free(descriptor);
 
 	feature->group3 = mmc_data[4] & 0x01;		/* 00000001 */
-	feature->unit_length = uint16_from_le(*(uint16_t*)&mmc_data[6]);
+	feature->unit_length = uint16_from_be(*(uint16_t*)&mmc_data[6]);
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -3057,13 +3057,13 @@ static RESULT parse_firmware_info(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->century = uint16_from_le(*(uint16_t*)&mmc_data[4]);
-	feature->year = uint16_from_le(*(uint16_t*)&mmc_data[6]);
-	feature->month = uint16_from_le(*(uint16_t*)&mmc_data[8]);
-	feature->day = uint16_from_le(*(uint16_t*)&mmc_data[10]);
-	feature->hour = uint16_from_le(*(uint16_t*)&mmc_data[12]);
-	feature->minute = uint16_from_le(*(uint16_t*)&mmc_data[14]);
-	feature->second = uint16_from_le(*(uint16_t*)&mmc_data[16]);
+	feature->century = uint16_from_be(*(uint16_t*)&mmc_data[4]);
+	feature->year = uint16_from_be(*(uint16_t*)&mmc_data[6]);
+	feature->month = uint16_from_be(*(uint16_t*)&mmc_data[8]);
+	feature->day = uint16_from_be(*(uint16_t*)&mmc_data[10]);
+	feature->hour = uint16_from_be(*(uint16_t*)&mmc_data[12]);
+	feature->minute = uint16_from_be(*(uint16_t*)&mmc_data[14]);
+	feature->second = uint16_from_be(*(uint16_t*)&mmc_data[16]);
 
 	*response = (optcl_feature_descriptor*)feature;
 
