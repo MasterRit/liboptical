@@ -60,7 +60,7 @@ static bool_t check_feature_descriptor(const optcl_feature_descriptor *descripto
 	assert(descriptor != 0);
 
 	if (descriptor == 0) {
-		return(True);
+		return(False);
 	}
 
 	return((bool_t)(uint16_from_be(descriptor->feature_code) == feature_code));
@@ -224,9 +224,14 @@ static RESULT parse_core(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->phys_i_standard	= uint32_from_be(*(uint32_t*)&mmc_data[4]);
-	feature->inq2			= bool_from_uint8(mmc_data[8] & 0x02);	/* 00000010 */
-	feature->dbe			= bool_from_uint8(mmc_data[8] & 0x01);	/* 00000001 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->phys_i_standard = uint32_from_be(*(uint32_t*)&mmc_data[4]);
+	}
+
+	if (feature->descriptor.additional_length > 4) {
+		feature->inq2 = bool_from_uint8(mmc_data[8] & 0x02);	/* 00000010 */
+		feature->dbe = bool_from_uint8(mmc_data[8] & 0x01);	/* 00000001 */
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -238,7 +243,6 @@ static RESULT parse_morphing(const uint8_t mmc_data[],
 			     optcl_feature_descriptor **response)
 {
 	RESULT error;
-	RESULT destroy_error;
 	bool_t check;
 	optcl_feature_morphing *feature = 0;
 	optcl_feature_descriptor *descriptor = 0;
@@ -282,14 +286,9 @@ static RESULT parse_morphing(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->ocevent	= bool_from_uint8(mmc_data[4] & 0x02);	/* 00000010 */
-	feature->async		= bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
-
-	assert(feature->ocevent == 1);
-
-	if (feature->ocevent != 1) {
-		destroy_error = optcl_feature_destroy((optcl_feature*)feature);
-		return(SUCCEEDED(destroy_error) ? E_FEATINVHEADER : destroy_error);
+	if (feature->descriptor.additional_length > 0) {
+		feature->ocevent = bool_from_uint8(mmc_data[4] & 0x02);	/* 00000010 */
+		feature->async = bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
 	}
 
 	*response = (optcl_feature_descriptor*)feature;
@@ -345,10 +344,12 @@ static RESULT parse_removable_medium(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->lmt		= mmc_data[4] & 0xe0;			/* 11100000 */
-	feature->eject		= bool_from_uint8(mmc_data[4] & 0x08);	/* 00001000 */
-	feature->pvnt_jmpr	= bool_from_uint8(mmc_data[4] & 0x04);	/* 00000100 */
-	feature->lock		= bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->lmt = mmc_data[4] & 0xe0;				/* 11100000 */
+		feature->eject = bool_from_uint8(mmc_data[4] & 0x08);		/* 00001000 */
+		feature->pvnt_jmpr = bool_from_uint8(mmc_data[4] & 0x04);	/* 00000100 */
+		feature->lock = bool_from_uint8(mmc_data[4] & 0x01);		/* 00000001 */
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -401,10 +402,12 @@ static RESULT parse_write_protect(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->dwp	= bool_from_uint8(mmc_data[4] & 0x08);	/* 00001000 */
-	feature->wdcb	= bool_from_uint8(mmc_data[4] & 0x04);	/* 00000100 */
-	feature->spwp	= bool_from_uint8(mmc_data[4] & 0x02);	/* 00000010 */
-	feature->sswpp	= bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->dwp = bool_from_uint8(mmc_data[4] & 0x08);	/* 00001000 */
+		feature->wdcb = bool_from_uint8(mmc_data[4] & 0x04);	/* 00000100 */
+		feature->spwp = bool_from_uint8(mmc_data[4] & 0x02);	/* 00000010 */
+		feature->sswpp = bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -457,9 +460,14 @@ static RESULT parse_random_readable(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->logical_block_size	= uint32_from_be(*(uint32_t*)&mmc_data[4]);
-	feature->blocking		= uint16_from_be(*(uint16_t*)&mmc_data[8]);
-	feature->pp			= bool_from_uint8(mmc_data[10] & 0x01);	/* 00000001 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->logical_block_size = uint32_from_be(*(uint32_t*)&mmc_data[4]);
+	}
+
+	if (feature->descriptor.additional_length > 4) {
+		feature->blocking = uint16_from_be(*(uint16_t*)&mmc_data[8]);
+		feature->pp = bool_from_uint8(mmc_data[10] & 0x01);	/* 00000001 */
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -558,9 +566,11 @@ static RESULT parse_cd_read(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->dap		= bool_from_uint8(mmc_data[4] & 0x80);	/* 10000000 */
-	feature->c2_flags	= bool_from_uint8(mmc_data[4] & 0x02);	/* 00000010 */
-	feature->cd_text	= bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->dap = bool_from_uint8(mmc_data[4] & 0x80);		/* 10000000 */
+		feature->c2_flags = bool_from_uint8(mmc_data[4] & 0x02);	/* 00000010 */
+		feature->cd_text = bool_from_uint8(mmc_data[4] & 0x01);		/* 00000001 */
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -613,8 +623,10 @@ static RESULT parse_dvd_read(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->multi110	= bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
-	feature->dual_r		= bool_from_uint8(mmc_data[6] & 0x01);	/* 00000001 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->multi110 = bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+		feature->dual_r	= bool_from_uint8(mmc_data[6] & 0x01);		/* 00000001 */
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -667,10 +679,18 @@ static RESULT parse_random_writable(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->last_logical_block	= uint32_from_be(*(uint32_t*)&mmc_data[4]);
-	feature->logical_block_size	= uint32_from_be(*(uint32_t*)&mmc_data[8]);
-	feature->blocking		= uint16_from_be(*(uint16_t*)&mmc_data[12]);
-	feature->pp			= bool_from_uint8(mmc_data[14] & 0x01);	/* 00000001 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->last_logical_block = uint32_from_be(*(uint32_t*)&mmc_data[4]);
+	}
+
+	if (feature->descriptor.additional_length > 4) {
+		feature->logical_block_size = uint32_from_be(*(uint32_t*)&mmc_data[8]);
+	}
+
+	if (feature->descriptor.additional_length > 8) {
+		feature->blocking = uint16_from_be(*(uint16_t*)&mmc_data[12]);
+		feature->pp = bool_from_uint8(mmc_data[14] & 0x01);	/* 00000001 */
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -682,7 +702,6 @@ static RESULT parse_inc_streaming_writable(const uint8_t mmc_data[],
 					   optcl_feature_descriptor **response)
 {
 	RESULT error;
-	RESULT destroy_error;
 	bool_t check;
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_inc_streaming_writable *feature = 0;
@@ -724,21 +743,17 @@ static RESULT parse_inc_streaming_writable(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->supported_dbts		= uint16_from_be(*(uint16_t*)&mmc_data[4]);
-	feature->trio			= bool_from_uint8(mmc_data[6] & 0x04);	/* 00000100 */
-	feature->arsv			= bool_from_uint8(mmc_data[6] & 0x02);	/* 00000010 */
-	feature->buf			= bool_from_uint8(mmc_data[6] & 0x01);	/* 00000001 */
-	feature->link_size_number	= mmc_data[7];
-
-	assert(feature->link_size_number + 7U < size);
-
-	if (feature->link_size_number + 7U >= size) {
-		destroy_error = optcl_feature_destroy((optcl_feature*)feature);
-		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	if (feature->descriptor.additional_length > 0) {
+		feature->supported_dbts	= uint16_from_be(*(uint16_t*)&mmc_data[4]);
+		feature->trio = bool_from_uint8(mmc_data[6] & 0x04);	/* 00000100 */
+		feature->arsv = bool_from_uint8(mmc_data[6] & 0x02);	/* 00000010 */
+		feature->buf = bool_from_uint8(mmc_data[6] & 0x01);	/* 00000001 */
+		feature->link_size_number = mmc_data[7];
 	}
 
-	memset(&feature->link_sizes, 0, sizeof(feature->link_sizes));
-	memcpy(&feature->link_sizes, &mmc_data[8], feature->link_size_number);
+	if (feature->descriptor.additional_length > feature->link_size_number + 4) {
+		memcpy(&feature->link_sizes, &mmc_data[8], feature->link_size_number);
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -842,11 +857,16 @@ static RESULT parse_formattable(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->renosa = bool_from_uint8(mmc_data[4] & 0x08);	/* 00001000 */
-	feature->expand = bool_from_uint8(mmc_data[4] & 0x04);	/* 00000100 */
-	feature->qcert	= bool_from_uint8(mmc_data[4] & 0x02);	/* 00000010 */
-	feature->cert	= bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
-	feature->rrm	= bool_from_uint8(mmc_data[8] & 0x01);	/* 00000001 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->renosa = bool_from_uint8(mmc_data[4] & 0x08);	/* 00001000 */
+		feature->expand = bool_from_uint8(mmc_data[4] & 0x04);	/* 00000100 */
+		feature->qcert = bool_from_uint8(mmc_data[4] & 0x02);	/* 00000010 */
+		feature->cert = bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+	}
+
+	if (feature->descriptor.additional_length > 4) {
+		feature->rrm = bool_from_uint8(mmc_data[8] & 0x01);	/* 00000001 */
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -899,7 +919,9 @@ static RESULT parse_hw_defect_management(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->ssa = bool_from_uint8(mmc_data[4] & 0x80);	/* 10000000 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->ssa = bool_from_uint8(mmc_data[4] & 0x80);	/* 10000000 */
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -952,9 +974,14 @@ static RESULT parse_write_once(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->logical_block_size	= uint32_from_be(*(uint32_t*)&mmc_data[4]);
-	feature->blocking		= uint16_from_be(*(uint16_t*)&mmc_data[8]);
-	feature->pp			= bool_from_uint8(mmc_data[10] & 0x01);	/* 00000001 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->logical_block_size = uint32_from_be(*(uint32_t*)&mmc_data[4]);
+	}
+
+	if (feature->descriptor.additional_length > 4) {
+		feature->blocking = uint16_from_be(*(uint16_t*)&mmc_data[8]);
+		feature->pp = bool_from_uint8(mmc_data[10] & 0x01);	/* 00000001 */
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -1109,9 +1136,11 @@ static RESULT parse_mrw(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->dvd_plus_write	= bool_from_uint8(mmc_data[4] & 0x04);	/* 00000100 */
-	feature->dvd_plus_read	= bool_from_uint8(mmc_data[4] & 0x02);	/* 00000010 */
-	feature->cd_write	= bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->dvd_plus_write	= bool_from_uint8(mmc_data[4] & 0x04);	/* 00000100 */
+		feature->dvd_plus_read = bool_from_uint8(mmc_data[4] & 0x02);	/* 00000010 */
+		feature->cd_write = bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -1164,9 +1193,11 @@ static RESULT parse_enh_defect_reporting(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->drt_dm			= bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
-	feature->dbi_cache_zones_num	= mmc_data[4];
-	feature->entries_num		= uint16_from_be(*(uint16_t*)&mmc_data[6]);
+	if (feature->descriptor.additional_length > 0) {
+		feature->drt_dm	= bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+		feature->dbi_cache_zones_num = mmc_data[4];
+		feature->entries_num = uint16_from_be(*(uint16_t*)&mmc_data[6]);
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -1219,9 +1250,11 @@ static RESULT parse_dvd_plus_rw(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->write		= bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
-	feature->quick_start	= bool_from_uint8(mmc_data[5] & 0x02);	/* 00000010 */
-	feature->close_only	= bool_from_uint8(mmc_data[5] & 0x01);	/* 00000001 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->write = bool_from_uint8(mmc_data[4] & 0x01);		/* 00000001 */
+		feature->quick_start = bool_from_uint8(mmc_data[5] & 0x02);	/* 00000010 */
+		feature->close_only = bool_from_uint8(mmc_data[5] & 0x01);	/* 00000001 */
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -1274,7 +1307,9 @@ static RESULT parse_dvd_plus_r(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->write = bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->write = bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+	}
 	
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -1327,10 +1362,12 @@ static RESULT parse_rigid_restricted_overwrite(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->dsdg		= bool_from_uint8(mmc_data[4] & 0x08);	/* 00001000 */
-	feature->dsdr		= bool_from_uint8(mmc_data[4] & 0x04);	/* 00000100 */
-	feature->intermediate	= bool_from_uint8(mmc_data[4] & 0x02);	/* 00000010 */
-	feature->blank		= bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->dsdg = bool_from_uint8(mmc_data[4] & 0x08);		/* 00001000 */
+		feature->dsdr = bool_from_uint8(mmc_data[4] & 0x04);		/* 00000100 */
+		feature->intermediate = bool_from_uint8(mmc_data[4] & 0x02);	/* 00000010 */
+		feature->blank = bool_from_uint8(mmc_data[4] & 0x01);		/* 00000001 */
+	}
 	
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -1383,13 +1420,15 @@ static RESULT parse_cd_tao(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->buf			= bool_from_uint8(mmc_data[4] & 0x40);	/* 01000000 */
-	feature->rw_raw			= bool_from_uint8(mmc_data[4] & 0x10);	/* 00010000 */
-	feature->rw_pack		= bool_from_uint8(mmc_data[4] & 0x08);	/* 00001000 */
-	feature->test_write		= bool_from_uint8(mmc_data[4] & 0x04);	/* 00000100 */
-	feature->cd_rw			= bool_from_uint8(mmc_data[4] & 0x02);	/* 00000010 */
-	feature->rw_subcode		= bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
-	feature->data_type_supported	= uint16_from_be(*(uint16_t*)&mmc_data[6]);
+	if (feature->descriptor.additional_length > 0) {
+		feature->buf = bool_from_uint8(mmc_data[4] & 0x40);		/* 01000000 */
+		feature->rw_raw = bool_from_uint8(mmc_data[4] & 0x10);		/* 00010000 */
+		feature->rw_pack = bool_from_uint8(mmc_data[4] & 0x08);		/* 00001000 */
+		feature->test_write = bool_from_uint8(mmc_data[4] & 0x04);	/* 00000100 */
+		feature->cd_rw = bool_from_uint8(mmc_data[4] & 0x02);		/* 00000010 */
+		feature->rw_subcode = bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+		feature->data_type_supported = uint16_from_be(*(uint16_t*)&mmc_data[6]);
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -1442,20 +1481,22 @@ static RESULT parse_cd_mastering(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->buf		= bool_from_uint8(mmc_data[4] & 0x40);	/* 01000000 */
-	feature->sao		= bool_from_uint8(mmc_data[4] & 0x20);	/* 00100000 */
-	feature->raw_ms		= bool_from_uint8(mmc_data[4] & 0x10);	/* 00010000 */
-	feature->raw		= bool_from_uint8(mmc_data[4] & 0x08);	/* 00001000 */
-	feature->test_write	= bool_from_uint8(mmc_data[4] & 0x04);	/* 00000100 */
-	feature->cd_rw		= bool_from_uint8(mmc_data[4] & 0x02);	/* 00000010 */
-	feature->rw		= bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
-	
-	feature->max_cue_length = uint32_from_be_bytes(
-		(uint8_t)0, 
-		mmc_data[5], 
-		mmc_data[6], 
-		mmc_data[7]
-		);
+	if (feature->descriptor.additional_length > 0) {
+		feature->buf = bool_from_uint8(mmc_data[4] & 0x40);		/* 01000000 */
+		feature->sao = bool_from_uint8(mmc_data[4] & 0x20);		/* 00100000 */
+		feature->raw_ms = bool_from_uint8(mmc_data[4] & 0x10);		/* 00010000 */
+		feature->raw = bool_from_uint8(mmc_data[4] & 0x08);		/* 00001000 */
+		feature->test_write = bool_from_uint8(mmc_data[4] & 0x04);	/* 00000100 */
+		feature->cd_rw = bool_from_uint8(mmc_data[4] & 0x02);		/* 00000010 */
+		feature->rw = bool_from_uint8(mmc_data[4] & 0x01);		/* 00000001 */
+		
+		feature->max_cue_length = uint32_from_be_bytes(
+			(uint8_t)0, 
+			mmc_data[5], 
+			mmc_data[6], 
+			mmc_data[7]
+			);
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -1508,10 +1549,12 @@ static RESULT parse_dvd_minus_r_minus_rw_write(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->buf		= bool_from_uint8(mmc_data[4] & 0x40);	/* 01000000 */
-	feature->rdl		= bool_from_uint8(mmc_data[4] & 0x10);	/* 00010000 */
-	feature->test_write	= bool_from_uint8(mmc_data[4] & 0x08);	/* 00001000 */
-	feature->dvd_rw		= bool_from_uint8(mmc_data[4] & 0x04);	/* 00000100 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->buf = bool_from_uint8(mmc_data[4] & 0x40);		/* 01000000 */
+		feature->rdl = bool_from_uint8(mmc_data[4] & 0x10);		/* 00010000 */
+		feature->test_write = bool_from_uint8(mmc_data[4] & 0x08);	/* 00001000 */
+		feature->dvd_rw	= bool_from_uint8(mmc_data[4] & 0x04);		/* 00000100 */
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -1523,7 +1566,6 @@ static RESULT parse_layer_jump_recording(const uint8_t mmc_data[],
 					 optcl_feature_descriptor **response)
 {
 	RESULT error;
-	RESULT destroy_error;
 	bool_t check;
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_layer_jmp_rec *feature = 0;
@@ -1565,17 +1607,13 @@ static RESULT parse_layer_jump_recording(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->link_sizes_num = mmc_data[7];
-
-	assert(feature->link_sizes_num + 7U < size);
-
-	if (feature->link_sizes_num + 7U >= size) {
-		destroy_error = optcl_feature_destroy((optcl_feature*)feature);
-		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	if (feature->descriptor.additional_length > 0) {
+		feature->link_sizes_num = mmc_data[7];
 	}
 
-	memset(feature->link_sizes, 0, sizeof(feature->link_sizes));
-	memcpy(feature->link_sizes, &mmc_data[8], feature->link_sizes_num);
+	if (feature->descriptor.additional_length > feature->link_sizes_num + 4) {
+		memcpy(feature->link_sizes, &mmc_data[8], feature->link_sizes_num);
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -1628,14 +1666,16 @@ static RESULT parse_cdrw_media_write_support(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->subtype7 = bool_from_uint8(mmc_data[5] & 0x80);	/* 10000000 */
-	feature->subtype6 = bool_from_uint8(mmc_data[5] & 0x40);	/* 01000000 */
-	feature->subtype5 = bool_from_uint8(mmc_data[5] & 0x20);	/* 00100000 */
-	feature->subtype4 = bool_from_uint8(mmc_data[5] & 0x10);	/* 00010000 */
-	feature->subtype3 = bool_from_uint8(mmc_data[5] & 0x08);	/* 00001000 */
-	feature->subtype2 = bool_from_uint8(mmc_data[5] & 0x04);	/* 00000100 */
-	feature->subtype1 = bool_from_uint8(mmc_data[5] & 0x02);	/* 00000010 */
-	feature->subtype0 = bool_from_uint8(mmc_data[5] & 0x01);	/* 00000001 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->subtype7 = bool_from_uint8(mmc_data[5] & 0x80);	/* 10000000 */
+		feature->subtype6 = bool_from_uint8(mmc_data[5] & 0x40);	/* 01000000 */
+		feature->subtype5 = bool_from_uint8(mmc_data[5] & 0x20);	/* 00100000 */
+		feature->subtype4 = bool_from_uint8(mmc_data[5] & 0x10);	/* 00010000 */
+		feature->subtype3 = bool_from_uint8(mmc_data[5] & 0x08);	/* 00001000 */
+		feature->subtype2 = bool_from_uint8(mmc_data[5] & 0x04);	/* 00000100 */
+		feature->subtype1 = bool_from_uint8(mmc_data[5] & 0x02);	/* 00000010 */
+		feature->subtype0 = bool_from_uint8(mmc_data[5] & 0x01);	/* 00000001 */
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -1739,9 +1779,11 @@ static RESULT parse_dvd_plus_rw_dual_layer(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->write		= bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
-	feature->quick_start	= bool_from_uint8(mmc_data[5] & 0x02);	/* 00000010 */
-	feature->close_only	= bool_from_uint8(mmc_data[5] & 0x01);	/* 00000001 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->write = bool_from_uint8(mmc_data[4] & 0x01);		/* 00000001 */
+		feature->quick_start = bool_from_uint8(mmc_data[5] & 0x02);	/* 00000010 */
+		feature->close_only = bool_from_uint8(mmc_data[5] & 0x01);	/* 00000001 */
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -1794,7 +1836,9 @@ static RESULT parse_dvd_plus_r_dual_layer(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->write = bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->write = bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -1847,18 +1891,35 @@ static RESULT parse_bd_read(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->bd_re_class0_bitmap	= uint16_from_be(*(uint16_t*)&mmc_data[8]);
-	feature->bd_re_class1_bitmap	= uint16_from_be(*(uint16_t*)&mmc_data[10]);
-	feature->bd_re_class2_bitmap	= uint16_from_be(*(uint16_t*)&mmc_data[12]);
-	feature->bd_re_class3_bitmap	= uint16_from_be(*(uint16_t*)&mmc_data[14]);
-	feature->bd_r_class0_bitmap	= uint16_from_be(*(uint16_t*)&mmc_data[16]);
-	feature->bd_r_class1_bitmap	= uint16_from_be(*(uint16_t*)&mmc_data[18]);
-	feature->bd_r_class2_bitmap	= uint16_from_be(*(uint16_t*)&mmc_data[20]);
-	feature->bd_r_class3_bitmap	= uint16_from_be(*(uint16_t*)&mmc_data[22]);
-	feature->bd_rom_class0_bitmap	= uint16_from_be(*(uint16_t*)&mmc_data[24]);
-	feature->bd_rom_class1_bitmap	= uint16_from_be(*(uint16_t*)&mmc_data[26]);
-	feature->bd_rom_class2_bitmap	= uint16_from_be(*(uint16_t*)&mmc_data[28]);
-	feature->bd_rom_class3_bitmap	= uint16_from_be(*(uint16_t*)&mmc_data[30]);
+	if (feature->descriptor.additional_length > 4) {
+		feature->bd_re_class0_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[8]);
+		feature->bd_re_class1_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[10]);
+	}
+
+	if (feature->descriptor.additional_length > 8) {
+		feature->bd_re_class2_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[12]);
+		feature->bd_re_class3_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[14]);
+	}
+
+	if (feature->descriptor.additional_length > 12) {
+		feature->bd_r_class0_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[16]);
+		feature->bd_r_class1_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[18]);
+	}
+
+	if (feature->descriptor.additional_length > 16) {
+		feature->bd_r_class2_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[20]);
+		feature->bd_r_class3_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[22]);
+	}
+
+	if (feature->descriptor.additional_length > 20) {
+		feature->bd_rom_class0_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[24]);
+		feature->bd_rom_class1_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[26]);
+	}
+
+	if (feature->descriptor.additional_length > 24) {
+		feature->bd_rom_class2_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[28]);
+		feature->bd_rom_class3_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[30]);
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -1911,15 +1972,29 @@ static RESULT parse_bd_write(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->svnr			= bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
-	feature->bd_re_class0_bitmap	= uint16_from_be(*(uint16_t*)&mmc_data[8]);
-	feature->bd_re_class1_bitmap	= uint16_from_be(*(uint16_t*)&mmc_data[10]);
-	feature->bd_re_class2_bitmap	= uint16_from_be(*(uint16_t*)&mmc_data[12]);
-	feature->bd_re_class3_bitmap	= uint16_from_be(*(uint16_t*)&mmc_data[14]);
-	feature->bd_r_class0_bitmap	= uint16_from_be(*(uint16_t*)&mmc_data[16]);
-	feature->bd_r_class1_bitmap	= uint16_from_be(*(uint16_t*)&mmc_data[18]);
-	feature->bd_r_class2_bitmap	= uint16_from_be(*(uint16_t*)&mmc_data[20]);
-	feature->bd_r_class3_bitmap	= uint16_from_be(*(uint16_t*)&mmc_data[22]);
+	if (feature->descriptor.additional_length > 0) {
+		feature->svnr = bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+	}
+
+	if (feature->descriptor.additional_length > 4) {
+		feature->bd_re_class0_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[8]);
+		feature->bd_re_class1_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[10]);
+	}
+
+	if (feature->descriptor.additional_length > 8) {
+		feature->bd_re_class2_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[12]);
+		feature->bd_re_class3_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[14]);
+	}
+
+	if (feature->descriptor.additional_length > 12) {
+		feature->bd_r_class0_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[16]);
+		feature->bd_r_class1_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[18]);
+	}
+
+	if (feature->descriptor.additional_length > 16) {
+		feature->bd_r_class2_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[20]);
+		feature->bd_r_class3_bitmap = uint16_from_be(*(uint16_t*)&mmc_data[22]);
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -2023,8 +2098,10 @@ static RESULT parse_hd_dvd_read(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->hd_dvd_r	= bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
-	feature->hd_dvd_ram	= bool_from_uint8(mmc_data[6] & 0x01);	/* 00000001 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->hd_dvd_r = bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+		feature->hd_dvd_ram = bool_from_uint8(mmc_data[6] & 0x01);	/* 00000001 */
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -2077,8 +2154,10 @@ static RESULT parse_hd_dvd_write(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->hd_dvd_r	= bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
-	feature->hd_dvd_ram	= bool_from_uint8(mmc_data[6] & 0x01);	/* 00000001 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->hd_dvd_r = bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+		feature->hd_dvd_ram = bool_from_uint8(mmc_data[6] & 0x01);	/* 00000001 */
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -2131,7 +2210,9 @@ static RESULT parse_hybrid_disk(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->ri = bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->ri = bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -2235,7 +2316,9 @@ static RESULT parse_smart(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->pp = bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->pp = bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -2288,9 +2371,11 @@ static RESULT parse_embedded_changer(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->scc			= bool_from_uint8(mmc_data[4] & 0x10);	/* 00010000 */
-	feature->sdp			= bool_from_uint8(mmc_data[4] & 0x04);	/* 00000100 */
-	feature->highest_slot_num	= mmc_data[7] & 0x1F;			/* 00001111 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->scc = bool_from_uint8(mmc_data[4] & 0x10);	/* 00010000 */
+		feature->sdp = bool_from_uint8(mmc_data[4] & 0x04);	/* 00000100 */
+		feature->highest_slot_num = mmc_data[7] & 0x1F;		/* 00001111 */
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -2343,7 +2428,9 @@ static RESULT parse_microcode_upgrade(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->m5 = bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->m5 = bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -2396,8 +2483,10 @@ static RESULT parse_timeout(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->group3		= bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
-	feature->unit_length	= uint16_from_be(*(uint16_t*)&mmc_data[6]);
+	if (feature->descriptor.additional_length > 0) {
+		feature->group3	= bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+		feature->unit_length = uint16_from_be(*(uint16_t*)&mmc_data[6]);
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -2450,7 +2539,9 @@ static RESULT parse_dvd_css(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->css_version = mmc_data[7];
+	if (feature->descriptor.additional_length > 0) {
+		feature->css_version = mmc_data[7];
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -2503,11 +2594,13 @@ static RESULT parse_rt_streaming(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->rbcb	= bool_from_uint8(mmc_data[4] & 0x10);	/* 00010000 */
-	feature->scs	= bool_from_uint8(mmc_data[4] & 0x08);	/* 00001000 */
-	feature->mp2a	= bool_from_uint8(mmc_data[4] & 0x04);	/* 00000100 */
-	feature->wspd	= bool_from_uint8(mmc_data[4] & 0x02);	/* 00000010 */
-	feature->sw	= bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+	if (feature->descriptor.additional_length > 0) {
+		feature->rbcb = bool_from_uint8(mmc_data[4] & 0x10);	/* 00010000 */
+		feature->scs = bool_from_uint8(mmc_data[4] & 0x08);	/* 00001000 */
+		feature->mp2a = bool_from_uint8(mmc_data[4] & 0x04);	/* 00000100 */
+		feature->wspd = bool_from_uint8(mmc_data[4] & 0x02);	/* 00000010 */
+		feature->sw = bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -2520,6 +2613,7 @@ static RESULT parse_drive_serial_number(const uint8_t mmc_data[],
 {
 	RESULT error;
 	bool_t check;
+	uint32_t length;
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_drive_serial_number *feature = 0;
 
@@ -2567,14 +2661,18 @@ static RESULT parse_drive_serial_number(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	memset(feature->serial_number, 0, sizeof(feature->serial_number));
+	if (feature->descriptor.additional_length > 0) {
+		length = (feature->descriptor.additional_length < sizeof(feature->serial_number))
+			? feature->descriptor.additional_length
+			: sizeof(feature->serial_number);
 
-	strncpy_s(
-		(char*)&feature->serial_number,
-		sizeof(feature->serial_number),
-		(const char*)&mmc_data[4], 
-		feature->descriptor.additional_length
-		);
+		strncpy_s(
+			(char*)&feature->serial_number,
+			sizeof(feature->serial_number),
+			(const char*)&mmc_data[4], 
+			length
+			);
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -2679,12 +2777,12 @@ static RESULT parse_dcbs(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	memset(feature->dcb_entries, 0, sizeof(feature->dcb_entries));
-
 	feature->dcb_entries_num = feature->descriptor.additional_length / 4;
 
-	for(i = 0; i < feature->dcb_entries_num; ++i) {
-		feature->dcb_entries[i] = uint32_from_be(*(uint32_t*)&mmc_data[(i + 1) * 4]);
+	if (feature->descriptor.additional_length >= feature->dcb_entries_num * 4) {
+		for(i = 0; i < feature->dcb_entries_num; ++i) {
+			feature->dcb_entries[i] = uint32_from_be(*(uint32_t*)&mmc_data[(i + 1) * 4]);
+		}
 	}
 
 	*response = (optcl_feature_descriptor*)feature;
@@ -2738,7 +2836,9 @@ static RESULT parse_dvd_cprm(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->cprm_version = mmc_data[7];
+	if (feature->descriptor.additional_length > 4) {
+		feature->cprm_version = mmc_data[7];
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -2791,13 +2891,24 @@ static RESULT parse_firmware_info(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->century	= uint16_from_be(*(uint16_t*)&mmc_data[4]);
-	feature->year		= uint16_from_be(*(uint16_t*)&mmc_data[6]);
-	feature->month		= uint16_from_be(*(uint16_t*)&mmc_data[8]);
-	feature->day		= uint16_from_be(*(uint16_t*)&mmc_data[10]);
-	feature->hour		= uint16_from_be(*(uint16_t*)&mmc_data[12]);
-	feature->minute		= uint16_from_be(*(uint16_t*)&mmc_data[14]);
-	feature->second		= uint16_from_be(*(uint16_t*)&mmc_data[16]);
+	if (feature->descriptor.additional_length > 0) {
+		feature->century = uint16_from_be(*(uint16_t*)&mmc_data[4]);
+		feature->year = uint16_from_be(*(uint16_t*)&mmc_data[6]);
+	}
+
+	if (feature->descriptor.additional_length > 4) {
+		feature->month = uint16_from_be(*(uint16_t*)&mmc_data[8]);
+		feature->day = uint16_from_be(*(uint16_t*)&mmc_data[10]);
+	}
+
+	if (feature->descriptor.additional_length > 8) {
+		feature->hour = uint16_from_be(*(uint16_t*)&mmc_data[12]);
+		feature->minute	= uint16_from_be(*(uint16_t*)&mmc_data[14]);
+	}
+
+	if (feature->descriptor.additional_length > 12) {
+		feature->second	= uint16_from_be(*(uint16_t*)&mmc_data[16]);
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 
@@ -2850,10 +2961,12 @@ static RESULT parse_aacs(const uint8_t mmc_data[],
 
 	free(descriptor);
 
-	feature->bng		= bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
-	feature->block_count	= mmc_data[5];
-	feature->agids_num	= mmc_data[6] & 0x0F;			/* 00001111 */
-	feature->aacs_version	= mmc_data[7];
+	if (feature->descriptor.additional_length > 0) {
+		feature->bng = bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
+		feature->block_count = mmc_data[5];
+		feature->agids_num = mmc_data[6] & 0x0F;		/* 00001111 */
+		feature->aacs_version = mmc_data[7];
+	}
 
 	*response = (optcl_feature_descriptor*)feature;
 

@@ -120,7 +120,7 @@ int optcl_parse_get_configuration_data(const uint8_t *mmc_response,
 	assert(size % 4 == 0);
 	assert(response);
 
-	if (mmc_response == 0 || response == 0) {
+	if (mmc_response == 0 || response == 0 || size == 0 || (size % 4 != 0)) {
 		return E_INVALIDARG;
 	}
 
@@ -197,10 +197,10 @@ int optcl_parse_inquiry_data(const uint8_t *mmc_response,
 	optcl_mmc_response_inquiry *nresponse;
 
 	assert(mmc_response);
-	assert(size > 0);
+	assert(size >= 5);
 	assert(response);
 
-	if (mmc_response == 0 || response == 0 || size <= 0) {
+	if (mmc_response == 0 || response == 0 || size < 0) {
 		return E_INVALIDARG;
 	}
 
@@ -210,50 +210,99 @@ int optcl_parse_inquiry_data(const uint8_t *mmc_response,
 		return 0;
 	}
 
-	nresponse->qualifier		= mmc_response[0] & 0xe0;	/* 11100000 */
-	nresponse->device_type		= mmc_response[0] & 0x1f;	/* 00011111 */
-	nresponse->rmb			= mmc_response[1] & 0x80;	/* 10000000 */
-	nresponse->version		= mmc_response[2];
-	nresponse->normaca		= mmc_response[3] & 0x20;	/* 00100000 */
-	nresponse->hisup		= mmc_response[3] & 0x10;	/* 00010000 */
-	nresponse->rdf			= mmc_response[3] & 0x0f;	/* 00001111 */
-	nresponse->additional_len	= mmc_response[4];
-	nresponse->sccs			= mmc_response[5] & 0x80;	/* 10000000 */
-	nresponse->acc			= mmc_response[5] & 0x40;	/* 01000000 */
-	nresponse->tpgs			= mmc_response[5] & 0x30;	/* 00110000 */
-	nresponse->_3pc			= mmc_response[5] & 0x08;	/* 00001000 */
-	nresponse->protect		= mmc_response[5] & 0x01;	/* 00000001 */
-	nresponse->bque			= mmc_response[6] & 0x80;	/* 10000000 */
-	nresponse->encserv		= mmc_response[6] & 0x40;	/* 01000000 */
-	nresponse->vs			= mmc_response[6] & 0x20;	/* 00100000 */
-	nresponse->multip		= mmc_response[6] & 0x10;	/* 00010000 */
-	nresponse->mchngr		= mmc_response[6] & 0x08;	/* 00001000 */
-	nresponse->addr16		= mmc_response[6] & 0x01;	/* 00000001 */
-	nresponse->wbus16		= mmc_response[7] & 0x20;	/* 00100000 */
-	nresponse->sync			= mmc_response[7] & 0x10;	/* 00010000 */
-	nresponse->linked		= mmc_response[7] & 0x08;	/* 00001000 */
-	nresponse->cmdque		= mmc_response[7] & 0x02;	/* 00000010 */
+	memset(nresponse, 0, sizeof(optcl_mmc_response_inquiry));
 
-	/* NOTE result->vs is duplicated at mmc_response[7] & 0x01 ?? */
+	nresponse->qualifier = mmc_response[0] & 0xe0;	/* 11100000 */
+	nresponse->device_type = mmc_response[0] & 0x1f;/* 00011111 */
+	nresponse->rmb = mmc_response[1] & 0x80;	/* 10000000 */
+	nresponse->version = mmc_response[2];
+	nresponse->normaca = mmc_response[3] & 0x20;	/* 00100000 */
+	nresponse->hisup = mmc_response[3] & 0x10;	/* 00010000 */
+	nresponse->rdf = mmc_response[3] & 0x0f;	/* 00001111 */
 
-	strncpy_s((char*)nresponse->vendor, 9, (char*)&mmc_response[8], 8);
-	strncpy_s((char*)nresponse->product, 17, (char*)&mmc_response[16], 16);
-	strncpy_s((char*)nresponse->vendor_string, 21, (char*)&mmc_response[36], 20);
+	if (size > 4) {
+		nresponse->additional_len = mmc_response[4];
+	}
 
-	nresponse->revision_level	= uint32_from_le(*(uint32_t*)&mmc_response[32]);
+	if (size > 5) {
+		nresponse->sccs	= mmc_response[5] & 0x80;	/* 10000000 */
+		nresponse->acc = mmc_response[5] & 0x40;	/* 01000000 */
+		nresponse->tpgs	= mmc_response[5] & 0x30;	/* 00110000 */
+		nresponse->_3pc	= mmc_response[5] & 0x08;	/* 00001000 */
+		nresponse->protect = mmc_response[5] & 0x01;	/* 00000001 */
+	}
 
-	nresponse->clocking		= mmc_response[56] & 0x0c;	/* 00001100 */
-	nresponse->qas			= mmc_response[56] & 0x02;	/* 00000010 */
-	nresponse->ius			= mmc_response[56] & 0x01;	/* 00000001 */
+	if (size > 6) {
+		nresponse->bque	= mmc_response[6] & 0x80;	/* 10000000 */
+		nresponse->encserv = mmc_response[6] & 0x40;	/* 01000000 */
+		nresponse->vs = mmc_response[6] & 0x20;		/* 00100000 */
+		nresponse->multip = mmc_response[6] & 0x10;	/* 00010000 */
+		nresponse->mchngr = mmc_response[6] & 0x08;	/* 00001000 */
+		nresponse->addr16 = mmc_response[6] & 0x01;	/* 00000001 */
+	}
 
-	nresponse->ver_desc1		= uint16_from_le(*(uint16_t*)&mmc_response[58]);
-	nresponse->ver_desc2		= uint16_from_le(*(uint16_t*)&mmc_response[60]);
-	nresponse->ver_desc3		= uint16_from_le(*(uint16_t*)&mmc_response[62]);
-	nresponse->ver_desc4		= uint16_from_le(*(uint16_t*)&mmc_response[64]);
-	nresponse->ver_desc5		= uint16_from_le(*(uint16_t*)&mmc_response[66]);
-	nresponse->ver_desc6		= uint16_from_le(*(uint16_t*)&mmc_response[68]);
-	nresponse->ver_desc7		= uint16_from_le(*(uint16_t*)&mmc_response[70]);
-	nresponse->ver_desc8		= uint16_from_le(*(uint16_t*)&mmc_response[72]);
+	if (size > 7) {
+		nresponse->wbus16 = mmc_response[7] & 0x20;	/* 00100000 */
+		nresponse->sync	= mmc_response[7] & 0x10;	/* 00010000 */
+		nresponse->linked = mmc_response[7] & 0x08;	/* 00001000 */
+		nresponse->cmdque = mmc_response[7] & 0x02;	/* 00000010 */
+
+		/* NOTE result->vs is duplicated at mmc_response[7] & 0x01 ?? */
+	}
+
+	if (size > 16) {
+		strncpy_s((char*)nresponse->vendor, 9, (char*)&mmc_response[8], 8);
+	}
+
+	if (size > 32) {
+		strncpy_s((char*)nresponse->product, 17, (char*)&mmc_response[16], 16);
+	}
+
+	if (size > 56) {
+		strncpy_s((char*)nresponse->vendor_string, 21, (char*)&mmc_response[36], 20);
+	}
+
+	if (size > 36) {
+		nresponse->revision_level = uint32_from_le(*(uint32_t*)&mmc_response[32]);
+	}
+
+	if (size > 56) {
+		nresponse->clocking = mmc_response[56] & 0x0c;	/* 00001100 */
+		nresponse->qas = mmc_response[56] & 0x02;	/* 00000010 */
+		nresponse->ius = mmc_response[56] & 0x01;	/* 00000001 */
+	}
+
+	if (size > 60) {
+		nresponse->ver_desc1 = uint16_from_le(*(uint16_t*)&mmc_response[58]);
+	}
+
+	if (size > 62) {
+		nresponse->ver_desc2 = uint16_from_le(*(uint16_t*)&mmc_response[60]);
+	}
+
+	if (size > 64) {
+		nresponse->ver_desc3 = uint16_from_le(*(uint16_t*)&mmc_response[62]);
+	}
+
+	if (size > 66) {
+		nresponse->ver_desc4 = uint16_from_le(*(uint16_t*)&mmc_response[64]);
+	}
+
+	if (size > 68) {
+		nresponse->ver_desc5 = uint16_from_le(*(uint16_t*)&mmc_response[66]);
+	}
+
+	if (size > 70) {
+		nresponse->ver_desc6 = uint16_from_le(*(uint16_t*)&mmc_response[68]);
+	}
+
+	if (size > 72) {
+		nresponse->ver_desc7 = uint16_from_le(*(uint16_t*)&mmc_response[70]);
+	}
+
+	if (size > 74) {
+		nresponse->ver_desc8 = uint16_from_le(*(uint16_t*)&mmc_response[72]);
+	}
 
 	*response = nresponse;
 
