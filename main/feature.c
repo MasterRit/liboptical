@@ -243,11 +243,11 @@ static RESULT parse_morphing(const uint8_t mmc_data[],
 	optcl_feature_morphing *feature = 0;
 	optcl_feature_descriptor *descriptor = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -306,11 +306,11 @@ static RESULT parse_removable_medium(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_removable_medium *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -364,11 +364,11 @@ static RESULT parse_write_protect(const uint8_t mmc_data[],
 	optcl_feature_write_protect *feature = 0;
 	optcl_feature_descriptor *descriptor = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 0) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -420,11 +420,11 @@ static RESULT parse_random_readable(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_random_readable *feature = 0;
 
-	assert(size == 12);
+	assert(size >= 4);
 	assert(mmc_data == 0);
 	assert(response == 0);
 
-	if (mmc_data == 0 || response == 0 || size != 12) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -475,11 +475,11 @@ static RESULT parse_multi_read(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_multi_read *feature = 0;
 
-	assert(size == 4);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 4) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -526,11 +526,11 @@ static RESULT parse_cd_read(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_cd_read *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -576,11 +576,11 @@ static RESULT parse_dvd_read(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_dvd_read *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -630,11 +630,11 @@ static RESULT parse_random_writable(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_random_writable *feature = 0;
 
-	assert(size == 16);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 16) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -687,11 +687,11 @@ static RESULT parse_inc_streaming_writable(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_inc_streaming_writable *feature = 0;
 
-	assert(size % 4 == 0);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || (size % 4 != 0)) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -754,11 +754,11 @@ static RESULT parse_sector_erasable(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_sector_erasable *feature = 0;
 
-	assert(size == 4);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 4) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -805,11 +805,11 @@ static RESULT parse_formattable(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_formattable *feature = 0;
 
-	assert(size == 12);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 12) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -862,11 +862,11 @@ static RESULT parse_hw_defect_management(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_hw_defect_mngmnt *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -915,11 +915,11 @@ static RESULT parse_write_once(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_write_once *feature = 0;
 
-	assert(size == 12);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 12) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -970,11 +970,11 @@ static RESULT parse_restricted_overwrite(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_restricted_ovr *feature = 0;
 
-	assert(size == 4);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 4) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -1021,11 +1021,11 @@ static RESULT parse_cdrw_cav_write(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_cdrw_cav_write *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -1072,11 +1072,11 @@ static RESULT parse_mrw(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_mrw *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -1127,11 +1127,11 @@ static RESULT parse_enh_defect_reporting(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_enh_defect_reporting *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -1182,11 +1182,11 @@ static RESULT parse_dvd_plus_rw(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_dvd_plus_rw *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -1237,11 +1237,11 @@ static RESULT parse_dvd_plus_r(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_dvd_plus_r *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -1290,11 +1290,11 @@ static RESULT parse_rigid_restricted_overwrite(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_rigid_restricted_ovr *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 48);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -1346,11 +1346,11 @@ static RESULT parse_cd_tao(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_cd_tao *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -1405,11 +1405,11 @@ static RESULT parse_cd_mastering(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_cd_mastering *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -1471,11 +1471,11 @@ static RESULT parse_dvd_minus_r_minus_rw_write(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_dvd_minus_r_minus_rw_write *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -1528,11 +1528,11 @@ static RESULT parse_layer_jump_recording(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_layer_jmp_rec *feature = 0;
 
-	assert(size % 4 == 0);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || (size % 4 != 0)) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -1591,11 +1591,11 @@ static RESULT parse_cdrw_media_write_support(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_cdrw_media_write *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -1651,11 +1651,11 @@ static RESULT parse_bdr_pow(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_bdr_pow *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -1702,11 +1702,11 @@ static RESULT parse_dvd_plus_rw_dual_layer(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_dvd_plus_rw_dual_layer *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -1757,11 +1757,11 @@ static RESULT parse_dvd_plus_r_dual_layer(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_dvd_r_plus_dual_layer *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -1810,11 +1810,11 @@ static RESULT parse_bd_read(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_bd_read *feature = 0;
 
-	assert(size == 32);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 32) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -1874,11 +1874,11 @@ static RESULT parse_bd_write(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_bd_write *feature = 0;
 
-	assert(size == 24);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 24) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -1935,11 +1935,11 @@ static RESULT parse_tsr(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_tsr *feature = 0;
 
-	assert(size == 4);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 4) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -1986,11 +1986,11 @@ static RESULT parse_hd_dvd_read(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_hd_dvd_read *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -2040,11 +2040,11 @@ static RESULT parse_hd_dvd_write(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_hd_dvd_write *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -2094,11 +2094,11 @@ static RESULT parse_hybrid_disk(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_hybrid_disk *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -2147,11 +2147,11 @@ static RESULT parse_power_management(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_power_mngmnt *feature = 0;
 
-	assert(size == 4);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 4) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -2198,11 +2198,11 @@ static RESULT parse_smart(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_smart *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -2251,11 +2251,11 @@ static RESULT parse_embedded_changer(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_embedded_changer *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -2306,11 +2306,11 @@ static RESULT parse_microcode_upgrade(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_microcode_upgrade *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -2359,11 +2359,11 @@ static RESULT parse_timeout(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_timeout *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -2413,11 +2413,11 @@ static RESULT parse_dvd_css(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_dvd_css *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -2466,11 +2466,11 @@ static RESULT parse_rt_streaming(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_rt_streaming *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -2523,11 +2523,11 @@ static RESULT parse_drive_serial_number(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_drive_serial_number *feature = 0;
 
-	assert(size % 4 == 0);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || (size % 4 != 0)) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -2590,11 +2590,11 @@ static RESULT parse_media_serial_number(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_media_serial_number *feature = 0;
 
-	assert(size == 4);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 4) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -2642,11 +2642,11 @@ static RESULT parse_dcbs(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_dcbs *feature = 0;
 
-	assert(size % 4 == 0);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || (size % 4 != 0)) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -2701,11 +2701,11 @@ static RESULT parse_dvd_cprm(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_dvd_cprm *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -2754,11 +2754,11 @@ static RESULT parse_firmware_info(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_firmware_info *feature = 0;
 
-	assert(size == 20);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 20) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -2813,11 +2813,11 @@ static RESULT parse_aacs(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_aacs *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -2869,11 +2869,11 @@ static RESULT parse_vcps(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_vcps *feature = 0;
 
-	assert(size == 8);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 8) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
