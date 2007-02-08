@@ -54,10 +54,8 @@ static raw_feature_parser get_feature_parser(uint16_t feature_code);
  * Parse helper functions
  */
 
-static bool_t check4_feature_descriptor(const optcl_feature_descriptor *descriptor,
-					uint16_t feature_code,
-					uint16_t additional_length,
-					uint8_t version)
+static bool_t check_feature_descriptor(const optcl_feature_descriptor *descriptor,
+				       uint16_t feature_code)
 {
 	assert(descriptor != 0);
 
@@ -65,29 +63,7 @@ static bool_t check4_feature_descriptor(const optcl_feature_descriptor *descript
 		return(True);
 	}
 
-	return((bool_t)(uint16_from_be(descriptor->feature_code) == feature_code
-		&& descriptor->additional_length == additional_length
-		&& descriptor->version == version));
-}
-
-static bool_t check6_feature_descriptor(const optcl_feature_descriptor *descriptor,
-					uint16_t feature_code,
-					uint16_t additional_length,
-					uint8_t version,
-					uint8_t persistent,
-					uint8_t current)
-{
-	assert(descriptor != 0);
-
-	if (descriptor == 0) {
-		return(True);
-	}
-
-	return((bool_t)(uint16_from_be(descriptor->feature_code) == feature_code
-		&& descriptor->additional_length == additional_length
-		&& descriptor->version == version
-		&& descriptor->persistent == persistent
-		&& descriptor->current == current));
+	return((bool_t)(uint16_from_be(descriptor->feature_code) == feature_code));
 }
 
 /*
@@ -156,14 +132,7 @@ static RESULT parse_profile_list(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check6_feature_descriptor(
-		descriptor, 
-		FEATURE_PROFILE_LIST, 
-		descriptor->additional_length, 
-		0, 
-		1, 
-		1
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_PROFILE_LIST);
 
 	assert(check == True);
 
@@ -216,11 +185,11 @@ static RESULT parse_core(const uint8_t mmc_data[],
 	optcl_feature_core *feature = 0;
 	optcl_feature_descriptor *descriptor = 0;
 
-	assert(size == 12);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
-	if (mmc_data == 0 || response == 0 || size != 12) {
+	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
 	}
 
@@ -230,14 +199,7 @@ static RESULT parse_core(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check6_feature_descriptor(
-		descriptor, 
-		FEATURE_CORE, 
-		8, 
-		2, 
-		1, 
-		1
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_CORE);
 
 	assert(check == True);
 
@@ -295,14 +257,7 @@ static RESULT parse_morphing(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check6_feature_descriptor(
-		descriptor, 
-		FEATURE_MORPHING, 
-		4, 
-		1, 
-		1, 
-		1
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_MORPHING);
 
 	assert(check == True);
 
@@ -365,14 +320,7 @@ static RESULT parse_removable_medium(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check6_feature_descriptor(
-		descriptor, 
-		FEATURE_REMOVABLE_MEDIUM, 
-		4, 
-		0, 
-		1, 
-		1
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_REMOVABLE_MEDIUM);
 
 	assert(check == True);
 
@@ -430,12 +378,7 @@ static RESULT parse_write_protect(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_WRITE_PROTECT, 
-		4, 
-		2
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_WRITE_PROTECT);
 
 	if (check != True) {
 		free(descriptor);
@@ -491,12 +434,7 @@ static RESULT parse_random_readable(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_RANDOM_READABLE, 
-		8, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_RANDOM_READABLE);
 
 	if (check != True) {
 		free(descriptor);
@@ -551,12 +489,7 @@ static RESULT parse_multi_read(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_MULTI_READ, 
-		0, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_MULTI_READ);
 
 	if (check != True) {
 		free(descriptor);
@@ -607,12 +540,7 @@ static RESULT parse_cd_read(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_CD_READ, 
-		4, 
-		2
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_CD_READ);
 
 	if (check != True) {
 		free(descriptor);
@@ -662,12 +590,7 @@ static RESULT parse_dvd_read(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_DVD_READ, 
-		4, 
-		1
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_DVD_READ);
 
 	if (check != True) {
 		free(descriptor);
@@ -721,12 +644,7 @@ static RESULT parse_random_writable(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_RANDOM_WRITABLE, 
-		12, 
-		1
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_RANDOM_WRITABLE);
 
 	if (check != True) {
 		free(descriptor);
@@ -783,12 +701,7 @@ static RESULT parse_inc_streaming_writable(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_INC_STREAMING_WRITABLE,
-		descriptor->additional_length,
-		3
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_INC_STREAMING_WRITABLE);
 
 	if (check != True) {
 		free(descriptor);
@@ -855,12 +768,7 @@ static RESULT parse_sector_erasable(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_SECTOR_ERASABLE, 
-		0, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_SECTOR_ERASABLE);
 
 	if (check != True) {
 		free(descriptor);
@@ -911,12 +819,7 @@ static RESULT parse_formattable(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_FORMATTABLE, 
-		8, 
-		1
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_FORMATTABLE);
 
 	if (check != True) {
 		free(descriptor);
@@ -973,12 +876,7 @@ static RESULT parse_hw_defect_management(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_HW_DEFECT_MANAGEMENT, 
-		4, 
-		1
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_HW_DEFECT_MANAGEMENT);
 
 	if (check != True) {
 		free(descriptor);
@@ -1031,12 +929,7 @@ static RESULT parse_write_once(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_WRITE_ONCE, 
-		8, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_WRITE_ONCE);
 
 	if (check != True) {
 		free(descriptor);
@@ -1091,12 +984,7 @@ static RESULT parse_restricted_overwrite(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_RESTRICTED_OVERWRITE, 
-		0, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_RESTRICTED_OVERWRITE);
 
 	if (check != True) {
 		free(descriptor);
@@ -1147,12 +1035,7 @@ static RESULT parse_cdrw_cav_write(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_CDRW_CAV_WRITE, 
-		4, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_CDRW_CAV_WRITE);
 
 	if (check != True) {
 		free(descriptor);
@@ -1203,12 +1086,7 @@ static RESULT parse_mrw(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_MRW, 
-		4, 
-		1
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_MRW);
 
 	if (check != True) {
 		free(descriptor);
@@ -1263,12 +1141,7 @@ static RESULT parse_enh_defect_reporting(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_ENH_DEFECT_REPORTING, 
-		4, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_ENH_DEFECT_REPORTING);
 
 	if (check != True) {
 		free(descriptor);
@@ -1323,12 +1196,7 @@ static RESULT parse_dvd_plus_rw(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_DVD_PLUS_RW, 
-		4, 
-		1
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_DVD_PLUS_RW);
 
 	if (check != True) {
 		free(descriptor);
@@ -1383,12 +1251,7 @@ static RESULT parse_dvd_plus_r(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_DVD_PLUS_R, 
-		4, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_DVD_PLUS_R);
 
 	if (check != True) {
 		free(descriptor);
@@ -1441,12 +1304,7 @@ static RESULT parse_rigid_restricted_overwrite(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_RIGID_RESTRICTED_OVERWRITE, 
-		4, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_RIGID_RESTRICTED_OVERWRITE);
 
 	if (check != True) {
 		free(descriptor);
@@ -1502,12 +1360,7 @@ static RESULT parse_cd_tao(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_CD_TAO, 
-		4, 
-		2
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_CD_TAO);
 
 	if (check != True) {
 		free(descriptor);
@@ -1566,12 +1419,7 @@ static RESULT parse_cd_mastering(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_CD_MASTERING, 
-		4, 
-		1
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_CD_MASTERING);
 
 	if (check != True) {
 		free(descriptor);
@@ -1637,12 +1485,7 @@ static RESULT parse_dvd_minus_r_minus_rw_write(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_DVD_MINUS_R_MINUS_RW_WRITE, 
-		4, 
-		2
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_DVD_MINUS_R_MINUS_RW_WRITE);
 
 	if (check != True) {
 		free(descriptor);
@@ -1699,12 +1542,7 @@ static RESULT parse_layer_jump_recording(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_LAYER_JUMP_RECORDING, 
-		descriptor->additional_length, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_LAYER_JUMP_RECORDING);
 
 	if (check != True) {
 		free(descriptor);
@@ -1767,12 +1605,7 @@ static RESULT parse_cdrw_media_write_support(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_CDRW_MEDIA_WRITE_SUPPORT, 
-		4, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_CDRW_MEDIA_WRITE_SUPPORT);
 
 	if (check != True) {
 		free(descriptor);
@@ -1832,12 +1665,7 @@ static RESULT parse_bdr_pow(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_BDR_POW, 
-		4, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_BDR_POW);
 
 	if (check != True) {
 		free(descriptor);
@@ -1888,12 +1716,7 @@ static RESULT parse_dvd_plus_rw_dual_layer(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_DVD_PLUS_RW_DUAL_LAYER, 
-		4, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_DVD_PLUS_RW_DUAL_LAYER);
 
 	if (check != True) {
 		free(descriptor);
@@ -1948,12 +1771,7 @@ static RESULT parse_dvd_plus_r_dual_layer(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_DVD_PLUS_R_DUAL_LAYER, 
-		4, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_DVD_PLUS_R_DUAL_LAYER);
 
 	if (check != True) {
 		free(descriptor);
@@ -2006,12 +1824,7 @@ static RESULT parse_bd_read(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_BD_READ, 
-		28, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_BD_READ);
 
 	if (check != True) {
 		free(descriptor);
@@ -2075,12 +1888,7 @@ static RESULT parse_bd_write(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_BD_WRITE, 
-		20, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_BD_WRITE);
 
 	if (check != True) {
 		free(descriptor);
@@ -2141,12 +1949,7 @@ static RESULT parse_tsr(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_TSR, 
-		0, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_TSR);
 
 	if (check != True) {
 		free(descriptor);
@@ -2197,12 +2000,7 @@ static RESULT parse_hd_dvd_read(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_HD_DVD_READ, 
-		4, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_HD_DVD_READ);
 
 	if (check != True) {
 		free(descriptor);
@@ -2256,12 +2054,7 @@ static RESULT parse_hd_dvd_write(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_HD_DVD_WRITE, 
-		4, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_HD_DVD_WRITE);
 
 	if (check != True) {
 		free(descriptor);
@@ -2315,12 +2108,7 @@ static RESULT parse_hybrid_disk(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_HYBRID_DISC, 
-		4, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_HYBRID_DISC);
 
 	if (check != True) {
 		free(descriptor);
@@ -2373,12 +2161,7 @@ static RESULT parse_power_management(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_POWER_MANAGEMENT, 
-		0, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_POWER_MANAGEMENT);
 
 	if (check != True) {
 		free(descriptor);
@@ -2429,12 +2212,7 @@ static RESULT parse_smart(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_SMART, 
-		4, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_SMART);
 
 	if (check != True) {
 		free(descriptor);
@@ -2487,12 +2265,7 @@ static RESULT parse_embedded_changer(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_EMBEDDED_CHANGER, 
-		4, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_EMBEDDED_CHANGER);
 
 	if (check != True) {
 		free(descriptor);
@@ -2547,12 +2320,7 @@ static RESULT parse_microcode_upgrade(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_MICROCODE_UPGRADE, 
-		4, 
-		1
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_MICROCODE_UPGRADE);
 
 	if (check != True) {
 		free(descriptor);
@@ -2605,12 +2373,7 @@ static RESULT parse_timeout(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_TIMEOUT, 
-		4, 
-		1
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_TIMEOUT);
 
 	if (check != True) {
 		free(descriptor);
@@ -2664,12 +2427,7 @@ static RESULT parse_dvd_css(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_DVD_CSS, 
-		4, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_DVD_CSS);
 
 	if (check != True) {
 		free(descriptor);
@@ -2722,12 +2480,7 @@ static RESULT parse_rt_streaming(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_RT_STREAMING, 
-		4, 
-		4
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_RT_STREAMING);
 
 	if (check != True) {
 		free(descriptor);
@@ -2784,12 +2537,7 @@ static RESULT parse_drive_serial_number(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_DRIVE_SERIAL_NUMBER, 
-		descriptor->additional_length, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_DRIVE_SERIAL_NUMBER);
 
 	if (check != True) {
 		free(descriptor);
@@ -2856,12 +2604,7 @@ static RESULT parse_media_serial_number(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_MEDIA_SERIAL_NUMBER, 
-		0, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_MEDIA_SERIAL_NUMBER);
 
 	if (check != True) {
 		free(descriptor);
@@ -2913,12 +2656,7 @@ static RESULT parse_dcbs(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_DCBS, 
-		descriptor->additional_length, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_DCBS);
 
 	if (check != True) {
 		free(descriptor);
@@ -2977,12 +2715,7 @@ static RESULT parse_dvd_cprm(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_DVD_CPRM, 
-		4, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_DVD_CPRM);
 
 	if (check != True) {
 		free(descriptor);
@@ -3035,12 +2768,7 @@ static RESULT parse_firmware_info(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_FIRMWARE_INFO, 
-		16, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_FIRMWARE_INFO);
 
 	if (check != True) {
 		free(descriptor);
@@ -3099,12 +2827,7 @@ static RESULT parse_aacs(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_AACS, 
-		4, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_AACS);
 
 	if (check != True) {
 		free(descriptor);
@@ -3160,12 +2883,7 @@ static RESULT parse_vcps(const uint8_t mmc_data[],
 		return(error);
 	}
 
-	check = check4_feature_descriptor(
-		descriptor, 
-		FEATURE_VCPS, 
-		4, 
-		0
-		);
+	check = check_feature_descriptor(descriptor, FEATURE_VCPS);
 
 	if (check != True) {
 		free(descriptor);
