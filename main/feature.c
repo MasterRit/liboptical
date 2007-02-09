@@ -3110,6 +3110,8 @@ RESULT optcl_feature_create_from_raw(optcl_feature **feature,
 	/*
 	 * NOTE If parser == 0 then it's 
 	 * probably an unrecognized vendor specific feature
+	 * which we don't know how to parse. We will instead pass it
+	 * to caller functions.
 	 */
 	if (parser == 0) {
 		*feature = nfeature;
