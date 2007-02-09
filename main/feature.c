@@ -1195,7 +1195,7 @@ static RESULT parse_enh_defect_reporting(const uint8_t mmc_data[],
 
 	if (feature->descriptor.additional_length > 0) {
 		feature->drt_dm	= bool_from_uint8(mmc_data[4] & 0x01);	/* 00000001 */
-		feature->dbi_cache_zones_num = mmc_data[4];
+		feature->dbi_cache_zones_num = mmc_data[5];
 		feature->entries_num = uint16_from_be(*(uint16_t*)&mmc_data[6]);
 	}
 
