@@ -1325,7 +1325,7 @@ static RESULT parse_rigid_restricted_overwrite(const uint8_t mmc_data[],
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_rigid_restricted_ovr *feature = 0;
 
-	assert(size >= 48);
+	assert(size >= 4);
 	assert(mmc_data != 0);
 	assert(response != 0);
 
