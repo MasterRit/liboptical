@@ -22,8 +22,8 @@
 
 #ifdef WIN32
 
-#define True			1
-#define False			0
+#define True			((bool_t)1)
+#define False			((bool_t)0)
 
 typedef unsigned __int8		bool_t;
 
