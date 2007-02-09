@@ -46,19 +46,19 @@ static int8_t equalfn_descriptors(const void *left, const void *right)
 	rdesc = (optcl_feature_descriptor*)right;
 
 	if (ldesc == 0 && rdesc == 0) {
-		return 0;
+		return(0);
 	} else if (ldesc == 0 && rdesc != 0) {
-		return -1;
+		return(-1);
 	} else if (ldesc != 0 && rdesc == 0) {
-		return 1;
+		return(1);
 	}
 
 	if (ldesc->feature_code == rdesc->feature_code) {
-		return 0;
+		return(0);
 	} else if (ldesc->feature_code < rdesc->feature_code) {
-		return -1;
+		return(-1);
 	} else {
-		return 1;
+		return(1);
 	}
 }
 
@@ -75,13 +75,13 @@ static RESULT parse_raw_profile_list(const uint8_t mmc_data[],
 	assert(feature != 0);
 
 	if (mmc_data == 0 || feature) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	nfeature = malloc(sizeof(optcl_feature_profile_list));
 
 	if (!nfeature) {
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
 	memset(nfeature, 0, sizeof(optcl_feature_profile_list));
@@ -109,6 +109,7 @@ int optcl_parse_get_configuration_data(const uint8_t *mmc_response,
 				       optcl_mmc_response_get_configuration **response)
 {
 	RESULT error;
+	RESULT destroy_error;
 	uint32_t offset;
 	uint8_t *raw_feature;
 	uint16_t feature_code;
@@ -121,17 +122,17 @@ int optcl_parse_get_configuration_data(const uint8_t *mmc_response,
 	assert(response);
 
 	if (mmc_response == 0 || response == 0 || size == 0 || (size % 4 != 0)) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	if (size < 8 || (size % 4) != 0) {
-		return E_FEATINVHEADER;
+		return(E_FEATINVHEADER);
 	}
 
 	nresponse = malloc(sizeof(optcl_mmc_response_get_configuration));
 
 	if (nresponse == 0) {
-		return E_OUTOFMEMORY;
+		return(E_OUTOFMEMORY);
 	}
 
 	nresponse->data_length = uint32_from_be(*(uint32_t*)&mmc_response[0]);
@@ -141,7 +142,7 @@ int optcl_parse_get_configuration_data(const uint8_t *mmc_response,
 
 	if (FAILED(error)) {
 		free(nresponse);
-		return error;
+		return(error);
 	}
 
 	/*
@@ -179,14 +180,14 @@ int optcl_parse_get_configuration_data(const uint8_t *mmc_response,
 	}
 
 	if (FAILED(error)) {
-		optcl_list_destroy(nresponse->descriptors, 1);
+		destroy_error = optcl_list_destroy(nresponse->descriptors, 1);
 		free(nresponse);
-		return error;
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
 	*response = nresponse;
 
-	return SUCCESS;
+	return(SUCCESS);
 
 }
 
@@ -201,13 +202,13 @@ int optcl_parse_inquiry_data(const uint8_t *mmc_response,
 	assert(response);
 
 	if (mmc_response == 0 || response == 0 || size < 0) {
-		return E_INVALIDARG;
+		return(E_INVALIDARG);
 	}
 
 	nresponse = malloc(sizeof(optcl_mmc_response_inquiry));
 
 	if (nresponse == 0) {
-		return 0;
+		return(E_OUTOFMEMORY);
 	}
 
 	memset(nresponse, 0, sizeof(optcl_mmc_response_inquiry));
@@ -306,5 +307,5 @@ int optcl_parse_inquiry_data(const uint8_t *mmc_response,
 
 	*response = nresponse;
 
-	return SUCCESS;
+	return(SUCCESS);
 }
