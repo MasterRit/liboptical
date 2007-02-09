@@ -221,8 +221,6 @@ RESULT optcl_list_destroy(optcl_list *list, bool_t deallocate)
 		return(error);
 	}
 	
-	memset(list, 0, sizeof(optcl_list));
-
 	free(list);
 
 	return(SUCCESS);
