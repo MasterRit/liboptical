@@ -151,5 +151,7 @@ typedef unsigned __int64	uint64_t;
 	))
 
 #define bool_from_uint8(val)	((bool_t)((val) > 0))
+#define bool_from_uint16(val)	bool_from_uint8(val)
+#define bool_from_uint32(val)	bool_from_uint8(val)
 
 #endif /* _TYPES_H */
