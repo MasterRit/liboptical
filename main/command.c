@@ -167,7 +167,7 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 		return(E_OUTOFMEMORY);
 	}
 
-	memset(nresponse0, 0, sizeof(nresponse0));
+	memset(nresponse0, 0, sizeof(optcl_mmc_response_get_configuration));
 
 	error = optcl_list_create(0, &nresponse0->descriptors);
 
@@ -252,12 +252,8 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 		error = optcl_list_get_tail_pos(nresponse1->descriptors, &it);
 
 		if (FAILED(error)) {
-			destroy_error = optcl_list_destroy(nresponse1->descriptors, 1);
-
-			if (FAILED(destroy_error)) {
-				error = destroy_error;
-			}
-
+			destroy_error = optcl_list_destroy(nresponse1->descriptors, True);
+			error = (FAILED(destroy_error)) ? destroy_error : error;
 			_aligned_free(mmc_response);
 			free(nresponse1);
 			break;
@@ -266,12 +262,8 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 		error = optcl_list_get_at_pos(nresponse1->descriptors, it, &descriptor);
 
 		if (FAILED(error)) {
-			destroy_error = optcl_list_destroy(nresponse1->descriptors, 1);
-
-			if (FAILED(destroy_error)) {
-				error = destroy_error;
-			}
-
+			destroy_error = optcl_list_destroy(nresponse1->descriptors, True);
+			error = (FAILED(destroy_error)) ? destroy_error : error;
 			_aligned_free(mmc_response);
 			free(nresponse1);
 			break;
@@ -284,18 +276,14 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 		error = optcl_list_append(nresponse0->descriptors, nresponse1->descriptors);
 
 		if (FAILED(error)) {
-			destroy_error = optcl_list_destroy(nresponse1->descriptors, 1);
-
-			if (FAILED(destroy_error)) {
-				error = destroy_error;
-			}
-
+			destroy_error = optcl_list_destroy(nresponse1->descriptors, True);
+			error = (FAILED(destroy_error)) ? destroy_error : error;
 			_aligned_free(mmc_response);
 			free(nresponse1);
 			break;
 		}
 
-		error = optcl_list_destroy(nresponse1->descriptors, 1);
+		error = optcl_list_destroy(nresponse1->descriptors, False);
 
 		if (FAILED(error)) {
 			_aligned_free(mmc_response);
@@ -309,7 +297,7 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 	} while(data_length > 0);
 
 	if (FAILED(error)) {
-		destroy_error = optcl_list_destroy(nresponse0->descriptors, 1);
+		destroy_error = optcl_list_destroy(nresponse0->descriptors, False);
 		free(nresponse0);
 		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
