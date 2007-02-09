@@ -564,6 +564,7 @@ RESULT optcl_array_set_size(optcl_array *array,
 	}
 
 	array->count = size;
+	array->buffer = nbuffer;
 
 	return(SUCCESS);
 }
