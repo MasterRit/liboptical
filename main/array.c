@@ -517,7 +517,6 @@ RESULT optcl_array_set_size(optcl_array *array,
 	uint32_t index;
 	ptr_t buffer = 0;
 	ptr_t nbuffer = 0;
-	uint32_t element_size;
 
 	assert(array != 0);
 	assert(size >= 0);
@@ -528,12 +527,6 @@ RESULT optcl_array_set_size(optcl_array *array,
 
 	if (array->count == size) {
 		return(SUCCESS);
-	}
-
-	error = optcl_array_get_element_size(array, &element_size);
-
-	if (FAILED(error)) {
-		return(error);
 	}
 
 	error = optcl_array_get_buffer(array, &buffer);
@@ -551,7 +544,7 @@ RESULT optcl_array_set_size(optcl_array *array,
 		}
 	}
 
-	nbuffer = realloc(buffer, size * element_size);
+	nbuffer = realloc(buffer, size * sizeof(ptr_t));
 
 	if (nbuffer == 0 && size > 0) {
 		return(E_OUTOFMEMORY);
