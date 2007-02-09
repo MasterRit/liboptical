@@ -105,6 +105,8 @@ RESULT optcl_list_add_head(optcl_list *list, const void *data)
 		list->last_node = nnode;
 	}
 
+	list->node_count++;
+
 	return(SUCCESS);
 }
 
@@ -137,6 +139,8 @@ RESULT optcl_list_add_tail(optcl_list *list, const void *data)
 	if (list->first_node == 0) {
 		list->first_node = nnode;
 	}
+
+	list->node_count++;
 
 	return(SUCCESS);
 }
@@ -502,7 +506,7 @@ RESULT optcl_list_get_previous(const optcl_list *list,
 	return(SUCCESS);
 }
 
-RESULT optcl_list_insert_after(const optcl_list *list, 
+RESULT optcl_list_insert_after(optcl_list *list, 
 			       const optcl_list_iterator pos, 
 			       const void *data)
 {
@@ -532,10 +536,12 @@ RESULT optcl_list_insert_after(const optcl_list *list,
 	pos->next = nnode;
 	nnode->prev = pos;
 
+	list->node_count++;
+
 	return(SUCCESS);
 }
 
-RESULT optcl_list_insert_before(const optcl_list *list, 
+RESULT optcl_list_insert_before(optcl_list *list, 
 				const optcl_list_iterator pos, 
 				const void *data)
 {
@@ -564,6 +570,8 @@ RESULT optcl_list_insert_before(const optcl_list *list,
 
 	pos->prev = nnode;
 	nnode->next = pos;
+
+	list->node_count++;
 
 	return(SUCCESS);
 }
@@ -610,7 +618,7 @@ RESULT optcl_list_remove(optcl_list *list, optcl_list_iterator pos)
 		pos->next->prev = pos->prev;
 	}
 
-	--(list->node_count);
+	list->node_count--;
 
 	free(pos);
 

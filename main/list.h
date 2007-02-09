@@ -96,12 +96,12 @@ extern RESULT optcl_list_get_previous(const optcl_list *list,
 				      optcl_list_iterator *previous);
 
 /* Insert new element after iterator position */
-extern RESULT optcl_list_insert_after(const optcl_list *list, 
+extern RESULT optcl_list_insert_after(optcl_list *list, 
 				      const optcl_list_iterator pos, 
 				      const void *data);
 
 /* Insert new element before iterator position */
-extern RESULT optcl_list_insert_before(const optcl_list *list, 
+extern RESULT optcl_list_insert_before(optcl_list *list, 
 				       const optcl_list_iterator pos, 
 				       const void *data);
 
