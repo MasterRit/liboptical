@@ -65,12 +65,12 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 	uint32_t transfer_size;
 	uint32_t alignment_mask;
 	uint32_t max_transfer_len;
-	uint8_t *mmc_response;
-	optcl_adapter *adapter;
-	optcl_list_iterator it;
-	optcl_feature_descriptor *descriptor;
-	optcl_mmc_response_get_configuration *nresponse0;
-	optcl_mmc_response_get_configuration *nresponse1;
+	uint8_t *mmc_response = 0;
+	optcl_adapter *adapter = 0;
+	optcl_list_iterator it = 0;
+	optcl_feature_descriptor *descriptor = 0;
+	optcl_mmc_response_get_configuration *nresponse0 = 0;
+	optcl_mmc_response_get_configuration *nresponse1 = 0;
 
 	assert(device != 0);
 	assert(command != 0);
@@ -234,7 +234,7 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 		rt = MMC_GET_CONFIG_RT_FROM;
 
 		/*
-		 * Process current chnk of data
+		 * Process current chunk of data
 		 */
 
 		error = optcl_parse_get_configuration_data(
