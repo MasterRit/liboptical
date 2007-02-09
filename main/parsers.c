@@ -212,40 +212,40 @@ int optcl_parse_inquiry_data(const uint8_t *mmc_response,
 
 	memset(nresponse, 0, sizeof(optcl_mmc_response_inquiry));
 
-	nresponse->qualifier = mmc_response[0] & 0xe0;	/* 11100000 */
-	nresponse->device_type = mmc_response[0] & 0x1f;/* 00011111 */
-	nresponse->rmb = mmc_response[1] & 0x80;	/* 10000000 */
+	nresponse->qualifier = mmc_response[0] & 0xe0;			/* 11100000 */
+	nresponse->device_type = mmc_response[0] & 0x1f;		/* 00011111 */
+	nresponse->rmb = bool_from_uint8(mmc_response[1] & 0x80);	/* 10000000 */
 	nresponse->version = mmc_response[2];
-	nresponse->normaca = mmc_response[3] & 0x20;	/* 00100000 */
-	nresponse->hisup = mmc_response[3] & 0x10;	/* 00010000 */
-	nresponse->rdf = mmc_response[3] & 0x0f;	/* 00001111 */
+	nresponse->normaca = mmc_response[3] & 0x20;			/* 00100000 */
+	nresponse->hisup = bool_from_uint8(mmc_response[3] & 0x10);	/* 00010000 */
+	nresponse->rdf = mmc_response[3] & 0x0f;			/* 00001111 */
 
 	if (size > 4) {
 		nresponse->additional_len = mmc_response[4];
 	}
 
 	if (size > 5) {
-		nresponse->sccs	= mmc_response[5] & 0x80;	/* 10000000 */
-		nresponse->acc = mmc_response[5] & 0x40;	/* 01000000 */
-		nresponse->tpgs	= mmc_response[5] & 0x30;	/* 00110000 */
-		nresponse->_3pc	= mmc_response[5] & 0x08;	/* 00001000 */
-		nresponse->protect = mmc_response[5] & 0x01;	/* 00000001 */
+		nresponse->sccs	= bool_from_uint8(mmc_response[5] & 0x80);	/* 10000000 */
+		nresponse->acc = bool_from_uint8(mmc_response[5] & 0x40);	/* 01000000 */
+		nresponse->tpgs	= mmc_response[5] & 0x30;			/* 00110000 */
+		nresponse->_3pc	= bool_from_uint8(mmc_response[5] & 0x08);	/* 00001000 */
+		nresponse->protect = bool_from_uint8(mmc_response[5] & 0x01);	/* 00000001 */
 	}
 
 	if (size > 6) {
-		nresponse->bque	= mmc_response[6] & 0x80;	/* 10000000 */
-		nresponse->encserv = mmc_response[6] & 0x40;	/* 01000000 */
-		nresponse->vs = mmc_response[6] & 0x20;		/* 00100000 */
-		nresponse->multip = mmc_response[6] & 0x10;	/* 00010000 */
-		nresponse->mchngr = mmc_response[6] & 0x08;	/* 00001000 */
-		nresponse->addr16 = mmc_response[6] & 0x01;	/* 00000001 */
+		nresponse->bque	= bool_from_uint8(mmc_response[6] & 0x80);	/* 10000000 */
+		nresponse->encserv = bool_from_uint8(mmc_response[6] & 0x40);	/* 01000000 */
+		nresponse->vs = bool_from_uint8(mmc_response[6] & 0x20);	/* 00100000 */
+		nresponse->multip = bool_from_uint8(mmc_response[6] & 0x10);	/* 00010000 */
+		nresponse->mchngr = bool_from_uint8(mmc_response[6] & 0x08);	/* 00001000 */
+		nresponse->addr16 = bool_from_uint8(mmc_response[6] & 0x01);	/* 00000001 */
 	}
 
 	if (size > 7) {
-		nresponse->wbus16 = mmc_response[7] & 0x20;	/* 00100000 */
-		nresponse->sync	= mmc_response[7] & 0x10;	/* 00010000 */
-		nresponse->linked = mmc_response[7] & 0x08;	/* 00001000 */
-		nresponse->cmdque = mmc_response[7] & 0x02;	/* 00000010 */
+		nresponse->wbus16 = bool_from_uint8(mmc_response[7] & 0x20);	/* 00100000 */
+		nresponse->sync	= bool_from_uint8(mmc_response[7] & 0x10);	/* 00010000 */
+		nresponse->linked = bool_from_uint8(mmc_response[7] & 0x08);	/* 00001000 */
+		nresponse->cmdque = bool_from_uint8(mmc_response[7] & 0x02);	/* 00000010 */
 
 		/* NOTE result->vs is duplicated at mmc_response[7] & 0x01 ?? */
 	}
@@ -267,9 +267,9 @@ int optcl_parse_inquiry_data(const uint8_t *mmc_response,
 	}
 
 	if (size > 56) {
-		nresponse->clocking = mmc_response[56] & 0x0c;	/* 00001100 */
-		nresponse->qas = mmc_response[56] & 0x02;	/* 00000010 */
-		nresponse->ius = mmc_response[56] & 0x01;	/* 00000001 */
+		nresponse->clocking = mmc_response[56] & 0x0c;			/* 00001100 */
+		nresponse->qas = bool_from_uint8(mmc_response[56] & 0x02);	/* 00000010 */
+		nresponse->ius = bool_from_uint8(mmc_response[56] & 0x01);	/* 00000001 */
 	}
 
 	if (size > 60) {
