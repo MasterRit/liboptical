@@ -58,6 +58,7 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 				       optcl_mmc_response_get_configuration **response)
 {
 	RESULT error;
+	RESULT destroy_error;
 	uint8_t rt;
 	uint8_t cdb[10];
 	int32_t data_length;
@@ -108,15 +109,15 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 	error = optcl_adapter_get_alignment_mask(adapter, &alignment_mask);
 
 	if (FAILED(error)) {
-		optcl_adapter_destroy(adapter);
-		return(error);
+		destroy_error = optcl_adapter_destroy(adapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
 	error = optcl_adapter_get_max_transfer_len(adapter, &max_transfer_len);
 
 	if (FAILED(error)) {
-		optcl_adapter_destroy(adapter);
-		return(error);
+		destroy_error = optcl_adapter_destroy(adapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
 	error = optcl_adapter_destroy(adapter);
@@ -293,9 +294,9 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 	} while(data_length > 0);
 
 	if (FAILED(error)) {
-		optcl_list_destroy(nresponse0->descriptors, 1);
+		destroy_error = optcl_list_destroy(nresponse0->descriptors, 1);
 		free(nresponse0);
-		return(error);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
 	*response = nresponse0;
@@ -308,6 +309,7 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 			     optcl_mmc_response_inquiry **response)
 {
 	RESULT error;
+	RESULT destroy_error;
 	uint8_t cdb[6];
 	uint8_t *mmc_response;
 	uint32_t alignment_mask;
@@ -338,8 +340,8 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 	error = optcl_adapter_get_alignment_mask(adapter, &alignment_mask);
 
 	if (FAILED(error)) {
-		optcl_adapter_destroy(adapter);
-		return(error);
+		destroy_error = optcl_adapter_destroy(adapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
 	error = optcl_adapter_destroy(adapter);
