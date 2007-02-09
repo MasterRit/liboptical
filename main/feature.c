@@ -2638,13 +2638,6 @@ static RESULT parse_drive_serial_number(const uint8_t mmc_data[],
 		return(E_FEATINVHEADER);
 	}
 
-	assert(descriptor->additional_length < sizeof(feature->descriptor));
-
-	if (descriptor->additional_length >= sizeof(feature->descriptor)) {
-		free(descriptor);
-		return(E_FEATINVHEADER);
-	}
-
 	error = optcl_feature_create(FEATURE_DRIVE_SERIAL_NUMBER, (optcl_feature**)&feature);
 
 	if (FAILED(error)) {
