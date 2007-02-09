@@ -308,15 +308,12 @@ RESULT optcl_array_find(const optcl_array *array,
 			break;
 		}
 
-		if (equalfn(current_element, element) != 0) {
-			continue;
+		if (equalfn(current_element, element) == 0) {
+			*index = i;
+			break;
 		}
 
-		*index = i;
-
 		++i;
-
-		break;
 	}
 
 	return(error);
@@ -539,7 +536,7 @@ RESULT optcl_array_set_size(optcl_array *array,
 	
 		/* Deallocate pointers */
 		for(i = 0; i < array->count - size; ++i) {
-			index = array->count - size + i;
+			index = size + i;
 			free(*(ptr_t**)&buffer[index * sizeof(ptr_t)]);
 		}
 	}
