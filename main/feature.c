@@ -63,7 +63,7 @@ static bool_t check_feature_descriptor(const optcl_feature_descriptor *descripto
 		return(False);
 	}
 
-	return((bool_t)(uint16_from_be(descriptor->feature_code) == feature_code));
+	return((bool_t)(descriptor->feature_code == feature_code));
 }
 
 /*
@@ -424,8 +424,8 @@ static RESULT parse_random_readable(const uint8_t mmc_data[],
 	optcl_feature_random_readable *feature = 0;
 
 	assert(size >= 4);
-	assert(mmc_data == 0);
-	assert(response == 0);
+	assert(mmc_data != 0);
+	assert(response != 0);
 
 	if (mmc_data == 0 || response == 0 || size < 4) {
 		return(E_INVALIDARG);
