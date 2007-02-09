@@ -3114,21 +3114,22 @@ RESULT optcl_feature_create_from_raw(optcl_feature **feature,
 
 	parser = get_feature_parser(nfeature->feature_code);
 
-	if (parser == 0) {
-		return(E_FEATUNKCODE);
-	}
+	/*
+	 * NOTE If parser == 0 then it's 
+	 * probably an unrecognized vendor specific feature
+	 */
+	if (parser != 0) {
+		error = parser(mmc_data, nfeature->additional_length + 4, &nfeature);
 
-	error = parser(mmc_data, nfeature->additional_length + 4, &nfeature);
-
-	free(nfeature);
-
-	if (FAILED(error)) {
-		return(error);
+		if (FAILED(error)) {
+			free(nfeature);
+			return(error);
+		}
 	}
 
 	*feature = nfeature;
 
-	return SUCCESS;
+	return(SUCCESS);
 }
 
 RESULT optcl_feature_create_descriptor(optcl_feature_descriptor **descriptor,
