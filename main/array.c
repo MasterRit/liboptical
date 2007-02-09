@@ -327,16 +327,16 @@ RESULT optcl_array_get(const optcl_array *array,
 		       const void **element)
 {
 	RESULT error;
-	void *buffer = 0;
-	uint32_t element_size;
+	ptr_t buffer = 0;
 
 	assert(array != 0);
 	assert(element != 0);
-	assert(index >= 0);
 
 	if (array == 0 || element == 0) {
 		return(E_INVALIDARG);
 	}
+
+	assert(index >= 0 && index < array->count);
 
 	if (index < 0 || index >= array->count) {
 		return(E_OUTOFRANGE);
@@ -348,13 +348,13 @@ RESULT optcl_array_get(const optcl_array *array,
 		return(error);
 	}
 
-	error = optcl_array_get_element_size(array, &element_size);
+	assert(buffer != 0);
 
-	if (FAILED(error)) {
-		return(error);
+	if (buffer == 0) {
+		return(E_POINTER);
 	}
 
-	*element = (char*)buffer + element_size * index;
+	*element = *(ptr_t**)&buffer[index * sizeof(ptr_t)];
 
 	return(SUCCESS);
 }
@@ -420,7 +420,7 @@ RESULT optcl_array_get_size(const optcl_array *array, uint32_t *size)
 RESULT optcl_array_remove(optcl_array *array, uint32_t index)
 {
 	RESULT error;
-	void *buffer = 0;
+	ptr_t buffer = 0;
 	uint32_t array_size;
 	uint32_t element_size;
 
@@ -455,9 +455,9 @@ RESULT optcl_array_remove(optcl_array *array, uint32_t index)
 
 	if (index < array_size - 1) {
 		memcpy(
-			(char*)buffer + element_size * index,
-			(char*)buffer + element_size * (index + 1),
-			element_size * (array_size - index - 1)
+			&buffer[index * sizeof(ptr_t)],
+			&buffer[(index + 1) * sizeof(ptr_t)],
+			(array_size - index - 1) * sizeof(ptr_t)
 			);
 	}
 
@@ -467,25 +467,19 @@ RESULT optcl_array_remove(optcl_array *array, uint32_t index)
 RESULT optcl_array_set(optcl_array *array, uint32_t index, const void *element)
 {
 	RESULT error;
-	void *buffer = 0;
-	uint32_t element_size;
+	ptr_t buffer = 0;
 
 	assert(array != 0);
 	assert(element != 0);
-	assert(index >= 0);
 
 	if (array == 0 || element == 0) {
 		return(E_INVALIDARG);
 	}
 
+	assert(index >= 0 && index < array->count);
+
 	if (index < 0 || index >= array->count) {
 		return(E_OUTOFRANGE);
-	}
-
-	error = optcl_array_get_element_size(array, &element_size);
-
-	if (FAILED(error)) {
-		return(error);
 	}
 
 	error = optcl_array_get_buffer(array, &buffer);
@@ -494,7 +488,7 @@ RESULT optcl_array_set(optcl_array *array, uint32_t index, const void *element)
 		return(error);
 	}
 
-	memcpy((char*)buffer + element_size * index, element, element_size);
+	memcpy(&buffer[index * sizeof(ptr_t)], &element, sizeof(ptr_t));
 
 	return(SUCCESS);
 }
@@ -518,11 +512,11 @@ RESULT optcl_array_set_size(optcl_array *array,
 			    uint32_t size, 
 			    bool_t deallocate)
 {
+	RESULT error;
 	uint32_t i;
 	uint32_t index;
-	RESULT error;
-	void *buffer = 0;
-	void *nbuffer = 0;
+	ptr_t buffer = 0;
+	ptr_t nbuffer = 0;
 	uint32_t element_size;
 
 	assert(array != 0);
@@ -553,7 +547,7 @@ RESULT optcl_array_set_size(optcl_array *array,
 		/* Deallocate pointers */
 		for(i = 0; i < array->count - size; ++i) {
 			index = array->count - size + i;
-			free(*((char**)buffer + index * sizeof(char)));
+			free(*(ptr_t**)&buffer[index * sizeof(ptr_t)]);
 		}
 	}
 
@@ -561,6 +555,14 @@ RESULT optcl_array_set_size(optcl_array *array,
 
 	if (nbuffer == 0 && size > 0) {
 		return(E_OUTOFMEMORY);
+	}
+
+	if (array->count < size) {
+		memset(
+			&nbuffer[array->count * sizeof(ptr_t)],
+			0, 
+			(size - array->count) * sizeof(ptr_t)
+			);
 	}
 
 	array->count = size;
@@ -572,7 +574,7 @@ RESULT optcl_array_set_size(optcl_array *array,
 RESULT optcl_array_sort(optcl_array *array)
 {
 	RESULT error;
-	void *buffer = 0;
+	ptr_t buffer = 0;
 	uint32_t array_size;
 	uint32_t element_size;
 	optcl_array_equalfn equalfn = 0;
