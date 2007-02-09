@@ -3111,13 +3111,16 @@ RESULT optcl_feature_create_from_raw(optcl_feature **feature,
 	 * NOTE If parser == 0 then it's 
 	 * probably an unrecognized vendor specific feature
 	 */
-	if (parser != 0) {
-		error = parser(mmc_data, nfeature->additional_length + 4, &nfeature);
+	if (parser == 0) {
+		*feature = nfeature;
+		return(SUCCESS);
+	}
+	
+	error = parser(mmc_data, nfeature->additional_length + 4, &nfeature);
 
-		if (FAILED(error)) {
-			free(nfeature);
-			return(error);
-		}
+	if (FAILED(error)) {
+		free(nfeature);
+		return(error);
 	}
 
 	*feature = nfeature;
