@@ -20,6 +20,8 @@
 #ifndef _LIST_H
 #define _LIST_H
 
+#include "types.h"
+
 
 typedef struct tag_optcl_list optcl_list;
 
