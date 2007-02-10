@@ -40,6 +40,7 @@ typedef unsigned __int64	uint64_t;
 #endif
 
 typedef uint8_t*		ptr_t;
+typedef uint8_t**		pptr_t;
 
 /*
  * Macros to convert from little-endian SCSI values to host endiannes
