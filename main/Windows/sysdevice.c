@@ -304,7 +304,7 @@ static RESULT enumerate_device_features(optcl_device *device)
 	}
 
 	while (it != 0) {
-		error = optcl_list_get_at_pos(response->descriptors, it, &feature);
+		error = optcl_list_get_at_pos(response->descriptors, it, (const pptr_t)&feature);
 
 		if (FAILED(error)) {
 			break;
@@ -622,7 +622,7 @@ RESULT optcl_device_enumerate(optcl_list **devices)
 			break;
 		}
 
-		error = optcl_list_add_tail(*devices, ndevice);
+		error = optcl_list_add_tail(*devices, (const ptr_t)ndevice);
 
 		if (FAILED(error)) {
 			break;
@@ -639,9 +639,9 @@ RESULT optcl_device_enumerate(optcl_list **devices)
 }
 
 RESULT optcl_device_command_execute(const optcl_device *device, 
-				    const void *cdb,
+				    const uint8_t cdb[],
 				    uint32_t cdb_size,
-				    void *param,
+				    uint8_t param[],
 				    uint32_t param_size)
 {
 	RESULT error;

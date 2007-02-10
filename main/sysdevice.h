@@ -22,6 +22,7 @@
 
 #include "errors.h"
 #include "list.h"
+#include "types.h"
 
 
 /* Enumerates all supported optical devices */
@@ -29,9 +30,9 @@ extern RESULT optcl_device_enumerate(optcl_list **devices);
 
 /* Execute SCSI command */
 extern RESULT optcl_device_command_execute(const optcl_device *device, 
-					   const void *cdb,
+					   const uint8_t cdb[],
 					   uint32_t cdb_size,
-					   void *param,
+					   uint8_t param[],
 					   uint32_t param_size);
 
 
