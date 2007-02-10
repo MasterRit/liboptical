@@ -151,8 +151,9 @@ RESULT optcl_array_create(uint32_t element_size,
 	optcl_array *narray = 0;
 
 	assert(array != 0);
+	assert(element_size > 0);
 
-	if (array == 0) {
+	if (array == 0 || element_size == 0) {
 		return(E_INVALIDARG);
 	}
 
@@ -333,9 +334,9 @@ RESULT optcl_array_get(const optcl_array *array,
 		return(E_INVALIDARG);
 	}
 
-	assert(index >= 0 && index < array->count);
+	assert(index < array->count);
 
-	if (index < 0 || index >= array->count) {
+	if (index >= array->count) {
 		return(E_OUTOFRANGE);
 	}
 
@@ -422,7 +423,6 @@ RESULT optcl_array_remove(optcl_array *array, uint32_t index)
 	uint32_t element_size;
 
 	assert(array != 0);
-	assert(index >= 0);
 
 	if (array == 0) {
 		return(E_INVALIDARG);
@@ -434,7 +434,9 @@ RESULT optcl_array_remove(optcl_array *array, uint32_t index)
 		return(error);
 	}
 
-	if (index < 0 || index >= array_size) {
+	assert(index < array_size);
+
+	if (index >= array_size) {
 		return(E_OUTOFRANGE);
 	}
 
@@ -467,15 +469,14 @@ RESULT optcl_array_set(optcl_array *array, uint32_t index, const void *element)
 	ptr_t buffer = 0;
 
 	assert(array != 0);
-	assert(element != 0);
 
-	if (array == 0 || element == 0) {
+	if (array == 0) {
 		return(E_INVALIDARG);
 	}
 
-	assert(index >= 0 && index < array->count);
+	assert(index < array->count);
 
-	if (index < 0 || index >= array->count) {
+	if (index >= array->count) {
 		return(E_OUTOFRANGE);
 	}
 
