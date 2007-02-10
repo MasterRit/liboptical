@@ -674,7 +674,7 @@ RESULT optcl_hashtable_rehash(optcl_hashtable *hashtable)
 		return(E_OUTOFRANGE);
 	}
 
-	error = optcl_array_create(sizeof(struct entry), 0, &nentries);
+	error = optcl_array_create(sizeof(struct entry*), 0, &nentries);
 
 	if (FAILED(error)) {
 		return(error);
