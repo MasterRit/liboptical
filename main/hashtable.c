@@ -347,6 +347,7 @@ RESULT optcl_hashtable_get_pairs(const optcl_hashtable *hashtable,
 		}
 
 		if (entry == 0) {
+			++i;
 			continue;
 		}
 
@@ -368,6 +369,7 @@ RESULT optcl_hashtable_get_pairs(const optcl_hashtable *hashtable,
 		}
 
 		if (entry->bucket == 0) {
+			++i;
 			continue;
 		}
 
@@ -716,6 +718,7 @@ RESULT optcl_hashtable_rehash(optcl_hashtable *hashtable)
 		}
 
 		if (entry == 0) {
+			++i;
 			continue;
 		}
 
