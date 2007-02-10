@@ -25,6 +25,7 @@
 #include "list.h"
 #include "media.h"
 #include "transport.h"
+#include "types.h"
 
 
 /* Device type codes */

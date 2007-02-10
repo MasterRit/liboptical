@@ -25,6 +25,7 @@
 #include "hashtable.h"
 #include "list.h"
 #include "media.h"
+#include "types.h"
 
 #include <assert.h>
 #include <malloc.h>
@@ -251,24 +252,6 @@ static RESULT copy_features_hashtable(optcl_hashtable *dest,
 	}
 
 	return(optcl_list_destroy(pairs, 1));	
-}
-
-static uint32_t joaat_hash_for_device(const uint8_t key[], uint32_t len)
-{
-	size_t i;
-	uint32_t hash = 0;
-     
-	for (i = 0; i < len; i++) {
-		hash += key[i];
-		hash += (hash << 10);
-		hash ^= (hash >> 6);
-	}
-
-	hash += (hash << 3);
-	hash ^= (hash >> 11);
-	hash += (hash << 15);
-
-	return(hash);
 }
 
 /*
@@ -504,7 +487,7 @@ RESULT optcl_device_create(optcl_device **device)
 
 	error = optcl_hashtable_create(
 		sizeof(int), 
-		&joaat_hash_for_device, 
+		0,
 		&newdev->info->features
 		);
 
@@ -633,7 +616,7 @@ RESULT optcl_device_get_feature(const optcl_device *device,
 	 */
 	return(optcl_hashtable_lookup(
 		device->info->features, 
-		(void*)(size_t)feature_code, 
+		&feature_code, 
 		feature
 		));
 }
@@ -898,6 +881,8 @@ RESULT optcl_device_set_feature(optcl_device *device,
 				uint16_t feature_code, 
 				optcl_feature *feature)
 {
+	uint16_t *key = 0;
+
 	assert(device != 0);
 	assert(feature != 0);
 
@@ -917,16 +902,15 @@ RESULT optcl_device_set_feature(optcl_device *device,
 		return(E_INVALIDARG);
 	}
 
-	/*
-	 * NOTE:
-	 * feature_code is intentionly cast to size_t 
-	 * to resolve 64-bit portability warning.
-	 */
-	return(optcl_hashtable_set(
-		device->info->features, 
-		(void*)(size_t)feature_code, 
-		feature
-		));
+	key = malloc(sizeof(uint16_t));
+
+	if (key == 0) {
+		return(E_OUTOFMEMORY);
+	}
+
+	*key = feature_code;
+
+	return(optcl_hashtable_set(device->info->features, key, feature));
 }
 
 RESULT optcl_device_set_path(optcl_device *device, char *path)
