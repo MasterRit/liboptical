@@ -259,12 +259,12 @@ int optcl_parse_inquiry_data(const uint8_t *mmc_response,
 		strncpy_s((char*)nresponse->product, 17, (char*)&mmc_response[16], 16);
 	}
 
-	if (size > 56) {
-		strncpy_s((char*)nresponse->vendor_string, 21, (char*)&mmc_response[36], 20);
-	}
-
 	if (size > 36) {
 		nresponse->revision_level = uint32_from_le(*(uint32_t*)&mmc_response[32]);
+	}
+
+	if (size > 56) {
+		strncpy_s((char*)nresponse->vendor_string, 21, (char*)&mmc_response[36], 20);
 	}
 
 	if (size > 56) {
