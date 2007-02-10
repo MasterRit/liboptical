@@ -30,8 +30,8 @@ typedef struct tag_optcl_hashtable optcl_hashtable;
 
 /* Key/value pair */
 typedef struct pair {
-	const void *key;
-	const void *value;
+	ptr_t key;
+	ptr_t value;
 } optcl_hashtable_pair;
 
 /* User hash function */
@@ -53,7 +53,8 @@ extern RESULT optcl_hashtable_create(uint32_t keysize,
 				     optcl_hashtable **hashtable);
 
 /* Destroy hashtable */
-extern RESULT optcl_hashtable_destroy(optcl_hashtable *hashtable, bool_t deallocate);
+extern RESULT optcl_hashtable_destroy(optcl_hashtable *hashtable, 
+				      bool_t deallocate);
 
 /* Get list of all key/value pairs */
 extern RESULT optcl_hashtable_get_pairs(const optcl_hashtable *hashtable,
@@ -61,13 +62,13 @@ extern RESULT optcl_hashtable_get_pairs(const optcl_hashtable *hashtable,
 
 /* Lookup key in the hashtable */
 extern RESULT optcl_hashtable_lookup(const optcl_hashtable *hashtable, 
-				     const void *key, 
-				     const void **value);
+				     const ptr_t key, 
+				     const pptr_t value);
 
 /* Set key/value pair */
 extern RESULT optcl_hashtable_set(optcl_hashtable *hashtable, 
-				  const void *key, 
-				  const void *value);
+				  const ptr_t key, 
+				  const ptr_t value);
 
 /* Rehash hashtable */
 extern RESULT optcl_hashtable_rehash(optcl_hashtable *hashtable);
