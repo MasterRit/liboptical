@@ -47,7 +47,7 @@ struct feature_sizes_entry {
  * Table of feature helper functions forward declarations
  */
 
-static int32_t get_feature_size(uint16_t feature_code);
+static uint16_t get_feature_size(uint16_t feature_code);
 static raw_feature_parser get_feature_parser(uint16_t feature_code);
 
 
@@ -3025,7 +3025,7 @@ static RESULT parse_vcps(const uint8_t mmc_data[],
 
 RESULT optcl_feature_copy(optcl_feature **dest, const optcl_feature *src)
 {
-	int size;
+	uint16_t size;
 
 	assert(dest != 0);
 	assert(src != 0);
@@ -3036,8 +3036,9 @@ RESULT optcl_feature_copy(optcl_feature **dest, const optcl_feature *src)
 
 	size = get_feature_size(src->feature_code);
 
-	if (size <= 0) {
-		return(E_DEVUNKNFEATURE);
+	if (size == 0) {
+		/* Unknown feature - vendor specific? */
+		size = sizeof(optcl_feature_descriptor);
 	}
 
 	free(*dest);
@@ -3066,8 +3067,9 @@ RESULT optcl_feature_create(uint16_t feature_code, optcl_feature **feature)
 
 	size = get_feature_size(feature_code);
 
-	if (size <= 0) {
-		return(E_DEVUNKNFEATURE);
+	if (size == 0) {
+		/* Unknown feature - vendor specific? */
+		size = sizeof(optcl_feature_descriptor);
 	}
 
 	nfeature = malloc(size);
@@ -3221,7 +3223,7 @@ static struct feature_sizes_entry __feature_table[] = {
  * Table of feature helper functions
  */
 
-static int32_t get_feature_size(uint16_t feature_code)
+static uint16_t get_feature_size(uint16_t feature_code)
 {
 	int i;
 	int elements;
@@ -3239,7 +3241,7 @@ static int32_t get_feature_size(uint16_t feature_code)
 	}
 
 	if (i == elements) {
-		return(-1);
+		return(0);
 	}
 
 	return(__feature_table[i].size);
