@@ -41,14 +41,14 @@ static char *_log_file = "optical.log";
  * Debug functions
  */
 
-RESULT optcl_debug_set_log_file(char *filename)
+RESULT optcl_debug_set_log_file(char filename[])
 {
 	_log_file = filename;
 	return(SUCCESS);
 }
 
-RESULT optcl_debug_log_bytes(const char *message, 
-			     const ptr_t data, 
+RESULT optcl_debug_log_bytes(const char message[],
+			     const uint8_t data[],
 			     uint32_t size)
 {
 	uint32_t i;
