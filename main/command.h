@@ -23,6 +23,7 @@
 #include "device.h"
 #include "errors.h"
 #include "list.h"
+#include "types.h"
 
 /*
  * Command field flags

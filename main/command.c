@@ -63,10 +63,10 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 	uint8_t cdb[10];
 	int32_t data_length;
 	uint16_t start_feature;
+	ptr_t mmc_response = 0;
 	uint32_t transfer_size;
 	uint32_t alignment_mask;
 	uint32_t max_transfer_len;
-	uint8_t *mmc_response = 0;
 	optcl_adapter *adapter = 0;
 	optcl_list_iterator it = 0;
 	optcl_feature_descriptor *descriptor = 0;
@@ -259,7 +259,7 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 			break;
 		}
 
-		error = optcl_list_get_at_pos(nresponse1->descriptors, it, &descriptor);
+		error = optcl_list_get_at_pos(nresponse1->descriptors, it, (const pptr_t)&descriptor);
 
 		if (FAILED(error)) {
 			destroy_error = optcl_list_destroy(nresponse1->descriptors, True);
@@ -314,7 +314,7 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 	RESULT error;
 	RESULT destroy_error;
 	uint8_t cdb[6];
-	uint8_t *mmc_response;
+	ptr_t mmc_response = 0;
 	uint32_t alignment_mask;
 	optcl_adapter *adapter;
 	optcl_mmc_response_inquiry *nresponse;
