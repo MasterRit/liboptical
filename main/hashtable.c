@@ -337,7 +337,7 @@ RESULT optcl_hashtable_get_pairs(const optcl_hashtable *hashtable,
 
 	while (i < entries_count) {
 
-		error = optcl_array_get(hashtable->entries, i, (pptr_t)&entry);
+		error = optcl_array_get(hashtable->entries, i, (const pptr_t)&entry);
 
 		if (FAILED(error)) {
 			break;
