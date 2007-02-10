@@ -21,6 +21,7 @@
 
 #include "errors.h"
 #include "feature.h"
+#include "types.h"
 
 #include <assert.h>
 #include <malloc.h>
