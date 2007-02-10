@@ -260,7 +260,7 @@ RESULT optcl_hashtable_create(uint32_t keysize,
 	nhashtable->hashfn = (hashfn) ? hashfn : joaat_hash;
 	nhashtable->keysize = keysize;
 
-	error = optcl_array_create(sizeof(struct entry), 0, &nhashtable->entries);
+	error = optcl_array_create(sizeof(struct entry*), 0, &nhashtable->entries);
 
 	if (FAILED(error)) {
 		free(nhashtable);
@@ -573,8 +573,8 @@ RESULT optcl_hashtable_set(optcl_hashtable *hashtable,
 		return(error);
 	}
 
-	loadfactor = (hashtable->keycount > 0) 
-		? (size * 1.0f) / (hashtable->keycount * 1.0f)
+	loadfactor = (hashtable->keycount > 0 && size > 0) 
+		? (hashtable->keycount * 1.0f) / size
 		: 100.0f;
 
 	if (loadfactor >= max_load_factor) {
