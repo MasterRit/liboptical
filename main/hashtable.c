@@ -647,6 +647,8 @@ RESULT optcl_hashtable_set(optcl_hashtable *hashtable,
 			return(error);
 		}
 	}
+
+	hashtable->keycount++;
 	
 	return(error);
 }
