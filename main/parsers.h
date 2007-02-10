@@ -21,6 +21,7 @@
 #define _PARSERS_H
 
 #include "command.h"
+#include "types.h"
 
 
 /* MMC_OPCODE_GET_CONFIG data parser */
