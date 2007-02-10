@@ -21,6 +21,7 @@
 
 #include "debug.h"
 #include "errors.h"
+#include "types.h"
 
 #include <assert.h>
 #include <errno.h>
@@ -47,7 +48,7 @@ RESULT optcl_debug_set_log_file(char *filename)
 }
 
 RESULT optcl_debug_log_bytes(const char *message, 
-			     const uint8_t *data, 
+			     const ptr_t data, 
 			     uint32_t size)
 {
 	uint32_t i;
