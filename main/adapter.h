@@ -20,7 +20,9 @@
 #ifndef _ADAPTER_H
 #define _ADAPTER_H
 
+
 #include "errors.h"
+#include "types.h"
 
 
 /* Bustype constants */
