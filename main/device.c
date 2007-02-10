@@ -81,7 +81,7 @@ static RESULT clear_media_info_list(optcl_list *infos)
 	}
 
 	while (it != 0) {
-		error = optcl_list_get_at_pos(infos, it, &media);
+		error = optcl_list_get_at_pos(infos, it, (const pptr_t)&media);
 
 		if (SUCCEEDED(error)) {
 			error = optcl_media_info_destroy(media);
@@ -127,7 +127,7 @@ static RESULT copy_media_info_list(optcl_list *dest, const optcl_list *src)
 	}
 
 	while (it != 0) {
-		error = optcl_list_get_at_pos(src, it, &media);
+		error = optcl_list_get_at_pos(src, it, (const pptr_t)&media);
 
 		if (FAILED(error)) {
 			break;
@@ -147,7 +147,7 @@ static RESULT copy_media_info_list(optcl_list *dest, const optcl_list *src)
 				break;
 			}
 
-			error = optcl_list_add_tail(dest, nmedia);
+			error = optcl_list_add_tail(dest, (const ptr_t)nmedia);
 
 			if (FAILED(error)) {
 				optcl_media_info_destroy(nmedia);
@@ -205,7 +205,7 @@ static RESULT copy_features_hashtable(optcl_hashtable *dest,
 	}
 
 	while (it != 0) {
-		error = optcl_list_get_at_pos(pairs, it, &pair);
+		error = optcl_list_get_at_pos(pairs, it, (const pptr_t)&pair);
 
 		if (FAILED(error)) {
 			break;
@@ -226,7 +226,7 @@ static RESULT copy_features_hashtable(optcl_hashtable *dest,
 			break;
 		}
 
-		error = optcl_feature_copy(&nfeature, pair->value);
+		error = optcl_feature_copy(&nfeature, (optcl_feature*)pair->value);
 
 		if (FAILED(error)) {
 			break;
@@ -237,7 +237,7 @@ static RESULT copy_features_hashtable(optcl_hashtable *dest,
 			break;
 		}
 
-		error = optcl_hashtable_set(dest, pair->key, nfeature);
+		error = optcl_hashtable_set(dest, pair->key, (const ptr_t)nfeature);
 
 		if (FAILED(error)) {
 			optcl_feature_destroy(nfeature);
@@ -616,8 +616,8 @@ RESULT optcl_device_get_feature(const optcl_device *device,
 	 */
 	return(optcl_hashtable_lookup(
 		device->info->features, 
-		&feature_code, 
-		feature
+		(const ptr_t)&feature_code, 
+		(const pptr_t)feature
 		));
 }
 
@@ -673,7 +673,7 @@ RESULT optcl_get_media_info(const optcl_device *device,
 		return(E_UNEXPECTED);
 	}
 
-	error = optcl_list_get_at_index(device->medias, media_index, &info);
+	error = optcl_list_get_at_index(device->medias, media_index, (const pptr_t)&info);
 
 	if (FAILED(error)) {
 		return(error);
@@ -846,7 +846,7 @@ RESULT optcl_device_add_media_info(optcl_device *device,
 		return(E_UNEXPECTED);
 	}
 
-	return(optcl_list_add_tail(device->medias, info));
+	return(optcl_list_add_tail(device->medias, (const ptr_t)info));
 }
 
 RESULT optcl_device_set_adapter(optcl_device *device, optcl_adapter *adapter)
@@ -910,7 +910,7 @@ RESULT optcl_device_set_feature(optcl_device *device,
 
 	*key = feature_code;
 
-	return(optcl_hashtable_set(device->info->features, key, feature));
+	return(optcl_hashtable_set(device->info->features, (const ptr_t)key, (const ptr_t)feature));
 }
 
 RESULT optcl_device_set_path(optcl_device *device, char *path)
