@@ -135,8 +135,11 @@ RESULT optcl_hashtable_clear(optcl_hashtable *hashtable, bool_t deallocate)
 		}
 
 		if (deallocate == True) {
+			if (entry->pair.key != entry->pair.value) {
+				free((void*)entry->pair.value);
+			}
+
 			free((void*)entry->pair.key);
-			free((void*)entry->pair.value);
 		}
 
 		if (entry->bucket != 0) {
