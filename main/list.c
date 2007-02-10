@@ -38,7 +38,7 @@
 struct tag_optcl_list_node {
 	struct tag_optcl_list_node *prev;
 	struct tag_optcl_list_node *next;
-	const void *data;
+	ptr_t data;
 };
 
 typedef struct tag_optcl_list_node optcl_list_node;
@@ -57,7 +57,7 @@ struct tag_optcl_list {
  */
 
 /* NOTE: There are no relations '<' and '>' for pointers. */
-static int8_t compare_data_ptrs(const void *left, const void *right)
+static int8_t compare_data_ptrs(const ptr_t left, const ptr_t right)
 {
 	int8_t result;
 
@@ -75,7 +75,7 @@ static int8_t compare_data_ptrs(const void *left, const void *right)
  * List functions implementation
  */
 
-RESULT optcl_list_add_head(optcl_list *list, const void *data)
+RESULT optcl_list_add_head(optcl_list *list, const ptr_t data)
 {
 	optcl_list_node *nnode = 0;
 
@@ -110,7 +110,7 @@ RESULT optcl_list_add_head(optcl_list *list, const void *data)
 	return(SUCCESS);
 }
 
-RESULT optcl_list_add_tail(optcl_list *list, const void *data)
+RESULT optcl_list_add_tail(optcl_list *list, const ptr_t data)
 {
 	optcl_list_node *nnode = 0;
 
@@ -280,11 +280,11 @@ RESULT optcl_list_copy(optcl_list *dest, const optcl_list *src)
 }
 
 RESULT optcl_list_find(const optcl_list *list, 
-		       const void *data,
+		       const ptr_t data,
 		       optcl_list_iterator *pos)
 {
 	RESULT error;
-	void *element = 0;
+	ptr_t element = 0;
 	optcl_list_iterator it = 0;
 
 	assert(list != 0);
@@ -349,7 +349,7 @@ RESULT optcl_list_get_equalfn(const optcl_list *list,
 
 RESULT optcl_list_get_at_index(const optcl_list *list, 
 			       uint32_t index, 
-			       const void **data)
+			       const pptr_t data)
 {
 	int forward;
 	RESULT error;
@@ -411,7 +411,7 @@ RESULT optcl_list_get_at_index(const optcl_list *list,
 
 RESULT optcl_list_get_at_pos(const optcl_list *list, 
 			     const optcl_list_iterator pos, 
-			     const void **data)
+			     const pptr_t data)
 {
 	assert(pos != 0);
 	assert(list != 0);
@@ -506,7 +506,7 @@ RESULT optcl_list_get_previous(const optcl_list *list,
 
 RESULT optcl_list_insert_after(optcl_list *list, 
 			       const optcl_list_iterator pos, 
-			       const void *data)
+			       const ptr_t data)
 {
 	optcl_list_node *nnode = 0;
 
@@ -541,7 +541,7 @@ RESULT optcl_list_insert_after(optcl_list *list,
 
 RESULT optcl_list_insert_before(optcl_list *list, 
 				const optcl_list_iterator pos, 
-				const void *data)
+				const ptr_t data)
 {
 	optcl_list_node *nnode = 0;
 
@@ -625,7 +625,7 @@ RESULT optcl_list_remove(optcl_list *list, optcl_list_iterator pos)
 
 RESULT optcl_list_set_at_pos(const optcl_list *list, 
 			     optcl_list_iterator pos, 
-			     const void *element)
+			     const ptr_t element)
 {
 	assert(list != 0);
 	assert(pos != 0);
@@ -660,7 +660,7 @@ RESULT optcl_list_sort(optcl_list *list)
 	RESULT error;
 	RESULT destroy_error;
 	uint32_t count;
-	void *element = 0;
+	ptr_t element = 0;
 	optcl_array *array = 0;
 	optcl_list_iterator it = 0;
 	
