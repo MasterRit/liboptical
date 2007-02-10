@@ -272,7 +272,6 @@ static RESULT enumerate_device_features(optcl_device *device)
 	RESULT destroy_error;
 	optcl_list_iterator it = 0;
 	optcl_feature *feature = 0;
-	optcl_feature *feature_copy = 0;
 	optcl_mmc_get_configuration command;
 	optcl_mmc_response_get_configuration *response = 0;
 
@@ -315,18 +314,7 @@ static RESULT enumerate_device_features(optcl_device *device)
 			break;
 		}
 
-		error = optcl_feature_create(feature->feature_code, &feature_copy);
-
-		if (FAILED(error)) {
-			break;
-		}
-
-		if (feature_copy == 0) {
-			error = E_POINTER;
-			break;
-		}
-
-		error = optcl_device_set_feature(device, feature->feature_code, feature_copy);
+		error = optcl_device_set_feature(device, feature->feature_code, feature);
 
 		if (FAILED(error)) {
 			break;
@@ -339,14 +327,15 @@ static RESULT enumerate_device_features(optcl_device *device)
 		}
 	}
 
+	destroy_error = optcl_list_destroy(response->descriptors, False);
+
 	free(response);
 
-	if (FAILED(error)) {
-		destroy_error = optcl_list_destroy(response->descriptors, 1);
-		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	if (FAILED(destroy_error)) {
+		return(destroy_error);
 	}
 
-	return(SUCCESS);
+	return(SUCCEEDED(destroy_error) ? error : destroy_error);
 }
 
 static RESULT enumerate_device(int index, 
