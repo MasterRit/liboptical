@@ -29,7 +29,7 @@ typedef struct tag_optcl_array optcl_array;
  * Compares two list elements 
  * Return 0 for equal, -1 for left lesser and 1 for left greater.
  */
-typedef int8_t (*optcl_array_equalfn)(const void *left, const void *right);
+typedef int8_t (*optcl_array_equalfn)(const ptr_t left, const ptr_t right);
 
 
 /* Append two arrays */
@@ -52,16 +52,16 @@ extern RESULT optcl_array_destroy(optcl_array *array, bool_t deallocate);
 
 /* Find element in the array */
 extern RESULT optcl_array_find(const optcl_array *array, 
-			       const void *element, 
+			       const ptr_t element, 
 			       uint32_t *index);
 
 /* Get element at index */
 extern RESULT optcl_array_get(const optcl_array *array, 
 			      uint32_t index, 
-			      const void **element);
+			      const pptr_t element);
 
 /* Get internal buffer */
-extern RESULT optcl_array_get_buffer(const optcl_array *array, void **buffer);
+extern RESULT optcl_array_get_buffer(const optcl_array *array, pptr_t buffer);
 
 /* Get array equalfn function */
 extern RESULT optcl_array_get_equalfn(const optcl_array *array, 
@@ -80,7 +80,7 @@ extern RESULT optcl_array_remove(optcl_array *array, uint32_t index);
 /* Set element at index position - resize list if required. */
 extern RESULT optcl_array_set(optcl_array *array, 
 			      uint32_t index, 
-			      const void *element);
+			      const ptr_t element);
 
 /* Resize array */
 extern RESULT optcl_array_set_size(optcl_array *array, 

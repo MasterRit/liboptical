@@ -32,7 +32,7 @@
  */
 
 struct tag_optcl_array {
-	void *buffer;
+	ptr_t buffer;
 	uint32_t count;
 	uint32_t element_size;
 	optcl_array_equalfn equalfn;
@@ -46,14 +46,14 @@ typedef struct tag_optcl_array optcl_array;
  */
 
 /* qsort comparator function pointer */
-typedef int (*qsort_equalfn)(const void *, const void *);
+typedef int (*qsort_equalfn)(const void*, const void*);
 
 
 /*
  * Helpers functions
  */
 
-static int8_t compare_ints(const void *left, const void *right)
+static int8_t compare_ints(const ptr_t left, const ptr_t right)
 {
 	int8_t result;
 	uint32_t larg;
@@ -89,9 +89,9 @@ RESULT optcl_array_append(optcl_array *dest, const optcl_array *src)
 {
 	uint32_t i;
 	RESULT error;
+	ptr_t element = 0;
 	uint32_t src_size;
 	uint32_t dest_size;
-	void *element = 0;
 
 	assert(src != 0);
 	assert(dest != 0);
@@ -198,8 +198,8 @@ RESULT optcl_array_copy(optcl_array *dest, const optcl_array *src)
 {
 	uint32_t i;
 	RESULT error;
+	ptr_t element = 0;
 	uint32_t src_count;
-	void *element = 0;
 
 	assert(src != 0);
 	assert(dest != 0);
@@ -268,13 +268,13 @@ RESULT optcl_array_destroy(optcl_array *array, bool_t deallocate)
 }
 
 RESULT optcl_array_find(const optcl_array *array, 
-			const void *element, 
+			const ptr_t element, 
 			uint32_t *index)
 {
 	uint32_t i;
 	RESULT error;
 	uint32_t array_size;
-	void *current_element = 0;
+	ptr_t current_element = 0;
 	optcl_array_equalfn equalfn = 0;
 
 	assert(array != 0);
@@ -322,7 +322,7 @@ RESULT optcl_array_find(const optcl_array *array,
 
 RESULT optcl_array_get(const optcl_array *array, 
 		       uint32_t index, 
-		       const void **element)
+		       const pptr_t element)
 {
 	RESULT error;
 	ptr_t buffer = 0;
@@ -352,12 +352,12 @@ RESULT optcl_array_get(const optcl_array *array,
 		return(E_POINTER);
 	}
 
-	*element = *(ptr_t**)&buffer[index * sizeof(ptr_t)];
+	*element = *(pptr_t)&buffer[index * sizeof(ptr_t)];
 
 	return(SUCCESS);
 }
 
-RESULT optcl_array_get_buffer(const optcl_array *array, void **buffer)
+RESULT optcl_array_get_buffer(const optcl_array *array, pptr_t buffer)
 {
 	assert(array != 0);
 	assert(buffer != 0);
@@ -463,7 +463,7 @@ RESULT optcl_array_remove(optcl_array *array, uint32_t index)
 	return(optcl_array_set_size(array, array_size - 1, 0));
 }
 
-RESULT optcl_array_set(optcl_array *array, uint32_t index, const void *element)
+RESULT optcl_array_set(optcl_array *array, uint32_t index, const ptr_t element)
 {
 	RESULT error;
 	ptr_t buffer = 0;
@@ -538,7 +538,7 @@ RESULT optcl_array_set_size(optcl_array *array,
 		/* Deallocate pointers */
 		for(i = 0; i < array->count - size; ++i) {
 			index = size + i;
-			free(*(ptr_t**)&buffer[index * sizeof(ptr_t)]);
+			free(*(pptr_t)&buffer[index * sizeof(ptr_t)]);
 		}
 	}
 
