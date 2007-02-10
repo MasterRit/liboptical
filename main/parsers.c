@@ -168,7 +168,7 @@ int optcl_parse_get_configuration_data(const uint8_t *mmc_response,
 			break;
 		}
 
-		error = optcl_list_add_tail(nresponse->descriptors, feature);
+		error = optcl_list_add_tail(nresponse->descriptors, (const ptr_t)feature);
 
 		if (FAILED(error)) {
 			free(feature);
