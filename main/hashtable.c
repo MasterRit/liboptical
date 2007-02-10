@@ -499,7 +499,6 @@ RESULT optcl_hashtable_lookup(const optcl_hashtable *hashtable,
 	}
 
 	if (hashfn(entry->pair.key, hashtable->keysize) == hash) {
-		assert(entry->bucket == 0);
 		*value = entry->pair.value;
 		return(SUCCESS);
 	}
