@@ -55,10 +55,9 @@ RESULT optcl_debug_log_bytes(const char message[],
 	FILE *stream;
 	errno_t errno;
 
-	assert(data);
-	assert(size > 0);
+	assert(message != 0);
 
-	if (data == 0 || size <= 0) {
+	if (message == 0) {
 		return(E_INVALIDARG);
 	}
 
@@ -81,16 +80,18 @@ RESULT optcl_debug_log_bytes(const char message[],
 		}
 	}
 
-	if (message != 0) {
-		fprintf(stream, "%s\r\n\n", message);
-	}
+	fprintf(stream, "%s\r\n\n", message);
 
-	for(i = 0; i < size; ++i) {
-		fprintf(stream, "%x", data[i]);
+	if (data != 0 && size > 0) {
+		for(i = 0; i < size; ++i) {
+			fprintf(stream, "%x", data[i]);
 
-		if (i < size - 1) {
-			fprintf(stream, "%s", ", ");
+			if (i < size - 1) {
+				fprintf(stream, "%s", ", ");
+			}
 		}
+	} else {
+		fprintf(stream, "%s", "null");
 	}
 
 	fprintf(stream, "%s", "\r\n\n");
