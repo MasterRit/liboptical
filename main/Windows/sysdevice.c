@@ -644,9 +644,8 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 	assert(cdb != 0);
 	assert(device != 0);
 	assert(cdb_size > 0);
-	assert(param_size >= 0);
 
-	if (cdb == 0 || device == 0 || cdb_size < 0 || param_size < 0) {
+	if (cdb == 0 || device == 0 || cdb_size == 0) {
 		return(E_INVALIDARG);
 	}
 
