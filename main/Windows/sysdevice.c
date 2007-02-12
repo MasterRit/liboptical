@@ -720,6 +720,7 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 	}
 
 	OPTCL_TRACE_ARRAY_MSG("Device response bytes:", param, bytes);
+	OPTCL_TRACE_ARRAY_MSG("Sense bytes:", sptdwb.ucSenseBuf, sptdwb.sptd.SenseInfoLength);
 
 	CloseHandle(hDevice);
 
