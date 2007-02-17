@@ -69,6 +69,7 @@
 #include "debug.h"
 #include "device.h"
 #include "errors.h"
+#include "helpers.h"
 #include "sysdevice.h"
 #include "transport.h"
 
@@ -80,7 +81,7 @@
  */
 
 #define SPT_SENSE_LENGTH	32U
-#define SPTWB_DATA_LENGTH	512U
+#define SPTWB_DATA_LENGTH	256U
 
 
 typedef struct _SCSI_PASS_THROUGH_WITH_BUFFERS {
@@ -500,7 +501,7 @@ static RESULT enumerate_device(int index,
 		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
-	tmp = _strdup((char*)response->product);
+	tmp = xstrdup((char*)response->product);
 
 	if (tmp == 0 && response->product != 0) {
 		free(response);
@@ -516,7 +517,7 @@ static RESULT enumerate_device(int index,
 		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
-	tmp = _strdup((char*)response->vendor);
+	tmp = xstrdup((char*)response->vendor);
 
 	if (tmp == 0 && response->vendor != 0) {
 		free(response);
@@ -532,7 +533,7 @@ static RESULT enumerate_device(int index,
 		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
-	tmp = _strdup((char*)response->vendor_string);
+	tmp = xstrdup((char*)response->vendor_string);
 
 	if (tmp == 0 && response->vendor_string != 0) {
 		free(response);
@@ -638,6 +639,8 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 	DWORD bytes;
 	BOOL success;
 	HANDLE hDevice;
+	uint8_t sense_key;
+	uint8_t response_code;
 	DWORD dwErrorCode;
 	SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER sptdwb;
 
@@ -703,6 +706,8 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 		FALSE
 		);
 
+	CloseHandle(hDevice);
+
 	dwErrorCode = GetLastError();
 
 	OPTCL_TRACE_ARRAY_MSG("DeviceIoControl error code:", (uint8_t*)&dwErrorCode, sizeof(dwErrorCode));
@@ -721,6 +726,21 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 
 	OPTCL_TRACE_ARRAY_MSG("Device response bytes:", param, bytes);
 	OPTCL_TRACE_ARRAY_MSG("Sense bytes:", sptdwb.ucSenseBuf, sptdwb.sptd.SenseInfoLength);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	sense_key = 0;
+	response_code = 0;
+
+	if (sptdwb.sptd.SenseInfoLength > 0) {
+		response_code = sptdwb.ucSenseBuf[0];
+	}
+
+	if (response_code == 0x70 || response_code == 0x71) {
+		/* Fixed format sense data */
+	}
 
 	CloseHandle(hDevice);
 
