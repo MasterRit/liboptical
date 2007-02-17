@@ -63,6 +63,7 @@ typedef int32_t RESULT;
 #define FACILITY_TRANSPORT	2
 #define FACILITY_COLLECTIONS	3
 #define FACILITY_FEATURES	4
+#define FACILITY_SENSE		2048
 
 /* Error status testing macros */
 
