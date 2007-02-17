@@ -534,7 +534,6 @@ RESULT optcl_array_set_size(optcl_array *array,
 	}
 
 	if (deallocate == True && array->count > size) {
-	
 		/* Deallocate pointers */
 		for(i = 0; i < array->count - size; ++i) {
 			index = size + i;
