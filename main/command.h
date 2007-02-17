@@ -20,48 +20,68 @@
 #ifndef _COMMAND_H
 #define _COMMAND_H
 
+
 #include "device.h"
 #include "errors.h"
 #include "list.h"
+#include "sensedata.h"
 #include "types.h"
 
+
 /*
- * Command field flags
+ * BLANK command command field flags
+ */
+
+#define MMC_BLANK_BLANK_DISK		0x00
+#define MMC_BLANK_MINIMAL_BLANK_DISK	0x01
+#define MMC_BLANK_BLANK_TRACK		0x02
+#define MMC_BLANK_UNRESERVE_TRACK	0x03
+#define MMC_BLANK_TRACK_TRAIL		0x04
+#define MMC_BLANK_UNCLOSE_LAST_SESSION	0x05
+#define MMC_BLANK_LAST_SESSION		0x06
+
+/*
+ * GET CONFIGURATION command field flags
  */
 
 #define MMC_GET_CONFIG_RT_ALL		0x00
 #define MMC_GET_CONFIG_RT_CURRENT	0x01
 #define MMC_GET_CONFIG_RT_FROM		0x02
 
+/*
+ * BLANK command structures
+ */
+
+typedef struct tag_mmc_blank {
+	bool_t immed;
+	uint8_t blanking_type;
+	uint32_t start_address;
+	/* uint8_t control */
+} optcl_mmc_blank;
 
 /*
- * Command structures
+ * GET CONFIGURATION command structures
  */
 
 typedef struct tag_mmc_get_configuration {
 	uint8_t rt;
 	uint16_t start_feature;
-	/* uint16_t allocation_length; */
-	/* uint8_t control; */
 } optcl_mmc_get_configuration;
-
-typedef struct tag_mmc_inquiry {
-	uint8_t evpd;
-	uint8_t page_code;
-	/* uint16_t allocation_length; */
-	/* uint8_t control; */
-} optcl_mmc_inquiry;
-
-
-/*
- * Command result structures
- */
 
 typedef struct tag_mmc_response_get_configuration {
 	uint32_t data_length;
 	uint16_t current_profile;
 	optcl_list *descriptors;
 } optcl_mmc_response_get_configuration;
+
+/*
+ * INQUIRY command structures
+ */
+
+typedef struct tag_mmc_inquiry {
+	uint8_t evpd;
+	uint8_t page_code;
+} optcl_mmc_inquiry;
 
 typedef struct tag_mmc_response_inquiry {
 	uint8_t qualifier;	/* Peripheral qualifier */
@@ -105,8 +125,28 @@ typedef struct tag_mmc_response_inquiry {
 } optcl_mmc_response_inquiry;
 
 /*
+ * REQUEST SENSE command structures
+ */
+
+typedef struct tag_mmc_request_sensedata {
+	bool_t desc;
+} optcl_mmc_request_sensedata;
+
+typedef struct tag_mmc_response_request_sensedata {
+	uint8_t response_code;
+	uint8_t sk;
+	uint8_t asc;
+	uint8_t ascq;
+	optcl_sensedata *sense_data;
+} optcl_mmc_response_request_sensedata;
+
+
+/*
  * Command functions
  */
+
+extern RESULT optcl_command_blank(const optcl_device *device,
+				  const optcl_mmc_blank *command);
 
 extern RESULT optcl_command_get_configuration(const optcl_device *device,
 					      const optcl_mmc_get_configuration *command,
