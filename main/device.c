@@ -23,6 +23,7 @@
 #include "errors.h"
 #include "device.h"
 #include "hashtable.h"
+#include "helpers.h"
 #include "list.h"
 #include "media.h"
 #include "types.h"
@@ -363,7 +364,7 @@ RESULT optcl_device_copy(optcl_device *dest, const optcl_device *src)
 	}
 
 	dest->type = src->type;
-	dest->path = _strdup(src->path);
+	dest->path = xstrdup(src->path);
 
 	if (src->path != 0 && dest->path == 0) {
 		return(E_OUTOFMEMORY);
@@ -389,28 +390,28 @@ RESULT optcl_device_copy(optcl_device *dest, const optcl_device *src)
 		return(E_UNEXPECTED);
 	}
 
-	dest->info->product = _strdup(src->info->product);
+	dest->info->product = xstrdup(src->info->product);
 
 	if (src->info->product != 0 && dest->info->product == 0) {
 		optcl_device_clear(dest);
 		return(E_OUTOFMEMORY);
 	}
 
-	dest->info->revision = _strdup(src->info->revision);
+	dest->info->revision = xstrdup(src->info->revision);
 
 	if (src->info->revision != 0 && dest->info->revision == 0) {
 		optcl_device_clear(dest);
 		return(E_OUTOFMEMORY);
 	}
 
-	dest->info->vendor = _strdup(src->info->vendor);
+	dest->info->vendor = xstrdup(src->info->vendor);
 
 	if (src->info->vendor && !dest->info->vendor) {
 		optcl_device_clear(dest);
 		return(E_OUTOFMEMORY);
 	}
 
-	dest->info->vendor_string = _strdup(src->info->vendor_string);
+	dest->info->vendor_string = xstrdup(src->info->vendor_string);
 
 	if (src->info->vendor_string != dest->info->vendor_string) {
 		optcl_device_clear(dest);
@@ -710,7 +711,7 @@ RESULT optcl_device_get_path(const optcl_device *device, char **path)
 		return(E_INVALIDARG);
 	}
 
-	*path = _strdup(device->path);
+	*path = xstrdup(device->path);
 
 	if (*path == 0 && device->path != 0) {
 		return(E_OUTOFMEMORY);
@@ -734,7 +735,7 @@ RESULT optcl_device_get_product(const optcl_device *device, char **product)
 		return(E_UNEXPECTED);
 	}
 
-	*product = _strdup(device->info->product);
+	*product = xstrdup(device->info->product);
 
 	if (*product == 0 && device->info->product != 0) {
 		return(E_OUTOFMEMORY);
@@ -758,7 +759,7 @@ RESULT optcl_device_get_revision(const optcl_device *device, char **revision)
 		return(E_UNEXPECTED);
 	}
 
-	*revision = _strdup(device->info->revision);
+	*revision = xstrdup(device->info->revision);
 
 	if (*revision == 0 && device->info->revision != 0) {
 		return(E_OUTOFMEMORY);
@@ -796,7 +797,7 @@ RESULT optcl_device_get_vendor(const optcl_device *device, char **vendor)
 		return(E_UNEXPECTED);
 	}
 
-	*vendor = _strdup(device->info->vendor);
+	*vendor = xstrdup(device->info->vendor);
 
 	if (*vendor == 0 && device->info->vendor != 0) {
 		return(E_OUTOFMEMORY);
@@ -821,7 +822,7 @@ RESULT optcl_device_get_vendor_string(const optcl_device *device,
 		return(E_UNEXPECTED);
 	}
 
-	*vendor_string = _strdup(device->info->vendor_string);
+	*vendor_string = xstrdup(device->info->vendor_string);
 
 	if (*vendor_string == 0 && device->info->vendor_string != 0) {
 		return(E_OUTOFMEMORY);

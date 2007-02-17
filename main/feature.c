@@ -21,6 +21,7 @@
 
 #include "errors.h"
 #include "feature.h"
+#include "helpers.h"
 #include "types.h"
 
 #include <assert.h>
@@ -2660,7 +2661,7 @@ static RESULT parse_drive_serial_number(const uint8_t mmc_data[],
 			? feature->descriptor.additional_length
 			: sizeof(feature->serial_number);
 
-		strncpy_s(
+		xstrncpy(
 			(char*)&feature->serial_number,
 			sizeof(feature->serial_number),
 			(const char*)&mmc_data[4], 

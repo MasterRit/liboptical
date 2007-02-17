@@ -22,6 +22,7 @@
 #include "debug.h"
 #include "errors.h"
 #include "feature.h"
+#include "helpers.h"
 #include "list.h"
 #include "parsers.h"
 #include "types.h"
@@ -252,11 +253,11 @@ int optcl_parse_inquiry_data(const uint8_t *mmc_response,
 	}
 
 	if (size > 16) {
-		strncpy_s((char*)nresponse->vendor, 9, (char*)&mmc_response[8], 8);
+		xstrncpy((char*)nresponse->vendor, 9, (char*)&mmc_response[8], 8);
 	}
 
 	if (size > 32) {
-		strncpy_s((char*)nresponse->product, 17, (char*)&mmc_response[16], 16);
+		xstrncpy((char*)nresponse->product, 17, (char*)&mmc_response[16], 16);
 	}
 
 	if (size > 36) {
@@ -264,7 +265,7 @@ int optcl_parse_inquiry_data(const uint8_t *mmc_response,
 	}
 
 	if (size > 56) {
-		strncpy_s((char*)nresponse->vendor_string, 21, (char*)&mmc_response[36], 20);
+		xstrncpy((char*)nresponse->vendor_string, 21, (char*)&mmc_response[36], 20);
 	}
 
 	if (size > 56) {
