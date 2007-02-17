@@ -510,6 +510,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Windows\helpers.c"
+				>
+			</File>
+			<File
 				RelativePath=".\list.c"
 				>
 			</File>
@@ -523,6 +527,10 @@
 			</File>
 			<File
 				RelativePath=".\profile.c"
+				>
+			</File>
+			<File
+				RelativePath=".\sensedata.c"
 				>
 			</File>
 			<File
@@ -624,6 +632,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\helpers.h"
+				>
+			</File>
+			<File
 				RelativePath=".\list.h"
 				>
 			</File>
@@ -637,6 +649,10 @@
 			</File>
 			<File
 				RelativePath=".\profile.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sensedata.h"
 				>
 			</File>
 			<File
