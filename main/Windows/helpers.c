@@ -56,3 +56,12 @@ errno_t xstrncpy(char *dest, size_t dest_size, const char *src, size_t count)
 {
 	return strncpy_s(dest, dest_size, src, count);
 }
+
+/*
+ * Safe memory routines
+ */
+
+errno_t xmemcpy(void *dest, size_t dest_size, const void *src, size_t count)
+{
+	return memcpy_s(dest, dest_size, src, count);
+}
