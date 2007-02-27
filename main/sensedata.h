@@ -59,7 +59,9 @@
  */
 
 /* Parse error code from raw sense data */
-extern RESULT optcl_sensedata_get_code(const uint8_t raw_data[], uint8_t size);
+extern RESULT optcl_sensedata_get_code(const uint8_t raw_data[], 
+				       uint8_t size, 
+				       RESULT *error_code);
 
 
 #endif /* _SENSEDATA_H */

@@ -29,9 +29,12 @@
  * Sense data functions
  */
 
-RESULT optcl_sensedata_get_code(const uint8_t raw_data[], uint8_t size)
+RESULT optcl_sensedata_get_code(const uint8_t raw_data[], 
+				uint8_t size, 
+				RESULT *error_code)
 {
 	RESULT error = SUCCESS;
+
 	uint8_t asc = 0;
 	uint8_t ascq = 0;
 	uint8_t sk = 0;
@@ -39,9 +42,10 @@ RESULT optcl_sensedata_get_code(const uint8_t raw_data[], uint8_t size)
 	uint8_t response_code;
 
 	assert(raw_data != 0);
+	assert(error_code != 0);
 	assert(size > 0);
 
-	if (raw_data == 0 || size == 0) {
+	if (raw_data == 0 || error_code == 0 || size == 0) {
 		return(E_INVALIDARG);
 	}
 
@@ -101,5 +105,11 @@ RESULT optcl_sensedata_get_code(const uint8_t raw_data[], uint8_t size)
 		}
 	}
 
-	return(SUCCEEDED(error) ? MAKE_SENSE_ERROCODE(sk, asc, ascq) : error);
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	*error_code = MAKE_SENSE_ERROCODE(sk, asc, ascq);
+
+	return(SUCCESS);
 }
