@@ -637,6 +637,8 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 				    uint32_t param_size)
 {
 	RESULT error;
+	RESULT sense_code;
+
 	char *path;
 	DWORD bytes;
 	BOOL success;
@@ -732,7 +734,14 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 	}
 
 	if (sptdwb.sptd.SenseInfoLength > 0) {
-		error = optcl_sensedata_get_code(sptdwb.ucSenseBuf, sptdwb.sptd.SenseInfoLength);
+		error = optcl_sensedata_get_code(
+			sptdwb.ucSenseBuf, 
+			sptdwb.sptd.SenseInfoLength, &sense_code
+			);
+
+		if (SUCCEEDED(error)) {
+			error = sense_code;
+		}
 	}
 
 	CloseHandle(hDevice);
