@@ -80,7 +80,7 @@ RESULT optcl_debug_log_bytes(const char message[],
 		}
 	}
 
-	fprintf(stream, "%s\r\n\n", message);
+	fprintf(stream, "%s\r\n\n\n", message);
 
 	if (data != 0 && size > 0) {
 		for(i = 0; i < size; ++i) {
@@ -94,7 +94,7 @@ RESULT optcl_debug_log_bytes(const char message[],
 		fprintf(stream, "%s", "null");
 	}
 
-	fprintf(stream, "%s", "\r\n\n");
+	fprintf(stream, "%s", "\r\n\n\n");
 	fclose(stream);
 
 	return(SUCCESS);
