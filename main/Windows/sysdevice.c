@@ -19,6 +19,8 @@
 
 #include <stdafx.h>
 
+#include "sensedata.h"
+
 #include <assert.h>
 #include <malloc.h>
 #include <memory.h>
@@ -639,8 +641,6 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 	DWORD bytes;
 	BOOL success;
 	HANDLE hDevice;
-	uint8_t sense_key;
-	uint8_t response_code;
 	DWORD dwErrorCode;
 	SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER sptdwb;
 
@@ -731,15 +731,8 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 		return(error);
 	}
 
-	sense_key = 0;
-	response_code = 0;
-
 	if (sptdwb.sptd.SenseInfoLength > 0) {
-		response_code = sptdwb.ucSenseBuf[0];
-	}
-
-	if (response_code == 0x70 || response_code == 0x71) {
-		/* Fixed format sense data */
+		error = optcl_sensedata_get_code(sptdwb.ucSenseBuf, sptdwb.sptd.SenseInfoLength);
 	}
 
 	CloseHandle(hDevice);
