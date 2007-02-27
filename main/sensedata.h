@@ -22,7 +22,6 @@
 
 
 #include "errors.h"
-#include "list.h"
 #include "types.h"
 
 
@@ -54,162 +53,13 @@
 #define SENSEDATA_RESPONSE_FIXEDFORMAT_DEFERRED 0x73	/* Fixed format deferred sense data		*/
 #define SENSEDATA_RESPONSE_VENDOR_SPECIFIC	0x7F	/* Vendor specific sense data			*/
 
-/*
- * Sense data structures
- */
-
-typedef struct tag_sensedata optcl_sensedata;
-
-typedef struct tag_sensedata_descriptor {
-	uint8_t descriptor_type;
-	bool_t valid;
-
-	union tag_descriptor {
-		uint32_t information;
-		uint8_t vendor_specific[256];
-	} descriptor_data;
-
-} optcl_sensedata_descriptor;
 
 /*
  * Sense data functions
  */
 
-/* Create new sense data structure */
-extern RESULT optcl_sensedata_create(uint8_t response_code, 
-				     optcl_sensedata **sense);
+/* Parse error code from raw sense data */
+extern RESULT optcl_sensedata_get_code(const uint8_t raw_data[], uint8_t size);
 
-/* Create new sense data structure from raw data */
-extern RESULT optcl_sensedata_create_from_raw(uint8_t raw_data[], 
-					      uint8_t size, 
-					      optcl_sensedata **sense);
-
-/* Clear sense data structure  */
-extern RESULT optcl_sensedata_clear(optcl_sensedata *sense);
-
-/* Copy sense data */
-extern RESULT optcl_sensedata_copy(optcl_sensedata *dest, 
-				   const optcl_sensedata *src);
-
-/* Destroy sense data structure */
-extern RESULT optcl_sensedata_destroy(optcl_sensedata *sense);
-
-/* Get additional sense code */
-extern RESULT optcl_sensedata_get_asc(const optcl_sensedata *sense, 
-				      uint8_t *asc);
-
-/* Get additional sense code qualifier */
-extern RESULT optcl_sensedata_get_ascq(const optcl_sensedata *sense, 
-				       uint8_t *ascq);
-
-/* Get sense bytes */
-extern RESULT optcl_sensedata_get_bytes(const optcl_sensedata *sense, 
-					uint8_t **bytes);
-
-/* Get command-specific information */
-extern RESULT optcl_sensedata_get_csi(const optcl_sensedata *sense, 
-				      uint16_t *csi);
-
-/* Get sense data descriptors */
-extern RESULT optcl_sensedata_get_descriptors(const optcl_sensedata *sense, 
-					      optcl_list **descriptors);
-
-/* Get eom field */
-extern RESULT optcl_sensedata_get_eom(const optcl_sensedata *sense, 
-				      bool_t *eom);
-
-/* Get field replacable unit code */
-extern RESULT optcl_sensedata_get_fruc(const optcl_sensedata *sense, 
-				       uint8_t *fruc);
-
-/* Get filemark field  */
-extern RESULT optcl_sensedata_get_filemark(const optcl_sensedata *sense, 
-					   bool_t *filemark);
-
-/* Get ili field */
-extern RESULT optcl_sensedata_get_ili(const optcl_sensedata *sense, 
-				      bool_t *ili);
-
-/* Get information field */
-extern RESULT optcl_sensedata_get_information(const optcl_sensedata *sense, 
-					      uint16_t *information);
-
-/* Get response code */
-extern RESULT optcl_sensedata_get_response_code(const optcl_sensedata *sense, 
-						uint8_t *response_code);
-
-/* Get sense key */
-extern RESULT optcl_sensedata_get_sk(const optcl_sensedata *sense, 
-				     uint8_t *sk);
-
-/* Get sense key specific field */
-extern RESULT optcl_sensedata_get_sks(const optcl_sensedata *sense, 
-				      uint16_t *sks);
-
-/* Get sksv field */
-extern RESULT optcl_sensedata_get_sksv(const optcl_sensedata *sense, 
-				       bool_t *sksv);
-
-/* Get valid field */
-extern RESULT optcl_sensedata_get_valid(const optcl_sensedata *sense, 
-					bool_t *valid);
-
-/* Get vendor specific sense data */
-extern RESULT optcl_sensedata_get_vendor(const optcl_sensedata *sense,
-					 uint8_t **raw);
-
-/* Set additional sense code */
-extern RESULT optcl_sensedata_set_asc(optcl_sensedata *sense, uint8_t asc);
-
-/* Set additional sense code qualifier */
-extern RESULT optcl_sensedata_set_ascq(optcl_sensedata *sense, uint8_t ascq);
-
-/* Set sense bytes */
-extern RESULT optcl_sensedata_set_bytes(optcl_sensedata *sense, 
-					uint8_t *bytes);
-
-/* Set command-specific information */
-extern RESULT optcl_sensedata_set_csi(optcl_sensedata *sense, uint16_t csi);
-
-/* Set sense data descriptors */
-extern RESULT optcl_sensedata_set_descriptors(optcl_sensedata *sense, 
-					      optcl_list *descriptors);
-
-/* Set eom field */
-extern RESULT optcl_sensedata_set_eom(optcl_sensedata *sense, bool_t eom);
-
-/* Set field replacable unit code */
-extern RESULT optcl_sensedata_set_fruc(optcl_sensedata *sense, uint8_t fruc);
-
-/* Set filemark field  */
-extern RESULT optcl_sensedata_set_filemark(optcl_sensedata *sense, 
-					   bool_t filemark);
-
-/* Set ili field */
-extern RESULT optcl_sensedata_set_ili(optcl_sensedata *sense, bool_t ili);
-
-/* Set information field */
-extern RESULT optcl_sensedata_set_information(optcl_sensedata *sense, 
-					      uint16_t information);
-
-/* Set response code */
-extern RESULT optcl_sensedata_set_response_code(optcl_sensedata *sense, 
-						uint8_t response_code);
-
-/* Set sense key */
-extern RESULT optcl_sensedata_set_sk(optcl_sensedata *sense, uint8_t sk);
-
-/* Set sense key specific field */
-extern RESULT optcl_sensedata_set_sks(optcl_sensedata *sense, uint16_t sks);
-
-/* Set sksv field */
-extern RESULT optcl_sensedata_set_sksv(optcl_sensedata *sense, bool_t sksv);
-
-/* Set valid field */
-extern RESULT optcl_sensedata_set_valid(optcl_sensedata *sense, bool_t valid);
-
-/* Set vendor specific sense data */
-extern RESULT optcl_sensedata_set_vendor(optcl_sensedata *sense,
-					 uint8_t *raw);
 
 #endif /* _SENSEDATA_H */
