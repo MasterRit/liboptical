@@ -83,8 +83,9 @@ typedef int32_t RESULT;
 #define MAKE_ERRORCODE(sev, fac, code)		\
 	((RESULT)(((int32_t)(sev) << 30) | ((int32_t)(fac) << 24) | ((int32_t)(code))))
 
-#define MAKE_SENSE_ERROCODE(sk, asc, ascq)	\
-	((RESULT)(((uint32_t)(sk) << 16) | ((uint32_t)(asc) << 8) | ((uint32_t)(ascq))))
+#define MAKE_SENSE_ERROCODE(sk, asc, ascq)		\
+	MAKE_ERRORCODE(SEVERITY_ERROR, FACILITY_SENSE,	\
+	((RESULT)(((uint32_t)(sk) << 16) | ((uint32_t)(asc) << 8) | ((uint32_t)(ascq)))))
 
 
 /* General status codes */
