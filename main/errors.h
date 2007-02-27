@@ -73,9 +73,13 @@ typedef int32_t RESULT;
 
 #define IS_ERROR(e)		((bool_t)((RESULT)(e) >> 31 == SEVERITY_ERROR))
 
-#define ERROR_CODE(e)		((int16_t)((RESULT)(e) & 0x00FFFFFF))
-#define ERROR_FACILITY(e)	((int8_t)((RESULT)((e) >> 24) & 0x7F))
-#define ERROR_SEVERITY(e)	((int8_t)(((RESULT)(e) >> 31) & 0x01))
+#define ERROR_CODE(e)		((uint32_t)((RESULT)(e) & 0x00FFFFFF))
+#define ERROR_FACILITY(e)	((uint8_t)((RESULT)((e) >> 24) & 0x7F))
+#define ERROR_SEVERITY(e)	((uint8_t)(((RESULT)(e) >> 31) & 0x01))
+
+#define ERROR_SENSE_SK(e)	((uint8_t)(ERROR_CODE(e) >> 16))
+#define ERROR_SENSE_ASC(e)	((uint8_t)(ERROR_CODE(e) >> 8))
+#define ERROR_SENSE_ASCQ(e)	((uint8_t)(ERROR_CODE(e)))
 
 
 /* Error formating helper macros */
