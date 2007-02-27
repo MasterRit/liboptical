@@ -530,6 +530,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\sensedata.c"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
