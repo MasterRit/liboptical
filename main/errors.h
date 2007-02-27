@@ -74,19 +74,17 @@ typedef int32_t RESULT;
 #define IS_ERROR(e)		((bool_t)((RESULT)(e) >> 31 == SEVERITY_ERROR))
 
 #define ERROR_CODE(e)		((int16_t)((RESULT)(e) & 0x00FFFFFF))
-#define ERROR_FACILITY(e)	((int16_t)((RESULT)((e) >> 16) & 0x7F000000))
+#define ERROR_FACILITY(e)	((int8_t)((RESULT)((e) >> 24) & 0x7F))
 #define ERROR_SEVERITY(e)	((int8_t)(((RESULT)(e) >> 31) & 0x01))
 
 
 /* Error formating helper macros */
 
 #define MAKE_ERRORCODE(sev, fac, code)		\
-	((RESULT)(((int32_t)(sev) << 30)	\
-		| ((int32_t)(fac) << 24)	\
-		| ((int32_t)(code))))
+	((RESULT)(((int32_t)(sev) << 30) | ((int32_t)(fac) << 24) | ((int32_t)(code))))
 
 #define MAKE_SENSE_ERROCODE(sk, asc, ascq)	\
-	((RESULT)((uint8_t)(sk << 16) | (uint8_t)(asc << 8) | (uint8_t)(ascq)))
+	((RESULT)(((uint32_t)(sk) << 16) | ((uint32_t)(asc) << 8) | ((uint32_t)(ascq))))
 
 
 /* General status codes */
