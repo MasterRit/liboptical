@@ -85,6 +85,9 @@ typedef int32_t RESULT;
 		| ((int32_t)(fac) << 24)	\
 		| ((int32_t)(code))))
 
+#define MAKE_SENSE_ERROCODE(sk, asc, ascq)	\
+	((RESULT)((uint8_t)(sk << 16) | (uint8_t)(asc << 8) | (uint8_t)(ascq)))
+
 
 /* General status codes */
 
