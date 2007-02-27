@@ -40,6 +40,7 @@
 #define MMC_BLANK_UNCLOSE_LAST_SESSION	0x05
 #define MMC_BLANK_LAST_SESSION		0x06
 
+
 /*
  * GET CONFIGURATION command field flags
  */
@@ -47,6 +48,7 @@
 #define MMC_GET_CONFIG_RT_ALL		0x00
 #define MMC_GET_CONFIG_RT_CURRENT	0x01
 #define MMC_GET_CONFIG_RT_FROM		0x02
+
 
 /*
  * BLANK command structures
@@ -58,6 +60,7 @@ typedef struct tag_mmc_blank {
 	uint32_t start_address;
 	/* uint8_t control */
 } optcl_mmc_blank;
+
 
 /*
  * GET CONFIGURATION command structures
@@ -73,6 +76,7 @@ typedef struct tag_mmc_response_get_configuration {
 	uint16_t current_profile;
 	optcl_list *descriptors;
 } optcl_mmc_response_get_configuration;
+
 
 /*
  * INQUIRY command structures
@@ -124,21 +128,20 @@ typedef struct tag_mmc_response_inquiry {
 	uint16_t ver_desc8;
 } optcl_mmc_response_inquiry;
 
+
 /*
  * REQUEST SENSE command structures
  */
 
-typedef struct tag_mmc_request_sensedata {
+typedef struct tag_mmc_request_sense {
 	bool_t desc;
-} optcl_mmc_request_sensedata;
+} optcl_mmc_request_sense;
 
-typedef struct tag_mmc_response_request_sensedata {
-	uint8_t response_code;
+typedef struct tag_mmc_response_request_sense {
 	uint8_t sk;
 	uint8_t asc;
 	uint8_t ascq;
-	optcl_sensedata *sense_data;
-} optcl_mmc_response_request_sensedata;
+} optcl_mmc_response_request_sense;
 
 
 /*
@@ -155,5 +158,9 @@ extern RESULT optcl_command_get_configuration(const optcl_device *device,
 extern RESULT optcl_command_inquiry(const optcl_device *device, 
 				    const optcl_mmc_inquiry *command, 
 				    optcl_mmc_response_inquiry **response);
+
+extern RESULT optcl_command_request_sense(const optcl_device *device,
+					  const optcl_mmc_request_sense *command,
+					  optcl_mmc_response_request_sense **response);
 
 #endif /* _COMMAND_H */

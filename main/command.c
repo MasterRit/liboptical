@@ -37,15 +37,25 @@
  * MMC opcodes
  */
 
-#define MMC_OPCODE_BLANK	0x00a1
-#define MMC_OPCODE_INQUIRY	0x0012
-#define MMC_OPCODE_GET_CONFIG	0x0046
+#define MMC_OPCODE_BLANK		0x00A1
+#define MMC_OPCODE_INQUIRY		0x0012
+#define MMC_OPCODE_GET_CONFIG		0x0046
+#define MMC_OPCODE_REQUEST_SENSE	0x0003
 
 /*
  * Constants used throughout the code
  */
 
 #define MAX_GET_CONFIG_TRANSFER_LEN	65530
+#define MAX_SENSEDATA_LENGTH		252
+
+/*
+ * Internal types
+ */
+
+typedef uint8_t	cdb6[6];
+typedef uint8_t cdb10[10];
+typedef uint8_t cdb12[12];
 
 /*
  * Helper functions
@@ -58,7 +68,7 @@
 RESULT optcl_command_blank(const optcl_device *device,
 			   const optcl_mmc_blank *command)
 {
-	uint8_t cdb[12];
+	cdb12 cdb;
 
 	assert(device != 0);
 	assert(command != 0);
@@ -95,8 +105,9 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 {
 	RESULT error;
 	RESULT destroy_error;
+
+	cdb10 cdb;
 	uint8_t rt;
-	uint8_t cdb[10];
 	int32_t data_length;
 	uint16_t start_feature;
 	ptr_t mmc_response = 0;
@@ -237,7 +248,7 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 		data_length -= max_transfer_len;
 
 		/*
-		 * Get the next chunk of data
+		 * Execute command to get next chunk of data
 		 */
 
 		cdb[1] = rt;
@@ -349,7 +360,8 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 {
 	RESULT error;
 	RESULT destroy_error;
-	uint8_t cdb[6];
+
+	cdb6 cdb;
 	ptr_t mmc_response = 0;
 	uint32_t alignment_mask;
 	optcl_adapter *adapter;
@@ -429,6 +441,10 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 		return(E_OUTOFMEMORY);
 	}
 
+	/*
+	 * Execute command
+	 */
+
 	/* Get standard inquiry data */
 	error = optcl_device_command_execute(
 		device, 
@@ -452,4 +468,103 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 	free_aligned(mmc_response);
 
 	return(error);
+}
+
+RESULT optcl_command_request_sense(const optcl_device *device,
+				   const optcl_mmc_request_sense *command,
+				   optcl_mmc_response_request_sense **response)
+{
+	RESULT error;
+	RESULT sense_code;
+	RESULT destroy_error;
+	
+	cdb6 cdb;
+	uint32_t alignment;
+	ptr_t mmc_response = 0;
+	optcl_adapter *adapter = 0;
+	optcl_mmc_response_request_sense *nresponse = 0;
+
+	assert(device != 0);
+	assert(command != 0);
+	assert(response != 0);
+
+	if (device == 0 || command == 0 || response == 0) {
+		return(E_INVALIDARG);
+	}
+
+	error = optcl_device_get_adapter(device, &adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	assert(adapter != 0);
+
+	if (adapter == 0) {
+		return(E_POINTER);
+	}
+
+	error = optcl_adapter_get_alignment_mask(adapter, &alignment);
+
+	if (FAILED(error)) {
+		destroy_error = optcl_adapter_destroy(adapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	error = optcl_adapter_destroy(adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_REQUEST_SENSE;
+	cdb[1] = (uint8_t)command->desc;
+	cdb[4] = MAX_SENSEDATA_LENGTH;
+
+	mmc_response = malloc_aligned(MAX_SENSEDATA_LENGTH, alignment);
+
+	if (mmc_response == 0) {
+		return(E_OUTOFMEMORY);
+	}
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		mmc_response,
+		MAX_SENSEDATA_LENGTH
+		);
+
+	if (FAILED(error)) {
+		free_aligned(mmc_response);
+		return(error);
+	}
+
+	error = optcl_sensedata_get_code(mmc_response, MAX_SENSEDATA_LENGTH, &sense_code);
+
+	free_aligned(mmc_response);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	nresponse = malloc(sizeof(optcl_mmc_response_request_sense));
+
+	if (nresponse == 0) {
+		return(E_OUTOFMEMORY);
+	}
+
+	nresponse->asc = ERROR_SENSE_ASC(sense_code);
+	nresponse->ascq = ERROR_SENSE_ASCQ(sense_code);
+	nresponse->sk = ERROR_SENSE_SK(sense_code);
+
+	*response = nresponse;
+
+	return(SUCCESS);
 }
