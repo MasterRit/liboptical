@@ -20,20 +20,23 @@
 #ifndef _ERRORS_H
 #define _ERRORS_H
 
+
 #include "types.h"
+
 
 /* Error code data type */
 
 typedef int32_t RESULT;
+
 
 /*
  *  Values are 32 bit values layed out as follows:
  *
  *   3 3 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1
  *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
- *  +-+-+-+-+-----------------------+-------------------------------+
- *  |S|R|C|R|     Facility          |               Code            |
- *  +-+-+-+-+-----------------------+-------------------------------+
+ *  +-+-------------+-----------------------------------------------+
+ *  |S|   Facility  |                     Code                      |
+ *  +-+-------------+-----------------------------------------------+
  *
  *  where
  *
@@ -42,28 +45,26 @@ typedef int32_t RESULT;
  *          0 - Success
  *          1 - Fail
  *
- *      C - is the OEM code flag
- *
- *      R - is a reserved bit
- *
  *      Facility - is the facility code
  *
  *      Code - is the facility's status code
  */
+
 
 /* Severity codes */
 
 #define SEVERITY_ERROR		0
 #define SEVERITY_SUCCESS	1
 
+
 /* Facility codes */
 
 #define FACILITY_GENERAL	0
 #define FACILITY_DEVICE		1
-#define FACILITY_TRANSPORT	2
-#define FACILITY_COLLECTIONS	3
-#define FACILITY_FEATURES	4
+#define FACILITY_COLLECTIONS	2
+#define FACILITY_FEATURES	3
 #define FACILITY_SENSE		2048
+
 
 /* Error status testing macros */
 
@@ -72,20 +73,23 @@ typedef int32_t RESULT;
 
 #define IS_ERROR(e)		((bool_t)((RESULT)(e) >> 31 == SEVERITY_ERROR))
 
-#define ERROR_CODE(e)		((int16_t)((RESULT)(e) & 0xFFFF))
-#define ERROR_FACILITY(e)	((int16_t)((RESULT)((e) >> 16) & 0x1fff))
+#define ERROR_CODE(e)		((int16_t)((RESULT)(e) & 0x00FFFFFF))
+#define ERROR_FACILITY(e)	((int16_t)((RESULT)((e) >> 16) & 0x7F000000))
 #define ERROR_SEVERITY(e)	((int8_t)(((RESULT)(e) >> 31) & 0x01))
+
 
 /* Error formating helper macros */
 
 #define MAKE_ERRORCODE(sev, fac, code)		\
 	((RESULT)(((int32_t)(sev) << 30)	\
-		| ((int32_t)(fac) << 16)	\
+		| ((int32_t)(fac) << 24)	\
 		| ((int32_t)(code))))
+
 
 /* General status codes */
 
 #define SUCCESS			((RESULT)(1 << 31))
+
 
 /* General error codes */
 
@@ -113,6 +117,7 @@ typedef int32_t RESULT;
 #define E_POINTER		\
 	MAKE_ERRORCODE(SEVERITY_ERROR, FACILITY_GENERAL, 7)
 
+
 /* FACILITY_DEVICE error codes */
 
 #define E_DEVUNKNFEATURE	\
@@ -130,12 +135,12 @@ typedef int32_t RESULT;
 #define E_DEVNOMOREDATA		\
 	MAKE_ERRORCODE(SEVERITY_ERROR, FACILITY_DEVICE, 259)
 
-/* FACILITY_TRANSPORT error codes */
 
 /* FACILITY_COLLECTIONS error codes */
 
 #define E_COLLINVLDHASHTABLE	\
 	MAKE_ERRORCODE(SEVERITY_ERROR, FACILITY_COLLECTIONS, 0)
+
 
 /* FACILITY_FEATURES error codes */
 
@@ -148,9 +153,11 @@ typedef int32_t RESULT;
 #define E_FEATUNKCODE		\
 	MAKE_ERRORCODE(SEVERITY_ERROR, FACILITY_FEATURES, 2)
 
+
 /* FACILITY_SENSE error codes */
 
 #define E_INVALIDRESPONSECODE	\
 	MAKE_ERRORCODE(SEVERITY_ERROR, FACILITY_SENSE, 0)
+
 
 #endif /* _ERRORS_H */
