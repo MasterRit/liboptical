@@ -62,7 +62,7 @@
 
 
 /*
- * Unit attention sense data error codes
+ * Unit attention error codes
  */
 
 /* Not ready to ready change, medium may have changed */
@@ -178,7 +178,7 @@
 
 
 /*
- * CDB or parameter validation sense data error codes
+ * CDB or parameter validation error codes
  */
 
 /* Parameter list length error */
@@ -219,7 +219,7 @@
 
 
 /*
- * Readiness sense data error codes
+ * Readiness error codes
  */
 
 /* Logical unit not ready, cause not reportable */
@@ -250,10 +250,16 @@
 #define E_SENSE_DIEW		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_NOT_READY, 0x0C, 0x0F)
 
 /* Incompatible medium installed */
-#define E_SENSE_IMI		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_NOT_READY, 0x30, 0x00)
+#define E_SENSE_IMI_2		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_NOT_READY, 0x30, 0x00)
+
+/* Incompatible medium installed */
+#define E_SENSE_IMI_5		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x30, 0x00)
 
 /* Cannot read medium - unknown format */
-#define E_SENSE_CRM_UF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_NOT_READY, 0x30, 0x01)
+#define E_SENSE_CRM_UF_2	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_NOT_READY, 0x30, 0x01)
+
+/* Cannot read medium - unknown format */
+#define E_SENSE_CRM_UF_5	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x30, 0x01)
 
 /* Cannot read medium - incompatible format */
 #define E_SENSE_CRM_IF_2	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_NOT_READY, 0x30, 0x02)
@@ -262,7 +268,10 @@
 #define E_SENSE_CRM_IF_5	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x30, 0x02)
 
 /* Cleaning cartridge installed */
-#define E_SENSE_CCI		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_NOT_READY, 0x30, 0x03)
+#define E_SENSE_CCI_2		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_NOT_READY, 0x30, 0x03)
+
+/* Cleaning cartridge installed */
+#define E_SENSE_CCI_5		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x30, 0x03)
 
 /* Cannot write medium - unknown format */
 #define E_SENSE_CWM_UF_2	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_NOT_READY, 0x30, 0x04)
@@ -283,7 +292,10 @@
 #define E_SENSE_CFM_IM_5	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x30, 0x06)
 
 /* Cleaning failure */
-#define E_SENSE_CF		MAKE_SENSE_ERRORCODE(SENSEDAT_SK_NOT_READY, 0x30, 0x07)
+#define E_SENSE_CF_2		MAKE_SENSE_ERRORCODE(SENSEDAT_SK_NOT_READY, 0x30, 0x07)
+
+/* Cleaning failure */
+#define E_SENSE_CF_5		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x30, 0x07)
 
 /* Cannot write medium - unsupported medium version */
 #define E_SENSE_CWM_UMV_2	MAKE_SENSE_ERRORCODE(SENSEDAT_SK_NOT_READY, 0x30, 0x11)
@@ -305,7 +317,7 @@
 
 
 /*
- * Protocol sense data error codes
+ * Protocol error codes
  */
 
 /* Command sequence error */
@@ -373,6 +385,47 @@
 
 /* No more track reservations allowed */
 #define E_SENSE_NMTRA		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x72, 0x05)
+
+
+/*
+ * General media access errors
+ */
+
+/* No reference position found */
+#define E_SENSE_NRPF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x06, 0x00)
+
+/* Track following error */
+#define E_SENSE_TFE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x09, 0x00)
+
+/* Tracking servo failure */
+#define E_SENSE_TSF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x09, 0x01)
+
+/* Focus servo failure */
+#define E_SENSE_FSF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x09, 0x02)
+
+/* Spindle servo failure */
+#define E_SENSE_SSF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x09, 0x03)
+
+/* Random positioning error */
+#define E_SENSE_RPE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x15, 0x00)
+
+/* Mechanical positioning error */
+#define E_SENSE_MPE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x15, 0x01)
+
+/* Medium format corrupted */
+#define E_SENSE_MFC		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x31, 0x00)
+
+/* Format command failed */
+#define E_SENSE_FCF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x31, 0x01)
+
+/* Zoned formatting failed due to spare linking */
+#define E_SENSE_ZFFDTSL		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x31, 0x02)
+
+/* Unable to recover table-of-contents */
+#define E_SENSE_UTRTOC		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x57, 0x00)
+
+/* CD control error */
+#define E_SENSE_CDCE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x73, 0x00)
 
 
 /*
