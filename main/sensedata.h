@@ -429,6 +429,97 @@
 
 
 /*
+ * Reading error codes
+ */
+
+/* Unrecovered read error */
+#define E_SENSE_URE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x11, 0x00)
+
+/* Read retries exhausted */
+#define E_SENSE_RRE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x11, 0x01)
+
+/* Error too long to correct */
+#define E_SENSE_ETLTC		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x11, 0x02)
+
+/* L-EC uncorrectable error */
+#define E_SENSE_LECUE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x11, 0x05)
+
+/* CIRC unrecovered error */
+#define E_SENSE_CIRCUE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x11, 0x06)
+
+/* Error reading UPC/EAN number */
+#define E_SENSE_ER_UPC_EAN_N	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x11, 0x0F)
+
+/* Error reading ISRC number */
+#define E_SENSE_ER_ISRC_N	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x11, 0x10)
+
+/* Read error - loss of streaming */
+#define E_SENSE_RE_LOS		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ABORTED_COMMAND, 0x11, 0x11)
+
+/* Random positioning error */
+#define E_SENSE_RPE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x15, 0x00)
+
+/* Mechanical positioning error */
+#define E_SENSE_MPE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x15, 0x01)
+
+/* Positioning error detected by read of medium */
+#define E_SENSE_PEDBROM		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x15, 0x02)
+
+/* Recovered data with no error correction applied */
+#define E_SENSE_RDWNECA		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x17, 0x00)
+
+/* Recovered data with retries */
+#define E_SENSE_RDWR		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x17, 0x01)
+
+/* Recovered data with positive head offset */
+#define E_SENSE_RDWPHO		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x17, 0x02)
+
+/* Recovered data with negative head offset */
+#define E_SENSE_RDWNHO		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x17, 0x03)
+
+/* Recovered data with retries and/or CIRC applied */
+#define E_SENSE_RDWRAOCIRCA	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x17, 0x04)
+
+/* Recovered data using previous sector ID */
+#define E_SENSE_RDUPSID		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x17, 0x05)
+
+/* Recovered data without ECC - recommend reassignment */
+#define E_SENSE_RDWOECC_RR	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x17, 0x07)
+
+/* Recovered data without ECC - recommend rewrite */
+#define E_SENSE_RDWOECC_RRW	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x17, 0x08)
+
+/* Recovered data without ECC - data rewritten */
+#define E_SENSE_RDWOECC_DRW	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x17, 0x09)
+
+/* Recovered data with error correction applied */
+#define E_SENSE_RDWECA		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x18, 0x00)
+
+/* Recovered data with error correction and retries applied */
+#define E_SENSE_RDWECARA	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x18, 0x01)
+
+/* Recovered data - data auto-reallocated */
+#define E_SENSE_RD_DAR		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x18, 0x02)
+
+/* Recovered data with CIRC */
+#define E_SENSE_RDWCIRC		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x18, 0x03)
+
+/* Recovered data with L-EC */
+#define E_SENSE_RDWLEC		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x18, 0x04)
+
+/* Recovered data - recommend reassignment */
+#define E_SENSE_RD_RR		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x18, 0x05)
+
+/* Recovered data - recommend rewrite */
+#define E_SENSE_RD_RRW		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x18, 0x06)
+
+/* Recovered data with linking */
+#define E_SENSE_RDWL		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x18, 0x08)
+
+/* Blank check */
+#define E_SENSE_BLANKCHECK	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_BLANK_CHECK, 0x00, 0x00)
+
+/*
  * Sense data functions
  */
 
