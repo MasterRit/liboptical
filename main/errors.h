@@ -87,7 +87,7 @@ typedef int32_t RESULT;
 #define MAKE_ERRORCODE(sev, fac, code)		\
 	((RESULT)(((int32_t)(sev) << 30) | ((int32_t)(fac) << 24) | ((int32_t)(code))))
 
-#define MAKE_SENSE_ERROCODE(sk, asc, ascq)		\
+#define MAKE_SENSE_ERRORCODE(sk, asc, ascq)		\
 	MAKE_ERRORCODE(SEVERITY_ERROR, FACILITY_SENSE,	\
 	((RESULT)(((uint32_t)(sk) << 16) | ((uint32_t)(asc) << 8) | ((uint32_t)(ascq)))))
 
@@ -163,7 +163,7 @@ typedef int32_t RESULT;
 /* FACILITY_SENSE error codes */
 
 #define E_INVALIDRESPONSECODE	\
-	MAKE_SENSE_ERROCODE(0x1E, 0xFF, 0xFF)
+	MAKE_SENSE_ERRORCODE(0x1E, 0xFF, 0xFF)
 
 
 #endif /* _ERRORS_H */
