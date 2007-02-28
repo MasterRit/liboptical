@@ -217,8 +217,9 @@
 /* Threshold parameters not supported */
 #define E_SENSE_TPNS		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x26, 0x03)
 
+
 /*
- * Readiness error codes
+ * Readiness sense data error codes
  */
 
 /* Logical unit not ready, cause not reportable */
@@ -301,6 +302,77 @@
 
 /* Logical unit has not self-configured yet */
 #define E_SENSE_LUHNSCY		MAKE_SENSE_ERRORCODE(SENSEDAT_SK_NOT_READY, 0x3E, 0x00)
+
+
+/*
+ * Protocol sense data error codes
+ */
+
+/* Command sequence error */
+#define E_SENSE_CSE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x2C, 0x00)
+
+/* Current program area is not empty */
+#define E_SENSE_CPAINE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x2C, 0x03)
+
+/* Current program area is empty */
+#define E_SENSE_CPAIE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x2C, 0x04)
+
+/* Cannot write - application code mismatch */
+#define E_SENSE_CW_ACM		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x30, 0x08)
+
+/* Current session not fixated for append */
+#define E_SENSE_CSNFFA		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x30, 0x09)
+
+/* Medium not formatted */
+#define E_SENSE_MNF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x30, 0x10)
+
+/* Saving parameters not supported */
+#define E_SENSE_SPNS		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x39, 0x00)
+
+/* Invalid bits in identify message */
+#define E_SENSE_IBIIM		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x3D, 0x00)
+
+/* Message error */
+#define E_SENSE_ME		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x43, 0x00)
+
+/* Medium removal prevented */
+#define E_SENSE_MRP		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x53, 0x02)
+
+/* Illegal mode for this track */
+#define E_SENSE_IMFTT		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x64, 0x00)
+
+/* Invalid packet size */
+#define E_SENSE_IPS		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x64, 0x01)
+
+/* Copy protection key exchange failure - authentication failure */
+#define E_SENSE_CPKEF_AF	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x6F, 0x00)
+
+/* Copy protection key exchange failure - key not present */
+#define E_SENSE_CPKEF_KNP	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x6F, 0x01)
+
+/* Copy protection key exchange failure - key not established */
+#define E_SENSE_CPKEF_KNE	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x6F, 0x02)
+
+/* Read of scrambled sector without authentication */
+#define E_SENSE_ROSSWA		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x6F, 0x03)
+
+/* Media region code is mismatched to logical unit region */
+#define E_SENSE_MRCIMTLUR	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x6F, 0x04)
+
+/* Logical unit region must be permanent, region reset count error */
+#define E_SENSE_LURMBP_RRCE	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x6F, 0x05)
+
+/* Insufficient block count for binding nonce recording */
+#define E_SENSE_IBCFBNR		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x6F, 0x06)
+
+/* Conflict in binding nonce recording */
+#define E_SENSE_CIBNR		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x6F, 0x07)
+
+/* Empty or partially written reserved track */
+#define E_SENSE_EOPWRT		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x72, 0x04)
+
+/* No more track reservations allowed */
+#define E_SENSE_NMTRA		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x72, 0x05)
 
 
 /*
