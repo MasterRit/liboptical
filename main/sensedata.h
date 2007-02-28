@@ -519,6 +519,134 @@
 /* Blank check */
 #define E_SENSE_BLANKCHECK	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_BLANK_CHECK, 0x00, 0x00)
 
+
+/*
+ * Writing error codes
+ */
+
+/* Write error */
+#define E_SENSE_WE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x0C, 0x00)
+
+/* Write error - recovery needed */
+#define E_SENSE_WE_RN		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x0C, 0x07)
+
+/* Write error - recovery failed */
+#define E_SENSE_WE_RF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x0C, 0x08)
+
+/* Write error - loss of streaming */
+#define E_SENSE_WE_LOS		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x0C, 0x09)
+
+/* Write error - padding blocks added */
+#define E_SENSE_WE_PBA		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x0C, 0x0A)
+
+/* Write protected */
+#define E_SENSE_WP		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_DATA_PROTECT, 0x27, 0x00)
+
+/* Hardware write protected */
+#define E_SENSE_HWWP		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_DATA_PROTECT, 0x27, 0x01)
+
+/* Logical unit software write protected */
+#define E_SENSE_LUSWP		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_DATA_PROTECT, 0x27, 0x02)
+
+/* Associated write protect */
+#define E_SENSE_AWP		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_DATA_PROTECT, 0x27, 0x03)
+
+/* Persistent write protect */
+#define E_SENSE_PWP		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_DATA_PROTECT, 0x27, 0x04)
+
+/* Permanent write protect */
+#define E_SENSE_PERMWP		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_DATA_PROTECT, 0x27, 0x05)
+
+/* Conditional write protect */
+#define E_SENSE_CWP		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_DATA_PROTECT, 0x27, 0x06)
+
+/* No defect spare location available */
+#define E_SENSE_NDSLA		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x32, 0x00)
+
+/* Erase failure */
+#define E_SENSE_EF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x51, 0x00)
+
+/* Erase failure - incomplete erase operation detected */
+#define E_SENSE_EF_IEOD		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x51, 0x01)
+
+/* Failure prediction threshold exceeded */
+#define E_SENSE_FPTE_1		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x5D, 0x00)
+
+/* Failure prediction threshold exceeded */
+#define E_SENSE_FPTE_3		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x5D, 0x00)
+
+/* Media failure prediction threshold exceeded */
+#define E_SENSE_MFPTE_1		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x5D, 0x01)
+
+/* Media failure prediction threshold exceeded */
+#define E_SENSE_MFPTE_3		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x5D, 0x01)
+
+/* Logical unit failure prediction threshold exceeded */
+#define E_SENSE_LUFPTE_1	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x5D, 0x02)
+
+/* Logical unit failure prediction threshold exceeded */
+#define E_SENSE_LUFPTE_3	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x5D, 0x02)
+
+/* Failure prediction threshold exceeded - predicted spare area exhaustion */
+#define E_SENSE_FPTE_PSAE_1	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x5D, 0x03)
+
+/* Failure prediction threshold exceeded - predicted spare area exhaustion */
+#define E_SENSE_FPTE_PSAE_3	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x5D, 0x03)
+
+/* Failure prediction threshold exceeded (FALSE) */
+#define E_SENSE_FPTE_FALSE	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x5D, 0xFF)
+
+/* Session fixation error */
+#define E_SENSE_SFE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x72, 0x00)
+
+/* Session fixation error writing lead-in */
+#define E_SENSE_SFEWLEADIN	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x72, 0x01)
+
+/* Session fixation error writing lead-out */
+#define E_SENSE_SFEWLEADOUT	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x72, 0x02)
+
+/* Session fixation error - incomplete track in session */
+#define E_SENSE_SFE_ITIS	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x72, 0x03)
+
+/* Empty or partially written reserved track */
+#define E_SENSE_EOPWRT		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x72, 0x04)
+
+/* No more track reservations allowed */
+#define E_SENSE_NMTRA		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x72, 0x05)
+
+/* RMZ extension is not allowed */
+#define E_SENSE_RMZINA		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x72, 0x06)
+
+/* No more test zone extensions are allowed */
+#define E_SENSE_NMTZEAA		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x72, 0x07)
+
+/* Power calibration area almost full */
+#define E_SENSE_PCAAF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x73, 0x01)
+
+/* Power calibration area full */
+#define E_SENSE_PCAF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x73, 0x02)
+
+/* Power calibration area error */
+#define E_SENSE_PCAE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x73, 0x03)
+
+/* Program memory area update failure */
+#define E_SENSE_PMAUF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x73, 0x04)
+
+/* Program memory area is full */
+#define E_SENSE_PMAIF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x73, 0x05)
+
+/* RMA/PMA is almost full */
+#define E_SENSE_RMA_PMA_IAF	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x73, 0x06)
+
+/* Current power calibration area is almost full */
+#define E_SENSE_CPCAIAF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x73, 0x10)
+
+/* Current power calibration area is full */
+#define E_SENSE_CPCAIF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x73, 0x11)
+
+/* RDZ is full */
+#define E_SENSE_RDZIF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x73, 0x17)
+
 /*
  * Sense data functions
  */
