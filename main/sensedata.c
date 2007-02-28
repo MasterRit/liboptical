@@ -109,7 +109,7 @@ RESULT optcl_sensedata_get_code(const uint8_t raw_data[],
 		return(error);
 	}
 
-	*error_code = MAKE_SENSE_ERROCODE(sk, asc, ascq);
+	*error_code = MAKE_SENSE_ERRORCODE(sk, asc, ascq);
 
 	return(SUCCESS);
 }
