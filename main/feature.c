@@ -3220,6 +3220,7 @@ static struct feature_sizes_entry __feature_table[] = {
 	{ FEATURE_VCPS,				sizeof(optcl_feature_vcps),			parse_vcps				}
 };
 
+
 /*
  * Table of feature helper functions
  */
@@ -3271,3 +3272,4 @@ static raw_feature_parser get_feature_parser(uint16_t feature_code)
 
 	return(__feature_table[i].parser);
 }
+	
