@@ -20,10 +20,28 @@
 #include <stdafx.h>
 
 #include "errors.h"
+#include "helpers.h"
 #include "sensedata.h"
 #include "types.h"
 
 #include <assert.h>
+
+
+/*
+ * Internal structures
+ */
+
+struct error_code_entry {
+	RESULT error_code;
+	char *message;
+};
+
+
+/*
+ * Forward declarations
+ */
+
+static char* get_error_message(RESULT error_code);
 
 /*
  * Sense data functions
@@ -112,4 +130,72 @@ RESULT optcl_sensedata_get_code(const uint8_t raw_data[],
 	*error_code = MAKE_SENSE_ERRORCODE(sk, asc, ascq);
 
 	return(SUCCESS);
+}
+
+RESULT optcl_sensedata_get_formatted_msg(RESULT error_code,
+					 char **message)
+{
+	char *msg = 0;
+
+	assert(message != 0);
+
+	if (message == 0) {
+		return(E_INVALIDARG);
+	}
+
+	msg = get_error_message(error_code);
+
+	if (msg == 0) {
+		return(E_OUTOFRANGE);
+	}
+
+	*message = xstrdup(msg);
+
+	if (*message == 0) {
+		return(E_OUTOFMEMORY);
+	}
+
+	return(SUCCESS);
+}
+
+
+/*
+ * Error messages table
+ */
+
+static struct error_code_entry __message_entries[] = {
+
+	/* Unit attention error codes */
+
+	{ E_SENSE_NRTRC_MMHC,		"Not ready to ready change, medium may have changed" }
+
+};
+
+
+/*
+ * Helper functions
+ */
+
+static char* get_error_message(RESULT error_code)
+{
+	int i;
+	int elements;
+
+	elements = sizeof(__message_entries) / sizeof(__message_entries[0]);
+
+	i = 0;
+
+	while (i < elements) {
+		if (__message_entries[i].error_code == error_code) {
+			break;
+		}
+
+		++i;
+	}
+
+	if (i == elements) {
+		return(0);
+	}
+
+	return(__message_entries[i].message);
 }

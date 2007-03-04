@@ -66,7 +66,7 @@
  */
 
 /* Not ready to ready change, medium may have changed */
-#define E_SENSE_NRTRC_MMHC	MAKE_SENSE_ERROCODE(SENSEDATA_SK_UNIT_ATTENTION, 0x28, 0x00)
+#define E_SENSE_NRTRC_MMHC	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_UNIT_ATTENTION, 0x28, 0x00)
 
 /* Import or export element accessed */
 #define E_SENSE_IOEEA		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_UNIT_ATTENTION, 0x28, 0x01)
@@ -856,6 +856,10 @@
 extern RESULT optcl_sensedata_get_code(const uint8_t raw_data[], 
 				       uint8_t size, 
 				       RESULT *error_code);
+
+/* Format error code message */
+extern RESULT optcl_sensedata_get_formatted_msg(RESULT error_code,
+						char **message);
 
 
 #endif /* _SENSEDATA_H */
