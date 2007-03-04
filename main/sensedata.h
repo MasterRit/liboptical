@@ -29,34 +29,34 @@
  * Sense response codes
  */
 
-#define SENSEDATA_RESPONSE_DESCFORMAT		0x70	/* Descriptor format sense data			*/
-#define SENSEDATA_RESPONSE_DESCFORMAT_DEFFERED	0x71	/* Descriptor format deferred sense data	*/
-#define SENSEDATA_RESPONSE_FIXEDFORMAT		0x72	/* Fixed format sense data			*/
-#define SENSEDATA_RESPONSE_FIXEDFORMAT_DEFERRED 0x73	/* Fixed format deferred sense data		*/
-#define SENSEDATA_RESPONSE_VENDOR_SPECIFIC	0x7F	/* Vendor specific sense data			*/
+#define SENSEDATA_RESPONSE_DESCFORMAT			0x70	/* Descriptor format sense data			*/
+#define SENSEDATA_RESPONSE_DESCFORMAT_DEFFERED		0x71	/* Descriptor format deferred sense data	*/
+#define SENSEDATA_RESPONSE_FIXEDFORMAT			0x72	/* Fixed format sense data			*/
+#define SENSEDATA_RESPONSE_FIXEDFORMAT_DEFERRED		0x73	/* Fixed format deferred sense data		*/
+#define SENSEDATA_RESPONSE_VENDOR_SPECIFIC		0x7F	/* Vendor specific sense data			*/
 
 
 /*
  * Sense keys
  */
 
-#define SENSEDATA_SK_NO_SENSE		0x00
-#define SENSEDATA_SK_RECOVERED_ERROR	0x01
-#define SENSEDATA_SK_NOT_READY		0x02
-#define SENSEDATA_SK_MEDIUM_ERROR	0x03
-#define SENSEDATA_SK_HARDWARE_ERROR	0x04
-#define SENSEDATA_SK_ILLEGAL_REQUEST	0x05
-#define SENSEDATA_SK_UNIT_ATTENTION	0x06
-#define SENSEDATA_SK_DATA_PROTECT	0x07
-#define SENSEDATA_SK_BLANK_CHECK	0x08
-#define SENSEDATA_SK_VENDOR_SPECIFIC	0x09
-#define SENSEDATA_SK_COPY_ABORTED	0x0A
-#define SENSEDATA_SK_ABORTED_COMMAND	0x0B
+#define SENSEDATA_SK_NO_SENSE			0x00
+#define SENSEDATA_SK_RECOVERED_ERROR		0x01
+#define SENSEDATA_SK_NOT_READY			0x02
+#define SENSEDATA_SK_MEDIUM_ERROR		0x03
+#define SENSEDATA_SK_HARDWARE_ERROR		0x04
+#define SENSEDATA_SK_ILLEGAL_REQUEST		0x05
+#define SENSEDATA_SK_UNIT_ATTENTION		0x06
+#define SENSEDATA_SK_DATA_PROTECT		0x07
+#define SENSEDATA_SK_BLANK_CHECK		0x08
+#define SENSEDATA_SK_VENDOR_SPECIFIC		0x09
+#define SENSEDATA_SK_COPY_ABORTED		0x0A
+#define SENSEDATA_SK_ABORTED_COMMAND		0x0B
 
 /* 0x0C Obsolete */
 
-#define SENSEDATA_SK_VOLUME_OVERFLOW	0x0D
-#define SENSEDATA_SK_MISCOMPARE		0x0E
+#define SENSEDATA_SK_VOLUME_OVERFLOW		0x0D
+#define SENSEDATA_SK_MISCOMPARE			0x0E
 
 /* 0x0F Reserved */
 
@@ -74,16 +74,16 @@
 /* Format - layer may have changed */
 #define E_SENSE_FLMHC		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_UNIT_ATTENTION, 0x28, 0x02)
 
-/* Power on, reset, or bus device reset occured */
+/* Power on, reset, or bus device reset occurred */
 #define E_SENSE_POROBDRO	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_UNIT_ATTENTION, 0x29, 0x00)
 
-/* Power on occured */
+/* Power on occurred */
 #define E_SENSE_POO		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_UNIT_ATTENTION, 0x29, 0x01)
 
-/* Bus reset occured */
+/* Bus reset occurred */
 #define E_SENSE_BRO		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_UNIT_ATTENTION, 0x29, 0x02)
 
-/* Bus device reset function occured */
+/* Bus device reset function occurred */
 #define E_SENSE_BDRFO		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_UNIT_ATTENTION, 0x29, 0x03)
 
 /* Device internal reset */
@@ -244,7 +244,7 @@
 #define E_SENSE_LUNR_LWIP	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_NOT_READY, 0x04, 0x08)
 
 /* Write error recovery needed */
-#define E_SENSE_WERN		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_NOT_READY, 0x0C, 0x07)
+#define E_SENSE_WE_RN		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_NOT_READY, 0x0C, 0x07)
 
 /* Defects in error window */
 #define E_SENSE_DIEW		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_NOT_READY, 0x0C, 0x0F)
@@ -407,10 +407,10 @@
 #define E_SENSE_SSF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x09, 0x03)
 
 /* Random positioning error */
-#define E_SENSE_RPE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x15, 0x00)
+#define E_SENSE_RPE_3		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x15, 0x00)
 
 /* Mechanical positioning error */
-#define E_SENSE_MPE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x15, 0x01)
+#define E_SENSE_MPE_3		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x15, 0x01)
 
 /* Medium format corrupted */
 #define E_SENSE_MFC		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x31, 0x00)
@@ -455,12 +455,6 @@
 
 /* Read error - loss of streaming */
 #define E_SENSE_RE_LOS		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ABORTED_COMMAND, 0x11, 0x11)
-
-/* Random positioning error */
-#define E_SENSE_RPE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x15, 0x00)
-
-/* Mechanical positioning error */
-#define E_SENSE_MPE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x15, 0x01)
 
 /* Positioning error detected by read of medium */
 #define E_SENSE_PEDBROM		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x15, 0x02)
@@ -525,10 +519,7 @@
  */
 
 /* Write error */
-#define E_SENSE_WE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x0C, 0x00)
-
-/* Write error - recovery needed */
-#define E_SENSE_WE_RN		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x0C, 0x07)
+#define E_SENSE_WE_3		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x0C, 0x00)
 
 /* Write error - recovery failed */
 #define E_SENSE_WE_RF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x0C, 0x08)
@@ -564,10 +555,10 @@
 #define E_SENSE_NDSLA		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x32, 0x00)
 
 /* Erase failure */
-#define E_SENSE_EF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x51, 0x00)
+#define E_SENSE_ERASEF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x51, 0x00)
 
 /* Erase failure - incomplete erase operation detected */
-#define E_SENSE_EF_IEOD		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x51, 0x01)
+#define E_SENSE_ERASEF_IEOD	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x51, 0x01)
 
 /* Failure prediction threshold exceeded */
 #define E_SENSE_FPTE_1		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x5D, 0x00)
@@ -623,8 +614,8 @@
 /* Power calibration area almost full */
 #define E_SENSE_PCAAF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x73, 0x01)
 
-/* Power calibration area full */
-#define E_SENSE_PCAF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x73, 0x02)
+/* Power calibration area is full */
+#define E_SENSE_PCAIF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x73, 0x02)
 
 /* Power calibration area error */
 #define E_SENSE_PCAE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x73, 0x03)
@@ -646,6 +637,216 @@
 
 /* RDZ is full */
 #define E_SENSE_RDZIF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x73, 0x17)
+
+
+/*
+ * Hardware failure codes
+ */
+
+/* Cleaning requested */
+#define E_SENSE_CR		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x00, 0x17)
+
+/* Logical unit does not respond to selection */
+#define E_SENSE_LUDNRTS		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x05, 0x00)
+
+/* Logical unit communication failure */
+#define E_SSENSE_LUCF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x08, 0x00)
+
+/* Logical unit communication timeout */
+#define E_SENSE_LUCT		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x08, 0x01)
+
+/* Logical unit communication parity error */
+#define E_SENSE_LUCPE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x08, 0x02)
+
+/* Logical unit communication CRC error (Ultra-DMA/32) */
+#define E_SENSE_LUCCRCEUDMA32	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x08, 0x03)
+
+/* Head select fault */
+#define E_SENSE_HSF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x09, 0x04)
+
+/* Random positioning error */
+#define E_SENSE_RPE_4		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x15, 0x00)
+
+/* Mechanical positioning error */
+#define E_SENSE_MPE_4		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x15, 0x01)
+
+/* Synchronous data transfer error */
+#define E_SENSE_SDTE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x1B, 0x00)
+
+/* Mechanical positioning or changer error */
+#define E_SENSE_MPOCE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x3B, 0x16)
+
+/* Logical unit failure */
+#define E_SENSE_LUF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x3E, 0x01)
+
+/* Timeout on logical unit */
+#define E_SENSE_TOLU		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x3E, 0x02)
+
+/* Diagnostic failure on component NN (0x80 - 0xFF) */
+#define E_SENSE_DFOCNN		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x40, 0xFF)
+
+/* Internal target failure */
+#define E_SENSE_ITF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x44, 0x00)
+
+/* Unsuccessful soft reset */
+#define E_SENSE_USR		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x46, 0x00)
+
+/* SCSI parity error */
+#define E_SENSE_SCSIPE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x47, 0x00)
+
+/* Command phase error */
+#define E_SENSE_CPE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x4A, 0x00)
+
+/* Data phase error */
+#define E_SENSE_DPE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x4B, 0x00)
+
+/* Logical unit failed self-configuration */
+#define E_SENSE_LUFSC		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x4C, 0x00)
+
+/* Media load or eject failed */
+#define E_SENSE_MLOEF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x53, 0x00)
+
+/* Voltage fault */
+#define E_SENSE_VF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_HARDWARE_ERROR, 0x65, 0x00)
+
+/*
+ * Errors Associated with non-ATAPI Environments
+ */
+
+/* I/O process terminated */
+#define E_SENSE_IOPT		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ABORTED_COMMAND, 0x00, 0x06)
+
+/* Multiple peripheral device selected */
+#define E_SENSE_MPDS		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x07, 0x00)
+
+/* Warning */
+#define E_SENSE_WARNING		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x0B, 0x00)
+
+/* Warning - Specified temperature exceeded */
+#define E_SENSE_WARNING_STE	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x0B, 0x01)
+
+/* Warning - Enclosure degraded */
+#define E_SENSE_WARNING_ED	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x0B, 0x02)
+
+/* Logical unit not supported */
+#define E_SENSE_LUNS		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x25, 0x00)
+
+/* Reservations preempted */
+#define E_SENSE_RESP		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_UNIT_ATTENTION, 0x2A, 0x03)
+
+/* Copy cannot execute since initiator cannot disconnect */
+#define E_SENSE_CCESICD		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x2B, 0x00)
+
+/* Commands cleared by another initiator */
+#define E_SENSE_CCBAI		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_UNIT_ATTENTION, 0x2F, 0x00)
+
+/* Enclosure failure */
+#define E_SENSE_ENCLOSUREF	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_NO_SENSE, 0x34, 0x00)
+
+/* Enclosure services failure */
+#define E_SENSE_ESF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_NO_SENSE, 0x35, 0x00)
+
+/* Unsupported enclosure function */
+#define E_SENSE_UEF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_NO_SENSE, 0x35, 0x01)
+
+/* Enclosure services unavailable */
+#define E_SENSE_ESU		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_NO_SENSE, 0x35, 0x02)
+
+/* Enclosure services transfer failure */
+#define E_SENSE_ESTF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_NO_SENSE, 0x35, 0x03)
+
+/* Enclosure services transfer refused */
+#define E_SENSE_ESTR		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_NO_SENSE, 0x35, 0x04)
+
+/* Select or reselect failure */
+#define E_SENSE_SORF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ABORTED_COMMAND, 0x45, 0x00)
+
+/* Initiator detected error message received */
+#define E_SENSE_IDEMR		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ABORTED_COMMAND, 0x48, 0x00)
+
+/* Invalid message error */
+#define E_SENSE_IME		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ABORTED_COMMAND, 0x49, 0x00)
+
+/* Tagged overlapped commands (NN = Queue tag) */
+#define E_SENSE_TOC_NN		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ABORTED_COMMAND, 0x4D, 0xFF)
+
+
+/*
+ * Additional error codes
+ */
+
+/* No additional sense information */
+#define E_SENSE_NOASI		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_NO_SENSE, 0x00, 0x00)
+
+/* Operation in progress */
+#define E_SENSE_OIP		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x00, 0x16)
+
+/* No seek complete */
+#define E_SENSE_NSC		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x02, 0x00)
+
+/* Logical unit not ready - self-test in progress */
+#define E_SENSE_LUNR_STIP	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_NOT_READY, 0x04, 0x09)
+
+/* Error log overflow */
+#define E_SENSE_ELO		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_UNIT_ATTENTION, 0x0A, 0x00)
+
+/* Warning - background self-test failed */
+#define E_SENSE_WARNING_BSTF	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x0B, 0x03)
+
+/* Warning - background pre-scan detected medium error */
+#define E_SENSE_WARNING_BPSDME	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x0B, 0x04)
+
+/* Warning - background medium scan detected medium error */
+#define E_SENSE_WARNING_BMSDME	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x0B, 0x05)
+
+/* Write error */
+#define E_SENSE_WE_1		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x0C, 0x00)
+
+/* Write error - recovered with auto-reallocation */
+#define E_SENSE_WE_RWAR		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x0C, 0x01)
+
+/* Write error - auto reallocation failed */
+#define E_SENSE_WE_ARF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x0C, 0x02)
+
+/* Write error - recommend reassignment */
+#define E_SENSE_WE_RR		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x0C, 0x03)
+
+/* Write error - loss of streaming */
+#define E_SENSE_WE_LOS		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_MEDIUM_ERROR, 0x0C, 0x09)
+
+/* Miscompare during verify operation */
+#define E_SENSE_MDVO		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_COPY_ABORTED, 0x1D, 0x00)
+
+/* Invalid release of persistent reservation */
+#define E_SENSE_IROPR		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x26, 0x04)
+
+/* Enclosure services checksum error */
+#define E_SENSE_ESCE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_NO_SENSE, 0x35, 0x05)
+
+/* Rounded parameter */
+#define E_SENSE_RP		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x37, 0x00)
+
+/* Medium not present - loadable */
+#define E_SENSE_MNP_L		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_NOT_READY, 0x3A, 0x03)
+
+/* Medium source element empty */
+#define E_SENSE_MSEE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_UNIT_ATTENTION, 0x3B, 0x0E)
+
+/* Overlapped commands attempted */
+#define E_SENSE_OCA		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ABORTED_COMMAND, 0x4E, 0x00)
+
+/* System resource failure */
+#define E_SENSE_SRF		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x55, 0x00)
+
+/* Spare area exhaustion failure prediction threshold exceeded */
+#define E_SENSE_SAEFPTE		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_RECOVERED_ERROR, 0x5D, 0x03)
+
+/* End of user area encountered on this track */
+#define E_SENSE_EOUAEOTT	MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x63, 0x00)
+
+/* Packet does not fit in available space */
+#define E_SENSE_PDNFIAS		MAKE_SENSE_ERRORCODE(SENSEDATA_SK_ILLEGAL_REQUEST, 0x63, 0x01)
+
 
 /*
  * Sense data functions
