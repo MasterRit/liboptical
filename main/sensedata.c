@@ -178,12 +178,8 @@ static struct error_code_entry __message_entries[] = {
 
 static char* get_error_message(RESULT error_code)
 {
-	int i;
-	int elements;
-
-	elements = sizeof(__message_entries) / sizeof(__message_entries[0]);
-
-	i = 0;
+	int i = 0;
+	int elements = sizeof(__message_entries) / sizeof(__message_entries[0]);
 
 	while (i < elements) {
 		if (__message_entries[i].error_code == error_code) {
