@@ -26,9 +26,9 @@
  * Memory allocation
  */
 
-extern void* malloc_aligned(size_t size, size_t alignment);
-extern void* realloc_aligned(void *memblock, size_t size, size_t alignment);
-extern void free_aligned(void *memoryblock);
+extern void* xmalloc_aligned(size_t size, size_t alignment);
+extern void* xrealloc_aligned(void *memblock, size_t size, size_t alignment);
+extern void xfree_aligned(void *memoryblock);
 
 /*
  * Safe string routines

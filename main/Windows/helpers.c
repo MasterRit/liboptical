@@ -28,17 +28,17 @@
  * Memory allocation 
  */
 
-void* malloc_aligned(size_t size, size_t alignment)
+void* xmalloc_aligned(size_t size, size_t alignment)
 {
 	return _aligned_malloc(size, alignment);
 }
 
-void* realloc_aligned(void *memblock, size_t size, size_t alignment)
+void* xrealloc_aligned(void *memblock, size_t size, size_t alignment)
 {
 	return _aligned_realloc(memblock, size, alignment);
 }
 
-void free_aligned(void *memoryblock)
+void xfree_aligned(void *memoryblock)
 {
 	_aligned_free(memoryblock);
 }
