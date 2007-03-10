@@ -25,12 +25,17 @@
 
 
 /* MMC_OPCODE_GET_CONFIG data parser */
-extern RESULT optcl_parse_get_configuration_data(const uint8_t *mmc_response, 
+extern RESULT optcl_parse_get_configuration_data(const uint8_t mmc_response[], 
 						 uint32_t size,
 						 optcl_mmc_response_get_configuration **response);
 
+/* MMC_OPCODE_GET_EVENT_STATUS */
+extern RESULT optcl_parse_get_event_status(const uint8_t mmc_response[],
+					   uint32_t size,
+					   optcl_mmc_response_get_event_status **response);
+
 /* MMC_OPCODE_INQUIRY data parser */
-extern RESULT optcl_parse_inquiry_data(const uint8_t *mmc_response, 
+extern RESULT optcl_parse_inquiry_data(const uint8_t mmc_response[], 
 				       uint32_t size,
 				       optcl_mmc_response_inquiry **response);
 

@@ -19,6 +19,7 @@
 
 #include "stdafx.h"
 
+#include "command.h"
 #include "debug.h"
 #include "errors.h"
 #include "feature.h"
@@ -67,6 +68,7 @@ static RESULT parse_raw_profile_list(const uint8_t mmc_data[],
 				     optcl_feature_profile_list **feature)
 {
 	RESULT error;
+
 	uint32_t index;
 	uint32_t offset;
 	optcl_feature_profile_list *nfeature = 0;
@@ -75,13 +77,13 @@ static RESULT parse_raw_profile_list(const uint8_t mmc_data[],
 	assert(mmc_data != 0);
 	assert(feature != 0);
 
-	if (mmc_data == 0 || feature) {
+	if (mmc_data == 0 || feature == 0) {
 		return(E_INVALIDARG);
 	}
 
 	nfeature = malloc(sizeof(optcl_feature_profile_list));
 
-	if (!nfeature) {
+	if (nfeature == 0) {
 		return(E_OUTOFMEMORY);
 	}
 
@@ -101,26 +103,172 @@ static RESULT parse_raw_profile_list(const uint8_t mmc_data[],
 	}
 }
 
+static RESULT parse_raw_event_status_descriptor(uint8_t event_class,
+						const uint8_t raw_data[], 
+						size_t size, 
+						optcl_mmc_ges_descriptor **descriptor)
+{
+	RESULT error = SUCCESS;
+
+	optcl_mmc_ges_media *media = 0;
+	optcl_mmc_ges_multihost *multihost = 0;
+	optcl_mmc_ges_device_busy *devicebusy = 0;
+	optcl_mmc_ges_power_management *pwrmngmnt = 0;
+	optcl_mmc_ges_operational_change *opchange = 0;
+	optcl_mmc_ges_external_request *exterrequest = 0;
+
+	assert(raw_data != 0);
+	assert(size >= 4);
+	assert(descriptor != 0);
+
+	if (raw_data == 0 || descriptor == 0) {
+		return(E_INVALIDARG);
+	}
+
+	if (size < 4) {
+		return(E_SIZEMISMATCH);
+	}
+
+	switch(event_class) {
+		case MMC_GET_EVENT_STATUS_OPCHANGE: {
+			opchange = malloc(
+				sizeof(optcl_mmc_ges_operational_change)
+				);
+
+			if (opchange == 0) {
+				error = E_OUTOFMEMORY;
+				break;
+			}
+
+			opchange->persistent_prev = bool_from_uint8(raw_data[1] & 0x80);/* 10000000 */
+			opchange->event_code = raw_data[0] & 0x15;			/* 00001111 */
+			opchange->status = raw_data[1] & 0x15;				/* 00001111 */
+			opchange->change = uint16_from_be(*(uint16_t*)&raw_data[2]);
+
+			*descriptor = (optcl_mmc_ges_descriptor*)opchange;
+
+			break;
+		}
+		case MMC_GET_EVENT_STATUS_POWERMGMT: {
+			pwrmngmnt = malloc(
+				sizeof(optcl_mmc_ges_power_management)
+				);
+
+			if (pwrmngmnt == 0) {
+				error = E_OUTOFMEMORY;
+				break;
+			}
+
+			pwrmngmnt->event_code = raw_data[0] & 0x15;			/* 00001111 */
+			pwrmngmnt->power_status = raw_data[1];
+
+			*descriptor = (optcl_mmc_ges_descriptor*)pwrmngmnt;
+
+			break;
+		}
+		case MMC_GET_EVENT_STATUS_EXTREQUEST: {
+			exterrequest = malloc(
+				sizeof(optcl_mmc_ges_external_request)
+				);
+
+			if (exterrequest == 0) {
+				error = E_OUTOFMEMORY;
+				break;
+			}
+
+			exterrequest->persistent_prev = bool_from_uint8(raw_data[1] & 0x80);/* 10000000 */
+			exterrequest->event_code = raw_data[0] & 0x15;			/* 00001111 */
+			exterrequest->ext_req_status = raw_data[0] & 0x15;		/* 00001111 */
+			exterrequest->external_request = uint16_from_be(*(uint16_t*)&raw_data[2]);
+
+			*descriptor = (optcl_mmc_ges_descriptor*)exterrequest;
+
+			break;
+		}
+		case MMC_GET_EVENT_STATUS_MEDIA: {
+			media = malloc(sizeof(optcl_mmc_ges_media));
+
+			if (media == 0) {
+				error = E_OUTOFMEMORY;
+				break;
+			}
+
+			media->event_code = raw_data[0] & 0x15;				/* 00001111 */
+			media->media_present = bool_from_uint8(raw_data[1] & 0x02);	/* 00000010 */
+			media->tray_open = bool_from_uint8(raw_data[1] & 0x01);		/* 00000001 */
+			media->start_slot = raw_data[2];
+			media->end_slot = raw_data[3];
+
+			*descriptor = (optcl_mmc_ges_descriptor*)media;
+
+			break;
+		}
+		case MMC_GET_EVENT_STATUS_MULTIHOST: {
+			multihost = malloc(sizeof(optcl_mmc_ges_multihost));
+
+			if (multihost == 0) {
+				error = E_OUTOFMEMORY;
+				break;
+			}
+
+			multihost->event_code = raw_data[0] & 0x15;			/* 00001111 */
+			multihost->persistent_prev = bool_from_uint8(raw_data[1] & 0x80);/* 10000000 */
+			multihost->multi_host_status = raw_data[1] & 0x15;		/* 00001111 */
+			multihost->multi_host_priority = uint16_from_be(*(uint16_t*)&raw_data[2]);
+
+			*descriptor = (optcl_mmc_ges_descriptor*)multihost;
+
+			break;
+		}
+		case MMC_GET_EVENT_STATUS_DEVICEBUSY: {
+			devicebusy = malloc(
+				sizeof(optcl_mmc_ges_device_busy)
+				);
+
+			if (devicebusy == 0) {
+				error = E_OUTOFMEMORY;
+				break;
+			}
+
+			devicebusy->event_code = raw_data[0] & 0x15;			/* 00001111 */
+			devicebusy->busy_status = raw_data[1];
+			devicebusy->time = uint16_from_be(*(uint16_t*)&raw_data[2]);
+
+			*descriptor = (optcl_mmc_ges_descriptor*)devicebusy;
+
+			break; 
+		}
+		default: {
+			error = E_OUTOFRANGE;
+			break;
+		}
+	}
+
+	return(error);
+}
+
+
 /*
  * Parser functions
  */ 
 
-int optcl_parse_get_configuration_data(const uint8_t *mmc_response, 
+int optcl_parse_get_configuration_data(const uint8_t mmc_response[], 
 				       uint32_t size,
 				       optcl_mmc_response_get_configuration **response)
 {
 	RESULT error;
 	RESULT destroy_error;
-	uint32_t offset;
-	uint8_t *raw_feature;
-	uint16_t feature_code;
-	optcl_feature_descriptor *feature;
-	optcl_mmc_response_get_configuration *nresponse;
 
-	assert(mmc_response);
+	uint32_t offset;
+	uint16_t feature_code;
+	uint8_t *raw_feature = 0;
+	optcl_feature_descriptor *feature = 0;
+	optcl_mmc_response_get_configuration *nresponse = 0;
+
+	assert(response != 0);
+	assert(mmc_response != 0);
 	assert(size >= 8);
 	assert(size % 4 == 0);
-	assert(response);
 
 	if (mmc_response == 0 || response == 0 || size == 0 || (size % 4 != 0)) {
 		return(E_INVALIDARG);
@@ -192,11 +340,98 @@ int optcl_parse_get_configuration_data(const uint8_t *mmc_response,
 
 }
 
-int optcl_parse_inquiry_data(const uint8_t *mmc_response, 
-			     uint32_t size,
-			     optcl_mmc_response_inquiry **response)
+RESULT optcl_parse_get_event_status(const uint8_t mmc_response[],
+				    uint32_t size,
+				    optcl_mmc_response_get_event_status **response)
 {
-	optcl_mmc_response_inquiry *nresponse;
+	RESULT error;
+	RESULT destroy_error;
+
+	uint16_t offset;
+	uint16_t descriptor_len;
+	optcl_list *descriptors = 0;
+	optcl_mmc_ges_descriptor *ndescriptor = 0;
+	optcl_mmc_response_get_event_status *nresponse = 0;
+
+	assert(mmc_response != 0);
+	assert(response != 0);
+	assert(size >= 4);
+
+	if (mmc_response == 0 || response == 0 || size < 4) {
+		return(E_INVALIDARG);
+	}
+
+	nresponse = malloc(sizeof(optcl_mmc_response_get_event_status));
+
+	if (nresponse == 0) {
+		return(E_OUTOFMEMORY);
+	}
+
+	memset(nresponse, 0, sizeof(optcl_mmc_response_get_event_status));
+
+	descriptor_len = uint16_from_be(*(uint16_t*)&mmc_response[0]);
+
+	nresponse->header.descriptor_len = descriptor_len;
+	nresponse->header.nea = bool_from_uint8(mmc_response[2] & 0x80);		/* 10000000 */
+	nresponse->header.notification_class = mmc_response[2] & 0x07;			/* 00000111 */
+	nresponse->header.event_class = mmc_response[3];
+	nresponse->event_class = nresponse->header.event_class;
+
+	error = optcl_list_create(0, &descriptors);
+
+	if (FAILED(error)) {
+		free(nresponse);
+		return(error);
+	}
+
+	assert(descriptors);
+
+	if (descriptors == 0) {
+		free(nresponse);
+		return(E_POINTER);
+	}
+
+	offset = 4;
+	error = SUCCESS;
+
+	while(offset < descriptor_len + 4) {
+		error = parse_raw_event_status_descriptor(
+			nresponse->event_class, 
+			&mmc_response[offset], 
+			size - offset, 
+			&ndescriptor
+			);
+
+		if (FAILED(error)) {
+			break;
+		}
+
+		error = optcl_list_add_tail(descriptors, (const ptr_t)ndescriptor);
+
+		if (FAILED(error)) {
+			break;
+		}
+
+		offset += 4;
+	}
+
+	if (FAILED(error)) {
+		free(nresponse);
+		destroy_error = optcl_list_destroy(descriptors, 1);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	nresponse->descriptors = descriptors;
+	*response = nresponse;
+
+	return(error);
+}
+
+RESULT optcl_parse_inquiry_data(const uint8_t mmc_response[], 
+				uint32_t size,
+				optcl_mmc_response_inquiry **response)
+{
+	optcl_mmc_response_inquiry *nresponse = 0;
 
 	assert(mmc_response);
 	assert(size >= 5);
@@ -214,13 +449,13 @@ int optcl_parse_inquiry_data(const uint8_t *mmc_response,
 
 	memset(nresponse, 0, sizeof(optcl_mmc_response_inquiry));
 
-	nresponse->qualifier = mmc_response[0] & 0xe0;			/* 11100000 */
-	nresponse->device_type = mmc_response[0] & 0x1f;		/* 00011111 */
+	nresponse->qualifier = mmc_response[0] & 0xE0;			/* 11100000 */
+	nresponse->device_type = mmc_response[0] & 0x1F;		/* 00011111 */
 	nresponse->rmb = bool_from_uint8(mmc_response[1] & 0x80);	/* 10000000 */
 	nresponse->version = mmc_response[2];
 	nresponse->normaca = mmc_response[3] & 0x20;			/* 00100000 */
 	nresponse->hisup = bool_from_uint8(mmc_response[3] & 0x10);	/* 00010000 */
-	nresponse->rdf = mmc_response[3] & 0x0f;			/* 00001111 */
+	nresponse->rdf = mmc_response[3] & 0x0F;			/* 00001111 */
 
 	if (size > 4) {
 		nresponse->additional_len = mmc_response[4];
@@ -269,7 +504,7 @@ int optcl_parse_inquiry_data(const uint8_t *mmc_response,
 	}
 
 	if (size > 56) {
-		nresponse->clocking = mmc_response[56] & 0x0c;			/* 00001100 */
+		nresponse->clocking = mmc_response[56] & 0x0C;			/* 00001100 */
 		nresponse->qas = bool_from_uint8(mmc_response[56] & 0x02);	/* 00000010 */
 		nresponse->ius = bool_from_uint8(mmc_response[56] & 0x01);	/* 00000001 */
 	}
