@@ -33,21 +33,13 @@
 #include <memory.h>
 #include <string.h>
 
-/*
- * MMC opcodes
- */
-
-#define MMC_OPCODE_BLANK		0x00A1
-#define MMC_OPCODE_INQUIRY		0x0012
-#define MMC_OPCODE_GET_CONFIG		0x0046
-#define MMC_OPCODE_REQUEST_SENSE	0x0003
 
 /*
  * Constants used throughout the code
  */
 
-#define MAX_GET_CONFIG_TRANSFER_LEN	65530
 #define MAX_SENSEDATA_LENGTH		252
+#define MAX_GET_CONFIG_TRANSFER_LEN	65530
 
 /*
  * Internal types
@@ -57,9 +49,20 @@ typedef uint8_t	cdb6[6];
 typedef uint8_t cdb10[10];
 typedef uint8_t cdb12[12];
 
+typedef RESULT (*response_deallocator)(void *response);
+
+struct response_deallocator_entry {
+	uint16_t opcode;
+	response_deallocator deallocator;
+};
+
+
 /*
- * Helper functions
+ * Forward declarations
  */
+
+static response_deallocator get_response_deallocator(uint16_t opcode);
+
 
 /*
  * Command functions
@@ -85,18 +88,70 @@ RESULT optcl_command_blank(const optcl_device *device,
 
 	cdb[0] = MMC_OPCODE_BLANK;
 	cdb[1] = (command->immed << 4) || command->blanking_type;
-	cdb[2] = (uint8_t)(uint32_to_le(command->start_address) >> 24);
-	cdb[3] = (uint8_t)((uint32_to_le(command->start_address) << 8) >> 24);
-	cdb[4] = (uint8_t)((uint32_to_le(command->start_address) << 16) >> 24);
-	cdb[5] = (uint8_t)((uint32_to_le(command->start_address) << 24) >> 24);
+	cdb[2] = (uint8_t)(command->start_address >> 24);
+	cdb[3] = (uint8_t)((command->start_address << 8) >> 24);
+	cdb[4] = (uint8_t)((command->start_address << 16) >> 24);
+	cdb[5] = (uint8_t)((command->start_address << 24) >> 24);
 
-	return optcl_device_command_execute(
+	return(optcl_device_command_execute(
 		device,
 		cdb,
 		sizeof(cdb),
 		0,
 		0
-		);
+		));
+}
+
+RESULT optcl_command_close_track_session(const optcl_device *device,
+					 const optcl_mmc_close_track_session *command)
+{
+	cdb10 cdb;
+
+	assert(device != 0);
+	assert(command != 0);
+
+	if (device == 0 || command == 0) {
+		return(E_INVALIDARG);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	memset(&cdb[0], 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_CLOSE_TRACK_SESSION;
+	cdb[1] = command->immed;
+	cdb[2] = command->close_function & 0x07;
+	cdb[4] = (uint8_t)(command->logical_track_number >> 8);
+	cdb[5] = (uint8_t)command->logical_track_number;
+
+	return(optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		0,
+		0
+		));
+}
+
+RESULT optcl_command_destroy_response(uint16_t opcode, void *response)
+{
+	response_deallocator deallocator = 0;
+
+	if (response == 0) {
+		return(SUCCESS);
+	}
+
+	deallocator = get_response_deallocator(opcode);
+
+	assert(deallocator != 0);
+
+	if (deallocator == 0) {
+		return(E_OUTOFRANGE);
+	}
+
+	return(deallocator(response));
 }
 
 RESULT optcl_command_get_configuration(const optcl_device *device,
@@ -184,11 +239,11 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 
 	cdb[0] = MMC_OPCODE_GET_CONFIG;
 	cdb[1] = rt;
-	cdb[2] = (uint8_t)(uint16_to_le(start_feature) >> 8);
-	cdb[3] = (uint8_t)((uint16_to_le(start_feature) << 8) >> 8);
+	cdb[2] = (uint8_t)(start_feature >> 8);
+	cdb[3] = (uint8_t)((start_feature << 8) >> 8);
 	cdb[8] = 8; /* enough to get feature descriptor header */
 
-	mmc_response = malloc_aligned(cdb[8], alignment_mask);
+	mmc_response = xmalloc_aligned(cdb[8], alignment_mask);
 
 	if (mmc_response == 0) {
 		return(E_OUTOFMEMORY);
@@ -203,14 +258,14 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 		);
 
 	if (FAILED(error)) {
-		free_aligned(mmc_response);
+		xfree_aligned(mmc_response);
 		return(error);
 	}
 
 	nresponse0 = malloc(sizeof(optcl_mmc_response_get_configuration));
 
 	if (nresponse0 == 0) {
-		free_aligned(mmc_response);
+		xfree_aligned(mmc_response);
 		return(E_OUTOFMEMORY);
 	}
 
@@ -220,7 +275,7 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 
 	if (FAILED(error)) {
 		free(nresponse0);
-		free_aligned(mmc_response);
+		xfree_aligned(mmc_response);
 		return(error);
 	}
 
@@ -233,7 +288,7 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 
 	data_length = uint32_from_be(*(int32_t*)&mmc_response[0]);
 
-	free_aligned(mmc_response);
+	xfree_aligned(mmc_response);
 	
 	nresponse0->data_length = data_length;
 
@@ -252,12 +307,12 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 		 */
 
 		cdb[1] = rt;
-		cdb[2] = (uint8_t)(uint16_to_le(start_feature) >> 8);
-		cdb[3] = (uint8_t)((uint16_to_le(start_feature) << 8) >> 8);
-		cdb[7] = (uint8_t)(uint16_to_le((uint16_t)transfer_size) >> 8);
-		cdb[8] = (uint8_t)((uint16_to_le((uint16_t)transfer_size) << 8) >> 8);
+		cdb[2] = (uint8_t)(start_feature >> 8);
+		cdb[3] = (uint8_t)((start_feature << 8) >> 8);
+		cdb[7] = (uint8_t)((uint16_t)transfer_size >> 8);
+		cdb[8] = (uint8_t)((((uint16_t)transfer_size) << 8) >> 8);
 
-		mmc_response = malloc_aligned(transfer_size, alignment_mask);
+		mmc_response = xmalloc_aligned(transfer_size, alignment_mask);
 
 		if (mmc_response == 0) {
 			error = E_OUTOFMEMORY;
@@ -275,7 +330,7 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 			);
 
 		if (FAILED(error)) {
-			free_aligned(mmc_response);
+			xfree_aligned(mmc_response);
 			break;
 		}
 
@@ -292,7 +347,7 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 			);
 
 		if (FAILED(error)) {
-			free_aligned(mmc_response);
+			xfree_aligned(mmc_response);
 			break;
 		}
 
@@ -301,7 +356,7 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 		if (FAILED(error)) {
 			destroy_error = optcl_list_destroy(nresponse1->descriptors, True);
 			error = (FAILED(destroy_error)) ? destroy_error : error;
-			free_aligned(mmc_response);
+			xfree_aligned(mmc_response);
 			free(nresponse1);
 			break;
 		}
@@ -311,7 +366,7 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 		if (FAILED(error)) {
 			destroy_error = optcl_list_destroy(nresponse1->descriptors, True);
 			error = (FAILED(destroy_error)) ? destroy_error : error;
-			free_aligned(mmc_response);
+			xfree_aligned(mmc_response);
 			free(nresponse1);
 			break;
 		}
@@ -325,7 +380,7 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 		if (FAILED(error)) {
 			destroy_error = optcl_list_destroy(nresponse1->descriptors, True);
 			error = (FAILED(destroy_error)) ? destroy_error : error;
-			free_aligned(mmc_response);
+			xfree_aligned(mmc_response);
 			free(nresponse1);
 			break;
 		}
@@ -333,13 +388,13 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 		error = optcl_list_destroy(nresponse1->descriptors, False);
 
 		if (FAILED(error)) {
-			free_aligned(mmc_response);
+			xfree_aligned(mmc_response);
 			free(nresponse1);
 			break;
 		}
 
 		free(nresponse1);
-		free_aligned(mmc_response);
+		xfree_aligned(mmc_response);
 
 	} while(data_length > 0);
 
@@ -353,6 +408,140 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 
 	return(error);
 }
+
+RESULT optcl_command_get_event_status(const optcl_device *device,
+				      const optcl_mmc_get_event_status *command,
+				      optcl_mmc_response_get_event_status **response)
+{
+	RESULT error;
+	
+	cdb10 cdb;
+	uint32_t alignment;
+	uint16_t descriptor_len;
+	ptr_t mmc_response = 0;
+	optcl_adapter *adapter = 0;
+	optcl_mmc_response_get_event_status *nresponse = 0;
+
+	assert(device != 0);
+	assert(command != 0);
+	assert(response != 0);
+
+	if (device == 0 || command == 0 || response == 0) {
+		return(E_INVALIDARG);
+	}
+
+	error = optcl_device_get_adapter(device, &adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	error = optcl_adapter_get_alignment_mask(adapter, &alignment);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	error = optcl_adapter_destroy(adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_GET_EVENT_STATUS;
+	cdb[1] = command->polled;
+	cdb[4] = command->class_request;
+	cdb[8] = 4; /* request only event header */
+
+	mmc_response = xmalloc_aligned(cdb[8], alignment);
+
+	if (mmc_response == 0) {
+		return(E_OUTOFMEMORY);
+	}
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		mmc_response,
+		cdb[8]
+		);
+
+	if (FAILED(error)) {
+		xfree_aligned(mmc_response);
+		return(error);
+	}
+
+	error = optcl_parse_get_event_status(mmc_response, cdb[8], &nresponse);
+
+	xfree_aligned(mmc_response);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	assert(nresponse != 0);
+
+	if (nresponse == 0) {
+		return(E_POINTER);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	descriptor_len = nresponse->header.descriptor_len;
+
+	cdb[7] = (uint8_t)(descriptor_len >> 8);
+	cdb[8] = (uint8_t)((descriptor_len << 8) >> 8) + 4;
+
+	mmc_response = xmalloc_aligned(
+		descriptor_len + 4, 
+		alignment
+		);
+
+	if (mmc_response == 0) {
+		return(E_OUTOFMEMORY);
+	}
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		mmc_response,
+		descriptor_len + 4
+		);
+
+	if (FAILED(error)) {
+		xfree_aligned(mmc_response);
+		return(error);
+	}
+
+	free(nresponse);
+
+	error = optcl_parse_get_event_status(
+		mmc_response, 
+		descriptor_len + 4, 
+		&nresponse
+		);
+
+	xfree_aligned(mmc_response);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	*response = nresponse;
+
+	return(SUCCESS);
+}
+
 
 RESULT optcl_command_inquiry(const optcl_device *device, 
 			     const optcl_mmc_inquiry *command, 
@@ -410,7 +599,7 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 	cdb[0] = MMC_OPCODE_INQUIRY;
 	cdb[4] = 5; /* the allocation length should be at least five */
 
-	mmc_response = malloc_aligned(cdb[4], alignment_mask);
+	mmc_response = xmalloc_aligned(cdb[4], alignment_mask);
 
 	if (mmc_response == 0) {
 		return(E_OUTOFMEMORY);
@@ -426,16 +615,16 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 		);
 
 	if (FAILED(error)) {
-		free_aligned(mmc_response);
+		xfree_aligned(mmc_response);
 		return(error);
 	}
 
 	/* Set standard inquiry data length */
 	cdb[4] = mmc_response[4] + 4;
 
-	free_aligned(mmc_response);
+	xfree_aligned(mmc_response);
 
-	mmc_response = malloc_aligned((size_t)cdb[4], alignment_mask);
+	mmc_response = xmalloc_aligned((size_t)cdb[4], alignment_mask);
 
 	if (mmc_response == 0) {
 		return(E_OUTOFMEMORY);
@@ -455,7 +644,7 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 		);
 
 	if (FAILED(error)) {
-		free_aligned(mmc_response);
+		xfree_aligned(mmc_response);
 		return(error);
 	}
 
@@ -465,7 +654,7 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 		*response = nresponse;
 	}
 
-	free_aligned(mmc_response);
+	xfree_aligned(mmc_response);
 
 	return(error);
 }
@@ -527,7 +716,7 @@ RESULT optcl_command_request_sense(const optcl_device *device,
 	cdb[1] = (uint8_t)command->desc;
 	cdb[4] = MAX_SENSEDATA_LENGTH;
 
-	mmc_response = malloc_aligned(MAX_SENSEDATA_LENGTH, alignment);
+	mmc_response = xmalloc_aligned(MAX_SENSEDATA_LENGTH, alignment);
 
 	if (mmc_response == 0) {
 		return(E_OUTOFMEMORY);
@@ -542,13 +731,13 @@ RESULT optcl_command_request_sense(const optcl_device *device,
 		);
 
 	if (FAILED(error)) {
-		free_aligned(mmc_response);
+		xfree_aligned(mmc_response);
 		return(error);
 	}
 
 	error = optcl_sensedata_get_code(mmc_response, MAX_SENSEDATA_LENGTH, &sense_code);
 
-	free_aligned(mmc_response);
+	xfree_aligned(mmc_response);
 
 	if (FAILED(error)) {
 		return(error);
@@ -567,4 +756,120 @@ RESULT optcl_command_request_sense(const optcl_device *device,
 	*response = nresponse;
 
 	return(SUCCESS);
+}
+
+
+/*
+ * Deallocators
+ */
+
+static RESULT deallocator_mmc_response_close_track_session(void *response)
+{
+	if (response == 0) {
+		return(SUCCESS);
+	}
+
+	free(response);
+
+	return(SUCCESS);
+}
+
+static RESULT deallocator_mmc_response_get_configuration(void *response)
+{
+	RESULT error;
+	optcl_mmc_response_get_configuration *mmc_response = 0;
+
+	if (response == 0) {
+		return(SUCCESS);
+	}
+
+	mmc_response = (optcl_mmc_response_get_configuration*)response;
+
+	assert(mmc_response->descriptors != 0);
+
+	error = optcl_list_destroy(mmc_response->descriptors, 1);
+
+	free(mmc_response);
+
+	return(error);
+}
+
+static RESULT deallocator_mmc_response_get_event_status(void *response)
+{
+	RESULT error;
+	optcl_mmc_response_get_event_status *mmc_response = 0;
+
+	if (response == 0) {
+		return(SUCCESS);
+	}
+
+	mmc_response = (optcl_mmc_response_get_event_status*)response;
+
+	assert(mmc_response->descriptors != 0);
+
+	error = optcl_list_destroy(mmc_response->descriptors, 1);
+
+	free(mmc_response);
+
+	return(error);
+}
+
+static RESULT deallocator_mmc_response_inquiry(void *response)
+{
+	if (response == 0) {
+		return(SUCCESS);
+	}
+
+	free(response);
+
+	return(SUCCESS);
+}
+
+static RESULT deallocator_mmc_response_request_sense(void *response) 
+{
+	if (response == 0) {
+		return(SUCCESS);
+	}
+
+	free(response);
+
+	return(SUCCESS);
+}
+
+
+/*
+ * Response deallocator table
+ */
+
+static struct response_deallocator_entry __deallocator_table[] = {
+	{ MMC_OPCODE_CLOSE_TRACK_SESSION,	deallocator_mmc_response_close_track_session	},
+	{ MMC_OPCODE_INQUIRY,			deallocator_mmc_response_get_configuration	},
+	{ MMC_OPCODE_GET_CONFIG,		deallocator_mmc_response_get_event_status	},
+	{ MMC_OPCODE_GET_EVENT_STATUS,		deallocator_mmc_response_inquiry		},
+	{ MMC_OPCODE_REQUEST_SENSE,		deallocator_mmc_response_request_sense		}
+};
+
+
+/*
+ * Helper functions
+ */
+
+response_deallocator get_response_deallocator(uint16_t opcode)
+{
+	int i = 0;
+	int elements = sizeof(__deallocator_table) / sizeof(__deallocator_table[0]);
+
+	while(i < elements) {
+		if (__deallocator_table[i].opcode == opcode) {
+			break;
+		}
+
+		++i;
+	}
+
+	if (i == elements) {
+		return(0);
+	}
+
+	return(__deallocator_table[i].deallocator);
 }
