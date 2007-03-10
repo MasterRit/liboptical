@@ -3227,12 +3227,8 @@ static struct feature_sizes_entry __feature_table[] = {
 
 static uint16_t get_feature_size(uint16_t feature_code)
 {
-	int i;
-	int elements;
-
-	elements = sizeof(__feature_table) / sizeof(__feature_table[0]);
-
-	i = 0;
+	int i = 0;
+	int elements = sizeof(__feature_table) / sizeof(__feature_table[0]);
 
 	while (i < elements) {
 		if (__feature_table[i].code == feature_code) {
@@ -3251,12 +3247,8 @@ static uint16_t get_feature_size(uint16_t feature_code)
 
 static raw_feature_parser get_feature_parser(uint16_t feature_code)
 {
-	int i;
-	int elements;
-
-	elements = sizeof(__feature_table) / sizeof(__feature_table[0]);
-
-	i = 0;
+	int i = 0;
+	int elements = sizeof(__feature_table) / sizeof(__feature_table[0]);
 
 	while (i < elements) {
 		if (__feature_table[i].code == feature_code) {
