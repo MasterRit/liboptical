@@ -35,6 +35,18 @@
 
 
 /*
+ * MMC opcodes
+ */
+
+#define MMC_OPCODE_BLANK		0x00A1
+#define MMC_OPCODE_CLOSE_TRACK_SESSION	0x005B
+#define MMC_OPCODE_INQUIRY		0x0012
+#define MMC_OPCODE_GET_CONFIG		0x0046
+#define MMC_OPCODE_GET_EVENT_STATUS	0x004A
+#define MMC_OPCODE_REQUEST_SENSE	0x0003
+
+
+/*
  * Constants used throughout the code
  */
 
@@ -49,7 +61,7 @@ typedef uint8_t	cdb6[6];
 typedef uint8_t cdb10[10];
 typedef uint8_t cdb12[12];
 
-typedef RESULT (*response_deallocator)(void *response);
+typedef RESULT (*response_deallocator)(optcl_mmc_response *response);
 
 struct response_deallocator_entry {
 	uint16_t opcode;
@@ -135,7 +147,7 @@ RESULT optcl_command_close_track_session(const optcl_device *device,
 		));
 }
 
-RESULT optcl_command_destroy_response(uint16_t opcode, void *response)
+RESULT optcl_command_destroy_response(optcl_mmc_response *response)
 {
 	response_deallocator deallocator = 0;
 
@@ -143,7 +155,7 @@ RESULT optcl_command_destroy_response(uint16_t opcode, void *response)
 		return(SUCCESS);
 	}
 
-	deallocator = get_response_deallocator(opcode);
+	deallocator = get_response_deallocator(response->command_opcode);
 
 	assert(deallocator != 0);
 
@@ -404,6 +416,8 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
+	nresponse0->header.command_opcode = MMC_OPCODE_GET_CONFIG;
+
 	*response = nresponse0;
 
 	return(error);
@@ -496,7 +510,7 @@ RESULT optcl_command_get_event_status(const optcl_device *device,
 	 * Execute command
 	 */
 
-	descriptor_len = nresponse->header.descriptor_len;
+	descriptor_len = nresponse->ges_header.descriptor_len;
 
 	cdb[7] = (uint8_t)(descriptor_len >> 8);
 	cdb[8] = (uint8_t)((descriptor_len << 8) >> 8) + 4;
@@ -536,6 +550,8 @@ RESULT optcl_command_get_event_status(const optcl_device *device,
 	if (FAILED(error)) {
 		return(error);
 	}
+
+	nresponse->header.command_opcode = MMC_OPCODE_GET_EVENT_STATUS;
 
 	*response = nresponse;
 
@@ -651,6 +667,7 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 	error = optcl_parse_inquiry_data(mmc_response, cdb[4], &nresponse);
 
 	if (SUCCEEDED(error)) {
+		nresponse->header.command_opcode = MMC_OPCODE_INQUIRY;
 		*response = nresponse;
 	}
 
@@ -749,6 +766,8 @@ RESULT optcl_command_request_sense(const optcl_device *device,
 		return(E_OUTOFMEMORY);
 	}
 
+	nresponse->header.command_opcode = MMC_OPCODE_REQUEST_SENSE;
+
 	nresponse->asc = ERROR_SENSE_ASC(sense_code);
 	nresponse->ascq = ERROR_SENSE_ASCQ(sense_code);
 	nresponse->sk = ERROR_SENSE_SK(sense_code);
@@ -763,7 +782,7 @@ RESULT optcl_command_request_sense(const optcl_device *device,
  * Deallocators
  */
 
-static RESULT deallocator_mmc_response_close_track_session(void *response)
+static RESULT deallocator_mmc_response_close_track_session(optcl_mmc_response *response)
 {
 	if (response == 0) {
 		return(SUCCESS);
@@ -774,7 +793,7 @@ static RESULT deallocator_mmc_response_close_track_session(void *response)
 	return(SUCCESS);
 }
 
-static RESULT deallocator_mmc_response_get_configuration(void *response)
+static RESULT deallocator_mmc_response_get_configuration(optcl_mmc_response *response)
 {
 	RESULT error;
 	optcl_mmc_response_get_configuration *mmc_response = 0;
@@ -794,7 +813,7 @@ static RESULT deallocator_mmc_response_get_configuration(void *response)
 	return(error);
 }
 
-static RESULT deallocator_mmc_response_get_event_status(void *response)
+static RESULT deallocator_mmc_response_get_event_status(optcl_mmc_response *response)
 {
 	RESULT error;
 	optcl_mmc_response_get_event_status *mmc_response = 0;
@@ -814,7 +833,7 @@ static RESULT deallocator_mmc_response_get_event_status(void *response)
 	return(error);
 }
 
-static RESULT deallocator_mmc_response_inquiry(void *response)
+static RESULT deallocator_mmc_response_inquiry(optcl_mmc_response *response)
 {
 	if (response == 0) {
 		return(SUCCESS);
@@ -825,7 +844,7 @@ static RESULT deallocator_mmc_response_inquiry(void *response)
 	return(SUCCESS);
 }
 
-static RESULT deallocator_mmc_response_request_sense(void *response) 
+static RESULT deallocator_mmc_response_request_sense(optcl_mmc_response *response) 
 {
 	if (response == 0) {
 		return(SUCCESS);

@@ -29,18 +29,6 @@
 
 
 /*
- * MMC opcodes
- */
-
-#define MMC_OPCODE_BLANK		0x00A1
-#define MMC_OPCODE_CLOSE_TRACK_SESSION	0x005B
-#define MMC_OPCODE_INQUIRY		0x0012
-#define MMC_OPCODE_GET_CONFIG		0x0046
-#define MMC_OPCODE_GET_EVENT_STATUS	0x004A
-#define MMC_OPCODE_REQUEST_SENSE	0x0003
-
-
-/*
  * BLANK command command field flags
  */
 
@@ -163,6 +151,15 @@
 
 
 /*
+ * Common to all commands
+ */
+
+typedef struct tag_mmc_response {
+	uint16_t command_opcode;
+} optcl_mmc_response;
+
+
+/*
  * BLANK command structures
  */
 
@@ -194,6 +191,7 @@ typedef struct tag_mmc_get_configuration {
 } optcl_mmc_get_configuration;
 
 typedef struct tag_mmc_response_get_configuration {
+	optcl_mmc_response header;
 	uint32_t data_length;
 	uint16_t current_profile;
 	optcl_list *descriptors;
@@ -264,7 +262,8 @@ typedef struct tag_mmc_ges_device_busy {
 } optcl_mmc_ges_device_busy;
 
 typedef struct tag_mmc_response_get_event_status {
-	optcl_mmc_ges_header header;
+	optcl_mmc_response header;
+	optcl_mmc_ges_header ges_header;
 	uint8_t event_class;
 	optcl_list *descriptors;
 } optcl_mmc_response_get_event_status;
@@ -281,6 +280,7 @@ typedef struct tag_mmc_inquiry {
 } optcl_mmc_inquiry;
 
 typedef struct tag_mmc_response_inquiry {
+	optcl_mmc_response header;
 	uint8_t qualifier;	/* Peripheral qualifier */
 	uint8_t device_type;
 	uint8_t rmb;
@@ -331,6 +331,7 @@ typedef struct tag_mmc_request_sense {
 } optcl_mmc_request_sense;
 
 typedef struct tag_mmc_response_request_sense {
+	optcl_mmc_response header;
 	uint8_t sk;
 	uint8_t asc;
 	uint8_t ascq;
@@ -347,7 +348,7 @@ extern RESULT optcl_command_blank(const optcl_device *device,
 extern RESULT optcl_command_close_track_session(const optcl_device *device,
 						const optcl_mmc_close_track_session *command);
 
-extern RESULT optcl_command_destroy_response(uint16_t opcode, void *response);
+extern RESULT optcl_command_destroy_response(optcl_mmc_response *response);
 
 extern RESULT optcl_command_get_configuration(const optcl_device *device,
 					      const optcl_mmc_get_configuration *command,
