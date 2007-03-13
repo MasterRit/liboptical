@@ -371,11 +371,11 @@ RESULT optcl_parse_get_event_status(const uint8_t mmc_response[],
 
 	descriptor_len = uint16_from_be(*(uint16_t*)&mmc_response[0]);
 
-	nresponse->header.descriptor_len = descriptor_len;
-	nresponse->header.nea = bool_from_uint8(mmc_response[2] & 0x80);		/* 10000000 */
-	nresponse->header.notification_class = mmc_response[2] & 0x07;			/* 00000111 */
-	nresponse->header.event_class = mmc_response[3];
-	nresponse->event_class = nresponse->header.event_class;
+	nresponse->ges_header.descriptor_len = descriptor_len;
+	nresponse->ges_header.nea = bool_from_uint8(mmc_response[2] & 0x80);	/* 10000000 */
+	nresponse->ges_header.notification_class = mmc_response[2] & 0x07;	/* 00000111 */
+	nresponse->ges_header.event_class = mmc_response[3];
+	nresponse->event_class = nresponse->ges_header.event_class;
 
 	error = optcl_list_create(0, &descriptors);
 
