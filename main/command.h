@@ -45,35 +45,70 @@
  * CLOSE TRACK SESSION command field flags
  */
 
-#define CD_R_RW_CLOSE_LOGICAL_TRACK			0x01
-#define CD_R_RW_CLOSE_SESSION_FINALIZE			0x02
-#define DVD_R_RW_CLOSE_LOGICAL_TRACK			0x01
-#define DVD_R_RW_CLOSE_SESSION_FINALIZE			0x02
-#define DVD_R_RW_FINALIZE_DVD_RW_DISC			0x03
-#define DVD_R_DL_CLOSE_LOGICAL_TRACK			0x01
-#define DVD_R_DL_CLOSE_SESSION_FINALIZE			0x02
-#define DVD_PLUS_R_CLOSE_LOGICAL_TRACK			0x01
-#define DVD_PLUS_R_CLOSE_SESSION			0x02
-#define DVD_PLUS_R_FINALIZE_30MM_RADIUS			0x05
-#define DVD_PLUS_R_FINALIZE_DISC			0x06
-#define DVD_PLUS_R_DL_CLOSE_LOGICAL_TRACK		0x01
-#define DVD_PLUS_R_DL_CLOSE_SESSION			0x02
-#define DVD_PLUS_R_DL_REC_EXT_LEADOUT			0x04
-#define DVD_PLUS_R_DL_FINALIZE_30MM_RADIUS		0x05
-#define DVD_PLUS_R_DL_FINALIZE_DISC			0x06
-#define DVD_PLUS_RW_QUICKSTOP_BG_FORMAT			0x00
-#define DVD_PLUS_RW_COMPSTOP_BG_FORMAT_30MM_RADIUS	0x02
-#define DVD_PLUS_RW_COMPSTOP_BG_FORMAT			0x03
-#define DVD_PLUS_RW_DL_QUICKSTOP_BG_FORMAT		0x00
-#define DVD_PLUS_RW_DL_COMPSTOP_BG_FORMAT_30MM_RADIUS	0x02
-#define DVD_PLUS_RW_DL_COMPSTOP_BG_FORMAT		0x03
-#define HD_DVD_R_CLOSE_LOGICAL_TRACK			0x01
-#define HD_DVD_R_CLOSE_SESSION				0x02
-#define HD_DVD_R_FINALIZE_DISC				0x06
-#define BD_R_CLOSE_LOGICAL_TRACK			0x01
-#define BD_R_CLOSE_SESSION				0x02
-#define BD_R_FINALIZE_DISC				0x06
-#define MRW_STOP_BG_FORMAT				0x02
+#define MMC_CTS_CD_R_RW_CLOSE_LOGICAL_TRACK			0x01
+#define MMC_CTS_CD_R_RW_CLOSE_SESSION_FINALIZE			0x02
+#define MMC_CTS_DVD_R_RW_CLOSE_LOGICAL_TRACK			0x01
+#define MMC_CTS_DVD_R_RW_CLOSE_SESSION_FINALIZE			0x02
+#define MMC_CTS_DVD_R_RW_FINALIZE_DVD_RW_DISC			0x03
+#define MMC_CTS_DVD_R_DL_CLOSE_LOGICAL_TRACK			0x01
+#define MMC_CTS_DVD_R_DL_CLOSE_SESSION_FINALIZE			0x02
+#define MMC_CTS_DVD_PLUS_R_CLOSE_LOGICAL_TRACK			0x01
+#define MMC_CTS_DVD_PLUS_R_CLOSE_SESSION			0x02
+#define MMC_CTS_DVD_PLUS_R_FINALIZE_30MM_RADIUS			0x05
+#define MMC_CTS_DVD_PLUS_R_FINALIZE_DISC			0x06
+#define MMC_CTS_DVD_PLUS_R_DL_CLOSE_LOGICAL_TRACK		0x01
+#define MMC_CTS_DVD_PLUS_R_DL_CLOSE_SESSION			0x02
+#define MMC_CTS_DVD_PLUS_R_DL_REC_EXT_LEADOUT			0x04
+#define MMC_CTS_DVD_PLUS_R_DL_FINALIZE_30MM_RADIUS		0x05
+#define MMC_CTS_DVD_PLUS_R_DL_FINALIZE_DISC			0x06
+#define MMC_CTS_DVD_PLUS_RW_QUICKSTOP_BG_FORMAT			0x00
+#define MMC_CTS_DVD_PLUS_RW_COMPSTOP_BG_FORMAT_30MM_RADIUS	0x02
+#define MMC_CTS_DVD_PLUS_RW_COMPSTOP_BG_FORMAT			0x03
+#define MMC_CTS_DVD_PLUS_RW_DL_QUICKSTOP_BG_FORMAT		0x00
+#define MMC_CTS_DVD_PLUS_RW_DL_COMPSTOP_BG_FORMAT_30MM_RADIUS	0x02
+#define MMC_CTS_DVD_PLUS_RW_DL_COMPSTOP_BG_FORMAT		0x03
+#define MMC_CTS_HD_DVD_R_CLOSE_LOGICAL_TRACK			0x01
+#define MMC_CTS_HD_DVD_R_CLOSE_SESSION				0x02
+#define MMC_CTS_HD_DVD_R_FINALIZE_DISC				0x06
+#define MMC_CTS_BD_R_CLOSE_LOGICAL_TRACK			0x01
+#define MMC_CTS_BD_R_CLOSE_SESSION				0x02
+#define MMC_CTS_BD_R_FINALIZE_DISC				0x06
+#define MMC_CTS_MRW_STOP_BG_FORMAT				0x02
+
+
+/*
+ * FORMAT UNIT command field flags
+ */
+
+/* Format types */
+#define MMC_FORMAT_FULL_FORMAT					0x00
+#define MMC_FORMAT_SPARE_AREA_EXPANSION				0x01
+#define MMC_FORMAT_ZONE_REFORMAT				0x04
+#define MMC_FORMAT_ZONE_FORMAT					0x05
+#define MMC_FORMAT_CD_RW_DVD_RW_FULL_FORMAT			0x10
+#define MMC_FORMAT_CD_RW_DVD_RW_GROW_SESSION			0x11
+#define MMC_FORMAT_CD_RW_DVD_RW_ADD_SESSION			0x12
+#define MMC_FORMAT_DVD_RW_QUICK_GROW_LAST_BORDER		0x13
+#define MMC_FORMAT_DVD_RW_QUICK_ADD_BORDER			0x14
+#define MMC_FORMAT_DVD_RW_QUICK_FORMAT				0x15
+#define MMC_FORMAT_HD_DVD_R_TEST_ZONE_EXPANSION			0x16
+#define MMC_FORMAT_FULL_FORMAT_WITH_SPARING_PARAMS		0x20
+#define MMC_FORMAT_MRW_FORMAT					0x24
+#define MMC_FORMAT_DVD_PLUS_RW_BASIC_FORMAT			0x26
+#define MMC_FORMAT_BD_RE_FULL_FORMAT_WITH_SPARE_AREAS		0x30
+#define MMC_FORMAT_BD_RE_FULL_FORMAT_WITHOUT_SPARE_AREAS	0x31
+#define MMC_FORMAT_BD_R_FULL_FORMAT_WITH_SPARE_AREAS		0x32
+
+/* Format sub-types for BD-R discs*/
+#define MMC_FORMAT_SUBTYPE_BD_R_SRM_PLUS_POW	0x00
+#define MMC_FORMAT_SUBTYPE_BD_R_SRM_POW		0x01
+#define MMC_FORMAT_SUBTYPE_BD_R_RRM		0x02
+
+/* Format sub-types for BD-RE discs with spare areas */
+#define MMC_FORMAT_SUBTYPE_BD_RE_QUICK_REFORMAT		0x00
+#define MMC_FORMAT_SUBTYPE_BD_RE_NO_CERTIFICATION	0x01
+#define MMC_FORMAT_SUBTYPE_BD_RE_FULL_CERTIFICATION	0x02
+#define MMC_FORMAT_SUBTYPE_BD_RE_QUICK_CERTIFICATION	0x03
 
 
 /*
@@ -182,6 +217,43 @@ typedef struct tag_mmc_close_track_session {
 
 
 /*
+ * FORMAT UNIT command structures
+ */
+
+typedef struct tag_mmc_format_unit {
+	bool_t cmplist;
+	bool_t fov;
+	bool_t dcrt;
+	bool_t try_out;
+	bool_t immed;
+	bool_t vs;
+	uint32_t num_of_blocks;
+	uint8_t format_type;
+	uint8_t format_subtype;
+
+	union tag_type_dependent {
+		struct tag_ff_with_sparing {
+			uint8_t m;
+			uint8_t n;
+		} ff_with_sparing;
+		struct tag_dvd_plus_rw_basicf {
+			bool_t quick_start;
+			bool_t restart;
+		} dvd_plus_rw_basicf;
+		struct tag_bd_r_with_spare_areas {
+			bool_t isa_v;
+			bool_t tdma_v;
+			uint8_t sadp;
+			uint8_t tdmadp;
+		} bd_r_with_spare_areas;
+		struct tag_other {
+			uint32_t type_dependent;
+		} other;
+	} type_dependant;
+} optcl_mmc_format_unit;
+
+
+/*
  * GET CONFIGURATION command structures
  */
 
@@ -270,6 +342,7 @@ typedef struct tag_mmc_response_get_event_status {
 
 typedef optcl_mmc_ges_header optcl_mmc_ges_descriptor;
 
+
 /*
  * INQUIRY command structures
  */
@@ -349,6 +422,9 @@ extern RESULT optcl_command_close_track_session(const optcl_device *device,
 						const optcl_mmc_close_track_session *command);
 
 extern RESULT optcl_command_destroy_response(optcl_mmc_response *response);
+
+extern RESULT optcl_command_format_unit(const optcl_device *device,
+					const optcl_mmc_format_unit *command);
 
 extern RESULT optcl_command_get_configuration(const optcl_device *device,
 					      const optcl_mmc_get_configuration *command,

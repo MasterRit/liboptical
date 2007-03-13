@@ -40,9 +40,10 @@
 
 #define MMC_OPCODE_BLANK		0x00A1
 #define MMC_OPCODE_CLOSE_TRACK_SESSION	0x005B
-#define MMC_OPCODE_INQUIRY		0x0012
+#define MMC_OPCODE_FORMAT_UNIT		0x0004
 #define MMC_OPCODE_GET_CONFIG		0x0046
 #define MMC_OPCODE_GET_EVENT_STATUS	0x004A
+#define MMC_OPCODE_INQUIRY		0x0012
 #define MMC_OPCODE_REQUEST_SENSE	0x0003
 
 
@@ -165,6 +166,145 @@ RESULT optcl_command_destroy_response(optcl_mmc_response *response)
 
 	return(deallocator(response));
 }
+
+RESULT optcl_command_format_unit(const optcl_device *device,
+				 const optcl_mmc_format_unit *command)
+{
+	RESULT error;
+	RESULT destroy_error;
+
+	cdb6 cdb;
+	uint32_t alignment;
+	uint8_t cdbparams[12];
+	optcl_adapter *adapter = 0;
+
+	assert(device != 0);
+	assert(command != 0);
+
+	if (device == 0 || command == 0) {
+		return(E_INVALIDARG);
+	}
+
+	error = optcl_device_get_adapter(device, &adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	assert(adapter);
+
+	if (adapter == 0) {
+		return(E_POINTER);
+	}
+
+	error = optcl_adapter_get_alignment_mask(adapter, &alignment);
+
+	if (FAILED(error)) {
+		destroy_error = optcl_adapter_destroy(adapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	error = optcl_adapter_destroy(adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_FORMAT_UNIT;
+	cdb[1] = (command->cmplist << 3) | 0x11;	/* 00010001 */
+
+	memset(cdbparams, 0, sizeof(cdbparams));
+
+	if (command->fov == True) {
+		cdbparams[1] = 
+			(command->dcrt << 5) 
+			| (command->try_out << 2) 
+			| (command->immed << 1) 
+			| command->vs 
+			| 0x10;				/* 00010000 */
+
+		/* format descriptor length should be set to 8 */
+		cdbparams[3] = 8;
+	}
+
+	/* number of blocks */
+	cdbparams[4] = (uint8_t)(command->num_of_blocks >> 24);
+	cdbparams[5] = (uint8_t)((command->num_of_blocks << 8) >> 24);
+	cdbparams[6] = (uint8_t)((command->num_of_blocks << 16) >> 24);
+	cdbparams[7] = (uint8_t)((command->num_of_blocks << 24) >> 24);
+
+	cdbparams[8] = (command->format_type << 2) | command->format_subtype;
+	
+	switch(command->format_type) {
+		case MMC_FORMAT_FULL_FORMAT:
+		case MMC_FORMAT_SPARE_AREA_EXPANSION:
+		case MMC_FORMAT_ZONE_REFORMAT:
+		case MMC_FORMAT_ZONE_FORMAT:
+		case MMC_FORMAT_CD_RW_DVD_RW_FULL_FORMAT:
+		case MMC_FORMAT_CD_RW_DVD_RW_GROW_SESSION:
+		case MMC_FORMAT_CD_RW_DVD_RW_ADD_SESSION:
+		case MMC_FORMAT_DVD_RW_QUICK_GROW_LAST_BORDER:
+		case MMC_FORMAT_DVD_RW_QUICK_ADD_BORDER:
+		case MMC_FORMAT_DVD_RW_QUICK_FORMAT:
+		case MMC_FORMAT_HD_DVD_R_TEST_ZONE_EXPANSION:
+		case MMC_FORMAT_MRW_FORMAT:
+		case MMC_FORMAT_BD_RE_FULL_FORMAT_WITH_SPARE_AREAS:
+		case MMC_FORMAT_BD_RE_FULL_FORMAT_WITHOUT_SPARE_AREAS: {
+			cdbparams[9] = (uint8_t)((command->type_dependant.other.type_dependent << 8) >> 24);
+			cdbparams[10] = (uint8_t)((command->type_dependant.other.type_dependent << 16) >> 24);
+			cdbparams[11] = (uint8_t)((command->type_dependant.other.type_dependent << 24) >> 24);
+			break;
+		}
+		case MMC_FORMAT_FULL_FORMAT_WITH_SPARING_PARAMS: {
+			cdbparams[9] = command->type_dependant.ff_with_sparing.m;
+			cdbparams[11] = command->type_dependant.ff_with_sparing.n;
+			break;
+
+		}
+		case MMC_FORMAT_DVD_PLUS_RW_BASIC_FORMAT: {
+			cdbparams[11] = 
+				(command->type_dependant.dvd_plus_rw_basicf.quick_start << 1) 
+				| command->type_dependant.dvd_plus_rw_basicf.restart;
+			break;
+		}
+		case MMC_FORMAT_BD_R_FULL_FORMAT_WITH_SPARE_AREAS: {
+			cdbparams[9] = 
+				(command->type_dependant.bd_r_with_spare_areas.isa_v << 7) 
+				| command->type_dependant.bd_r_with_spare_areas.sadp;
+
+			cdbparams[10] = 
+				(command->type_dependant.bd_r_with_spare_areas.tdma_v << 7)
+				| command->type_dependant.bd_r_with_spare_areas.tdmadp;
+			break;
+		}
+		default: {
+			assert(False);
+			error = E_INVALIDARG;
+			break;
+		}
+	}
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		cdbparams,
+		sizeof(cdbparams)
+		);
+
+	return(error);
+}
+
 
 RESULT optcl_command_get_configuration(const optcl_device *device,
 				       const optcl_mmc_get_configuration *command,
