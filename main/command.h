@@ -396,6 +396,18 @@ typedef struct tag_mmc_response_inquiry {
 
 
 /*
+ * LOAD/UNLOAD MEDIUM command structures
+ */
+
+typedef struct mmc_load_unload {
+	bool_t immed;
+	bool_t load_unload;
+	bool_t start;
+	uint8_t slot;
+} optcl_mmc_load_unload;
+
+
+/*
  * REQUEST SENSE command structures
  */
 
@@ -437,6 +449,10 @@ extern RESULT optcl_command_get_event_status(const optcl_device *device,
 extern RESULT optcl_command_inquiry(const optcl_device *device, 
 				    const optcl_mmc_inquiry *command, 
 				    optcl_mmc_response_inquiry **response);
+
+extern RESULT optcl_command_load_unload_medium(const optcl_device *device,
+					       const optcl_mmc_load_unload *command);
+
 
 extern RESULT optcl_command_request_sense(const optcl_device *device,
 					  const optcl_mmc_request_sense *command,

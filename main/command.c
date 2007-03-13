@@ -44,6 +44,7 @@
 #define MMC_OPCODE_GET_CONFIG		0x0046
 #define MMC_OPCODE_GET_EVENT_STATUS	0x004A
 #define MMC_OPCODE_INQUIRY		0x0012
+#define MMC_OPCODE_LOAD_UNLOAD		0x00A6
 #define MMC_OPCODE_REQUEST_SENSE	0x0003
 
 
@@ -812,6 +813,42 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 	}
 
 	xfree_aligned(mmc_response);
+
+	return(error);
+}
+
+RESULT optcl_command_load_unload_medium(const optcl_device *device,
+					const optcl_mmc_load_unload *command)
+{
+	RESULT error;
+
+	cdb12 cdb;
+
+	assert(device != 0);
+	assert(command != 0);
+
+	if (device == 0 || command == 0) {
+		return(E_INVALIDARG);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_LOAD_UNLOAD;
+	cdb[1] = command->immed;
+	cdb[4] = (command->load_unload << 1) | command->start;
+	cdb[8] = command->slot;
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		0,
+		0
+		);
 
 	return(error);
 }
