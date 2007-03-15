@@ -744,7 +744,5 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 		}
 	}
 
-	CloseHandle(hDevice);
-
 	return(error);
 }
