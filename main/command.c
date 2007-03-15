@@ -38,14 +38,15 @@
  * MMC opcodes
  */
 
-#define MMC_OPCODE_BLANK		0x00A1
-#define MMC_OPCODE_CLOSE_TRACK_SESSION	0x005B
-#define MMC_OPCODE_FORMAT_UNIT		0x0004
-#define MMC_OPCODE_GET_CONFIG		0x0046
-#define MMC_OPCODE_GET_EVENT_STATUS	0x004A
-#define MMC_OPCODE_INQUIRY		0x0012
-#define MMC_OPCODE_LOAD_UNLOAD		0x00A6
-#define MMC_OPCODE_REQUEST_SENSE	0x0003
+#define MMC_OPCODE_BLANK			0x00A1
+#define MMC_OPCODE_CLOSE_TRACK_SESSION		0x005B
+#define MMC_OPCODE_FORMAT_UNIT			0x0004
+#define MMC_OPCODE_GET_CONFIG			0x0046
+#define MMC_OPCODE_GET_EVENT_STATUS		0x004A
+#define MMC_OPCODE_INQUIRY			0x0012
+#define MMC_OPCODE_LOAD_UNLOAD			0x00A6
+#define MMC_OPCODE_PREVENT_ALLOW_REMOVAL	0x001E
+#define MMC_OPCODE_REQUEST_SENSE		0x0003
 
 
 /*
@@ -818,7 +819,7 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 }
 
 RESULT optcl_command_load_unload_medium(const optcl_device *device,
-					const optcl_mmc_load_unload *command)
+					const optcl_mmc_load_unload_medium *command)
 {
 	RESULT error;
 
@@ -841,6 +842,40 @@ RESULT optcl_command_load_unload_medium(const optcl_device *device,
 	cdb[1] = command->immed;
 	cdb[4] = (command->load_unload << 1) | command->start;
 	cdb[8] = command->slot;
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		0,
+		0
+		);
+
+	return(error);
+}
+
+RESULT optcl_command_prevent_allow_removal(const optcl_device *device,
+					   const optcl_mmc_prevent_allow_removal *command)
+{
+	RESULT error;
+
+	cdb6 cdb;
+
+	assert(device != 0);
+	assert(command != 0);
+
+	if (device == 0 || command == 0) {
+		return(E_INVALIDARG);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_PREVENT_ALLOW_REMOVAL;
+	cdb[4] = (command->persistent << 1) | command->prevent;
 
 	error = optcl_device_command_execute(
 		device,

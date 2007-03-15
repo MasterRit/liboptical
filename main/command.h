@@ -399,12 +399,46 @@ typedef struct tag_mmc_response_inquiry {
  * LOAD/UNLOAD MEDIUM command structures
  */
 
-typedef struct mmc_load_unload {
+typedef struct tag_mmc_load_unload_medium {
 	bool_t immed;
 	bool_t load_unload;
 	bool_t start;
 	uint8_t slot;
-} optcl_mmc_load_unload;
+} optcl_mmc_load_unload_medium;
+
+
+/*
+ * MECHANISM STATUS command structures
+ */
+
+typedef struct tag_mmc_response_mechanism_status {
+	optcl_mmc_response header;
+	bool_t fault;
+	uint8_t changer_state;
+	uint8_t current_slot;
+	uint8_t mechanism_state;
+	bool_t door_open;
+	uint32_t current_lba;
+	uint8_t available_slots;
+	uint16_t slot_table_len;
+
+	struct tag_slot_entry {
+		bool_t disk_present;
+		bool_t change;
+		bool_t cwp_v;
+		bool_t cwp;
+	} slot_entries[256];
+} optcl_mmc_response_mechanism_status;
+
+
+/*
+ * PREVENT ALLOW MEDIA REMOVAL command structures
+ */
+
+typedef struct tag_mmc_prevent_allow_removal {
+	bool_t persistent;
+	bool_t prevent;
+} optcl_mmc_prevent_allow_removal;
 
 
 /*
@@ -451,8 +485,10 @@ extern RESULT optcl_command_inquiry(const optcl_device *device,
 				    optcl_mmc_response_inquiry **response);
 
 extern RESULT optcl_command_load_unload_medium(const optcl_device *device,
-					       const optcl_mmc_load_unload *command);
+					       const optcl_mmc_load_unload_medium *command);
 
+extern RESULT optcl_command_prevent_allow_removal(const optcl_device *device,
+						  const optcl_mmc_prevent_allow_removal *command);
 
 extern RESULT optcl_command_request_sense(const optcl_device *device,
 					  const optcl_mmc_request_sense *command,
