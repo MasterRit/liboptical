@@ -46,6 +46,8 @@
 #define MMC_OPCODE_INQUIRY			0x0012
 #define MMC_OPCODE_LOAD_UNLOAD			0x00A6
 #define MMC_OPCODE_PREVENT_ALLOW_REMOVAL	0x001E
+#define MMC_OPCODE_READ_10			0x0028
+#define MMC_OPCODE_READ_12			0x0028
 #define MMC_OPCODE_REQUEST_SENSE		0x0003
 
 
@@ -53,6 +55,7 @@
  * Constants used throughout the code
  */
 
+#define READ_BLOCK_SIZE			2048U
 #define MAX_SENSEDATA_LENGTH		252
 #define MAX_GET_CONFIG_TRANSFER_LEN	65530
 
@@ -884,6 +887,185 @@ RESULT optcl_command_prevent_allow_removal(const optcl_device *device,
 		0,
 		0
 		);
+
+	return(error);
+}
+
+RESULT optcl_command_read_10(const optcl_device *device,
+			     const optcl_mmc_read_10 *command,
+			     ptr_t *response)
+{
+	RESULT error;
+	RESULT destroy_error;
+
+	cdb10 cdb;
+	uint32_t alignment;
+	ptr_t nresponse = 0;
+	uint32_t max_transfer_len;
+	optcl_adapter *adapter = 0;
+
+	assert(device != 0);
+	assert(command != 0);
+
+	if (device == 0 || command == 0) {
+		return(E_INVALIDARG);
+	}
+
+	error = optcl_device_get_adapter(device, &adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	error = optcl_adapter_get_alignment_mask(adapter, &alignment);
+
+	if (FAILED(error)) {
+		destroy_error = optcl_adapter_destroy(adapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	error = optcl_adapter_get_max_transfer_len(adapter, &max_transfer_len);
+
+	if (FAILED(error)) {
+		destroy_error = optcl_adapter_destroy(adapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	error = optcl_adapter_destroy(adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	if (command->transfer_length * READ_BLOCK_SIZE > max_transfer_len) {
+		return(E_INVALIDARG);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_READ_10;
+	cdb[1] = (command->fua << 3);
+	cdb[2] = (uint8_t)(command->start_lba >> 24);
+	cdb[3] = (uint8_t)((command->start_lba << 8) >> 24);
+	cdb[4] = (uint8_t)((command->start_lba << 16) >> 24);
+	cdb[5] = (uint8_t)((command->start_lba << 24) >> 24);
+	cdb[7] = (uint8_t)(command->transfer_length >> 8);
+	cdb[8] = (uint8_t)((command->transfer_length << 8) >> 8);
+	
+	nresponse = xmalloc_aligned(command->transfer_length * READ_BLOCK_SIZE, alignment);
+
+	if (nresponse == 0) {
+		return(E_OUTOFMEMORY);
+	}
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		nresponse,
+		command->transfer_length * READ_BLOCK_SIZE
+		);
+
+	if (FAILED(error)) {
+		xfree_aligned(nresponse);
+	}
+
+	*response = nresponse;
+
+	return(error);
+}
+
+RESULT optcl_command_read_12(const optcl_device *device,
+			     const optcl_mmc_read_12 *command,
+			     ptr_t *response)
+{
+	RESULT error;
+	RESULT destroy_error;
+
+	cdb12 cdb;
+	uint32_t alignment;
+	ptr_t nresponse = 0;
+	uint32_t max_transfer_len;
+	optcl_adapter *adapter = 0;
+
+	assert(device != 0);
+	assert(command != 0);
+
+	if (device == 0 || command == 0) {
+		return(E_INVALIDARG);
+	}
+
+	error = optcl_device_get_adapter(device, &adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	error = optcl_adapter_get_alignment_mask(adapter, &alignment);
+
+	if (FAILED(error)) {
+		destroy_error = optcl_adapter_destroy(adapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	error = optcl_adapter_get_max_transfer_len(adapter, &max_transfer_len);
+
+	if (FAILED(error)) {
+		destroy_error = optcl_adapter_destroy(adapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	error = optcl_adapter_destroy(adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	if (command->transfer_length * READ_BLOCK_SIZE > max_transfer_len) {
+		return(E_INVALIDARG);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+	
+	cdb[0] = MMC_OPCODE_READ_12;
+	cdb[1] = (command->fua << 3);
+	cdb[2] = (uint8_t)(command->start_lba >> 24);
+	cdb[3] = (uint8_t)((command->start_lba << 8) >> 24);
+	cdb[4] = (uint8_t)((command->start_lba << 16) >> 24);
+	cdb[5] = (uint8_t)((command->start_lba << 24) >> 24);
+	cdb[6] = (uint8_t)(command->transfer_length >> 24);
+	cdb[7] = (uint8_t)((command->transfer_length << 8) >> 24);
+	cdb[8] = (uint8_t)((command->transfer_length << 16) >> 24);
+	cdb[9] = (uint8_t)((command->transfer_length << 24) >> 24);
+	cdb[10] = (command->streaming << 7);
+
+	nresponse = xmalloc_aligned(command->transfer_length * READ_BLOCK_SIZE, alignment);
+
+	if (nresponse == 0) {
+		return(E_OUTOFMEMORY);
+	}
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		nresponse,
+		command->transfer_length * READ_BLOCK_SIZE
+		);
+
+	if (FAILED(error)) {
+		xfree_aligned(nresponse);
+	}
+
+	*response = nresponse;
 
 	return(error);
 }

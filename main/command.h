@@ -442,6 +442,24 @@ typedef struct tag_mmc_prevent_allow_removal {
 
 
 /*
+ * READ command structures
+ */
+
+typedef struct tag_mmc_read_10 {
+	bool_t fua;
+	uint32_t start_lba;
+	uint16_t transfer_length;
+} optcl_mmc_read_10;
+
+typedef struct tag_mmc_read_12 {
+	bool_t fua;
+	uint32_t start_lba;
+	uint32_t transfer_length;
+	bool_t streaming;
+} optcl_mmc_read_12;
+
+
+/*
  * REQUEST SENSE command structures
  */
 
@@ -489,6 +507,14 @@ extern RESULT optcl_command_load_unload_medium(const optcl_device *device,
 
 extern RESULT optcl_command_prevent_allow_removal(const optcl_device *device,
 						  const optcl_mmc_prevent_allow_removal *command);
+
+extern RESULT optcl_command_read_10(const optcl_device *device,
+				    const optcl_mmc_read_10 *command,
+				    ptr_t *response);
+
+extern RESULT optcl_command_read_12(const optcl_device *device,
+				    const optcl_mmc_read_12 *command,
+				    ptr_t *response);
 
 extern RESULT optcl_command_request_sense(const optcl_device *device,
 					  const optcl_mmc_request_sense *command,
