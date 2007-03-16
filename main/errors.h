@@ -64,6 +64,7 @@ typedef int32_t RESULT;
 #define FACILITY_COLLECTIONS	2
 #define FACILITY_FEATURES	3
 #define FACILITY_SENSE		4
+#define FACILITY_COMMANDS	5
 
 
 /* Error status testing macros */
@@ -164,6 +165,12 @@ typedef int32_t RESULT;
 
 #define E_INVALIDRESPONSECODE	\
 	MAKE_SENSE_ERRORCODE(0x1E, 0xFF, 0xFF)
+
+
+/* FACILITY_COMMANDS error codes */
+
+#define E_CMNDINVOPCODE		\
+	MAKE_ERRORCODE(SEVERITY_ERROR, FACILITY_COMMANDS, 0)
 
 
 #endif /* _ERRORS_H */
