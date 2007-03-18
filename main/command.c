@@ -1672,7 +1672,21 @@ RESULT optcl_command_read_10(const optcl_device *device,
 		xfree_aligned(mmc_response);
 	}
 
-	nresponse->data = mmc_response;
+	nresponse->data = malloc(command->transfer_length * READ_BLOCK_SIZE);
+
+	if (nresponse->data == 0) {
+		free(nresponse);
+		xfree_aligned(mmc_response);
+		return(E_OUTOFMEMORY);
+	}
+
+	xmemcpy(nresponse->data, 
+		command->transfer_length * READ_BLOCK_SIZE, 
+		mmc_response, 
+		command->transfer_length * READ_BLOCK_SIZE
+		);
+
+	xfree_aligned(mmc_response);
 
 	*response = nresponse;
 
@@ -2313,7 +2327,7 @@ static RESULT deallocator_mmc_response_read_10(optcl_mmc_response *response)
 
 	mmc_response = (optcl_mmc_response_read*)response;
 
-	xfree_aligned(mmc_response->data);
+	free(mmc_response->data);
 	free(mmc_response);
 
 	return(SUCCESS);
