@@ -253,16 +253,19 @@ typedef struct tag_mmc_format_unit {
 			uint8_t m;
 			uint8_t n;
 		} ff_with_sparing;
+
 		struct tag_dvd_plus_rw_basicf {
 			bool_t quick_start;
 			bool_t restart;
 		} dvd_plus_rw_basicf;
+
 		struct tag_bd_r_with_spare_areas {
 			bool_t isa_v;
 			bool_t tdma_v;
 			uint8_t sadp;
 			uint8_t tdmadp;
 		} bd_r_with_spare_areas;
+
 		struct tag_other {
 			uint32_t type_dependent;
 		} other;
@@ -501,27 +504,60 @@ typedef struct tag_mmc_response_read_buffer {
 			uint32_t buffer_capacity;
 			ptr_t buffer;
 		} combined;
+
 		struct tag_data {
 			ptr_t buffer;
 		} data;
+
 		struct tag_descriptor {
 			uint8_t offset_boundary;
 			uint32_t buffer_capacity;
 		} descriptor;
+
 		struct tag_echo {
 			ptr_t buffer;
 		} echo;
+
 		struct tag_echo_desc {
 			uint32_t buffer_capacity;
 		} echo_desc;
+
 		struct tag_expander {
 			ptr_t buffer;
 		} expander;
+
 		struct tag_vendor {
 			ptr_t buffer;
 		} vendor;
 	} response;
 } optcl_mmc_response_read_buffer;
+
+
+/*
+ * READ BUFFER CAPACITY command structures
+ */
+
+typedef struct tag_mmc_read_buffer_capacity {
+	bool_t block;
+} optcl_mmc_read_buffer_capacity;
+
+typedef struct tag_mmc_resopnse_read_buffer_capacity {
+	optcl_mmc_response header;
+
+	union tag_desc {
+		struct tag_block {
+			bool_t block;
+			uint16_t data_length;
+			uint32_t available_buffer_len;
+		} block;
+
+		struct tag_bytes {
+			uint16_t data_length;
+			uint32_t buffer_len;
+			uint32_t buffer_blank_len;
+		} bytes;
+	} desc;
+} optcl_mmc_response_read_buffer_capacity;
 
 
 /*
@@ -584,6 +620,10 @@ extern RESULT optcl_command_read_12(const optcl_device *device,
 extern RESULT optcl_command_read_buffer(const optcl_device *device,
 					const optcl_mmc_read_buffer *command,
 					optcl_mmc_response_read_buffer **response);
+
+extern RESULT optcl_command_read_buffer_capacity(const optcl_device *device,
+						 const optcl_mmc_read_buffer_capacity *command,
+						 optcl_mmc_response_read_buffer_capacity **response);
 
 extern RESULT optcl_command_request_sense(const optcl_device *device,
 					  const optcl_mmc_request_sense *command,

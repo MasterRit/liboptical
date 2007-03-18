@@ -48,6 +48,7 @@
 #define MMC_OPCODE_READ_10			0x0028
 #define MMC_OPCODE_READ_12			0x0028
 #define MMC_OPCODE_READ_BUFFER			0x003C
+#define MMC_OPCODE_READ_BUFFER_CAPACITY		0x005C
 #define MMC_OPCODE_REQUEST_SENSE		0x0003
 
 
@@ -1881,6 +1882,108 @@ RESULT optcl_command_read_buffer(const optcl_device *device,
 	return(error);
 }
 
+RESULT optcl_command_read_buffer_capacity(const optcl_device *device,
+					  const optcl_mmc_read_buffer_capacity *command,
+					  optcl_mmc_response_read_buffer_capacity **response)
+{
+	RESULT error;
+	RESULT destroy_error;
+
+	cdb10 cdb;
+	uint32_t alignment;
+	ptr_t mmc_response = 0;
+	optcl_adapter *adapter = 0;
+	optcl_mmc_response_read_buffer_capacity *nresponse = 0;
+
+	assert(device != 0);
+	assert(command != 0);
+	assert(response != 0);
+
+	if (device == 0 || command == 0 || response == 0) {
+		return(E_INVALIDARG);
+	}
+
+	error = optcl_device_get_adapter(device, &adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	error = optcl_adapter_get_alignment_mask(adapter, &alignment);
+
+	if (FAILED(error)) {
+		destroy_error = optcl_adapter_destroy(adapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	error = optcl_adapter_destroy(adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_READ_BUFFER_CAPACITY;
+	cdb[1] = command->block & 0x01;
+	cdb[8] = 12; /* size of the response buffer */
+
+	mmc_response = xmalloc_aligned(12, alignment);
+
+	if (mmc_response == 0) {
+		return(E_OUTOFMEMORY);
+	}
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		mmc_response,
+		12
+		);
+
+	if (FAILED(error)) {
+		xfree_aligned(mmc_response);
+		return(error);
+	}
+
+	nresponse = malloc(sizeof(optcl_mmc_response_read_buffer_capacity));
+
+	if (nresponse == 0) {
+		return(E_OUTOFMEMORY);
+	}
+
+	nresponse->header.command_opcode = MMC_OPCODE_READ_BUFFER_CAPACITY;
+
+	if (command->block) {
+		nresponse->desc.block.data_length 
+			= uint16_from_be(*(uint16_t*)&mmc_response[0]);
+
+		nresponse->desc.block.block = bool_from_uint8(mmc_response[3]);
+
+		nresponse->desc.block.available_buffer_len 
+			= uint32_from_be(*(uint32_t*)&mmc_response[8]);
+	} else {
+		nresponse->desc.bytes.data_length
+			= uint16_from_be(*(uint16_t*)&mmc_response[0]);
+
+		nresponse->desc.bytes.buffer_len
+			= uint32_from_be(*(uint32_t*)&mmc_response[4]);
+
+		nresponse->desc.bytes.buffer_blank_len
+			= uint32_from_be(*(uint32_t*)&mmc_response[8]);
+	}
+
+	*response = nresponse;
+
+	return(error);
+}
+
+
 RESULT optcl_command_request_sense(const optcl_device *device,
 				   const optcl_mmc_request_sense *command,
 				   optcl_mmc_response_request_sense **response)
@@ -2149,6 +2252,17 @@ static RESULT deallocator_mmc_response_read_buffer(optcl_mmc_response *response)
 	return(SUCCESS);
 }
 
+static RESULT deallocator_mmc_response_read_buffer_capcity(optcl_mmc_response *response)
+{
+	if (response == 0) {
+		return(SUCCESS);
+	}
+
+	free(response);
+
+	return(SUCCESS);
+}
+
 static RESULT deallocator_mmc_response_request_sense(optcl_mmc_response *response) 
 {
 	if (response == 0) {
@@ -2179,6 +2293,7 @@ static struct response_deallocator_entry __deallocator_table[] = {
 	{ MMC_OPCODE_READ_10,			deallocator_mmc_response_read_10		},
 	{ MMC_OPCODE_READ_12,			deallocator_mmc_response_read_10		},
 	{ MMC_OPCODE_READ_BUFFER,		deallocator_mmc_response_read_buffer		},
+	{ MMC_OPCODE_READ_BUFFER_CAPACITY,	deallocator_mmc_response_read_buffer_capcity	},
 	{ MMC_OPCODE_REQUEST_SENSE,		deallocator_mmc_response_request_sense		}
 };
 
