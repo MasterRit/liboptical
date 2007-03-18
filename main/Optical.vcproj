@@ -522,10 +522,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\parsers.c"
-				>
-			</File>
-			<File
 				RelativePath=".\profile.c"
 				>
 			</File>
@@ -641,10 +637,6 @@
 			</File>
 			<File
 				RelativePath=".\media.h"
-				>
-			</File>
-			<File
-				RelativePath=".\parsers.h"
 				>
 			</File>
 			<File
