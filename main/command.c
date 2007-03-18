@@ -529,7 +529,7 @@ static RESULT parse_raw_inquiry_data(const uint8_t mmc_response[],
 	if (size > 6) {
 		nresponse->bque	= bool_from_uint8(mmc_response[6] & 0x80);	/* 10000000 */
 		nresponse->encserv = bool_from_uint8(mmc_response[6] & 0x40);	/* 01000000 */
-		nresponse->vs = bool_from_uint8(mmc_response[6] & 0x20);	/* 00100000 */
+		nresponse->vs1 = bool_from_uint8(mmc_response[6] & 0x20);	/* 00100000 */
 		nresponse->multip = bool_from_uint8(mmc_response[6] & 0x10);	/* 00010000 */
 		nresponse->mchngr = bool_from_uint8(mmc_response[6] & 0x08);	/* 00001000 */
 		nresponse->addr16 = bool_from_uint8(mmc_response[6] & 0x01);	/* 00000001 */
@@ -540,8 +540,7 @@ static RESULT parse_raw_inquiry_data(const uint8_t mmc_response[],
 		nresponse->sync	= bool_from_uint8(mmc_response[7] & 0x10);	/* 00010000 */
 		nresponse->linked = bool_from_uint8(mmc_response[7] & 0x08);	/* 00001000 */
 		nresponse->cmdque = bool_from_uint8(mmc_response[7] & 0x02);	/* 00000010 */
-
-		/* NOTE result->vs is duplicated at mmc_response[7] & 0x01 ?? */
+		nresponse->vs2 = bool_from_uint8(mmc_response[7] & 0x01);	/* 00000001 */
 	}
 
 	if (size > 16) {
