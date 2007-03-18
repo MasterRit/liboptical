@@ -1581,6 +1581,7 @@ RESULT optcl_command_read_10(const optcl_device *device,
 	cdb10 cdb;
 	uint32_t alignment;
 	ptr_t mmc_response = 0;
+	uint32_t transfer_size;
 	uint32_t max_transfer_len;
 	optcl_adapter *adapter = 0;
 	optcl_mmc_response_read *nresponse = 0;
@@ -1631,7 +1632,9 @@ RESULT optcl_command_read_10(const optcl_device *device,
 		return(E_OUTOFMEMORY);
 	}
 
-	if (command->transfer_length * READ_BLOCK_SIZE > max_transfer_len) {
+	transfer_size = command->transfer_length * READ_BLOCK_SIZE;
+
+	if (transfer_size > max_transfer_len) {
 		return(E_INVALIDARG);
 	}
 
@@ -1650,10 +1653,7 @@ RESULT optcl_command_read_10(const optcl_device *device,
 	cdb[7] = (uint8_t)(command->transfer_length >> 8);
 	cdb[8] = (uint8_t)((command->transfer_length << 8) >> 8);
 	
-	mmc_response = xmalloc_aligned(
-		command->transfer_length * READ_BLOCK_SIZE, 
-		alignment
-		);
+	mmc_response = xmalloc_aligned(transfer_size, alignment);
 
 	if (mmc_response == 0) {
 		return(E_OUTOFMEMORY);
@@ -1664,7 +1664,7 @@ RESULT optcl_command_read_10(const optcl_device *device,
 		cdb,
 		sizeof(cdb),
 		mmc_response,
-		command->transfer_length * READ_BLOCK_SIZE
+		transfer_size
 		);
 
 	if (FAILED(error)) {
@@ -1672,7 +1672,7 @@ RESULT optcl_command_read_10(const optcl_device *device,
 		xfree_aligned(mmc_response);
 	}
 
-	nresponse->data = malloc(command->transfer_length * READ_BLOCK_SIZE);
+	nresponse->data = malloc(transfer_size);
 
 	if (nresponse->data == 0) {
 		free(nresponse);
@@ -1680,11 +1680,7 @@ RESULT optcl_command_read_10(const optcl_device *device,
 		return(E_OUTOFMEMORY);
 	}
 
-	xmemcpy(nresponse->data, 
-		command->transfer_length * READ_BLOCK_SIZE, 
-		mmc_response, 
-		command->transfer_length * READ_BLOCK_SIZE
-		);
+	xmemcpy(nresponse->data, transfer_size, mmc_response, transfer_size);
 
 	xfree_aligned(mmc_response);
 
