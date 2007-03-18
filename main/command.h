@@ -186,6 +186,23 @@
 
 
 /*
+ * READ BUFFER command field flags
+ */
+
+#define MMC_READ_BUFFER_MODE_COMBINED	0x00
+#define MMC_READ_BUFFER_MODE_VENDOR	0x01
+#define MMC_READ_BUFFER_MODE_DATA	0x02
+#define MMC_READ_BUFFER_MODE_DESCRIPTOR	0x03
+#define MMC_READ_BUFFER_MODE_ECHO	0x0A
+#define MMC_READ_BUFFER_MODE_ECHO_DESC	0x0B
+#define MMC_READ_BUFFER_MODE_EXPANDER	0x1A
+
+/* 0x04 - 0x09 Reserved */
+/* 0x0C - 0x19 reserved */
+/* 0x1B - 0x1F Reserved */
+
+
+/*
  * Common to all commands
  */
 
@@ -458,6 +475,54 @@ typedef struct tag_mmc_read_12 {
 	bool_t streaming;
 } optcl_mmc_read_12;
 
+typedef struct tag_mmc_response_read {
+	optcl_mmc_response header;
+	ptr_t data;
+} optcl_mmc_response_read;
+
+
+/*
+ * READ BUFFER command structures
+ */
+
+typedef struct tag_mmc_read_buffer {
+	uint8_t mode;
+	uint8_t buffer_id;
+	uint32_t buffer_offset;
+	uint32_t allocation_len;
+} optcl_mmc_read_buffer;
+
+typedef struct tag_mmc_response_read_buffer {
+	optcl_mmc_response header;
+	uint8_t mode;
+
+	union tag_response {
+		struct tag_combined {
+			uint32_t buffer_capacity;
+			ptr_t buffer;
+		} combined;
+		struct tag_data {
+			ptr_t buffer;
+		} data;
+		struct tag_descriptor {
+			uint8_t offset_boundary;
+			uint32_t buffer_capacity;
+		} descriptor;
+		struct tag_echo {
+			ptr_t buffer;
+		} echo;
+		struct tag_echo_desc {
+			uint32_t buffer_capacity;
+		} echo_desc;
+		struct tag_expander {
+			ptr_t buffer;
+		} expander;
+		struct tag_vendor {
+			ptr_t buffer;
+		} vendor;
+	} response;
+} optcl_mmc_response_read_buffer;
+
 
 /*
  * REQUEST SENSE command structures
@@ -510,11 +575,15 @@ extern RESULT optcl_command_prevent_allow_removal(const optcl_device *device,
 
 extern RESULT optcl_command_read_10(const optcl_device *device,
 				    const optcl_mmc_read_10 *command,
-				    ptr_t *response);
+				    optcl_mmc_response_read **response);
 
 extern RESULT optcl_command_read_12(const optcl_device *device,
 				    const optcl_mmc_read_12 *command,
-				    ptr_t *response);
+				    optcl_mmc_response_read **response);
+
+extern RESULT optcl_command_read_buffer(const optcl_device *device,
+					const optcl_mmc_read_buffer *command,
+					optcl_mmc_response_read_buffer **response);
 
 extern RESULT optcl_command_request_sense(const optcl_device *device,
 					  const optcl_mmc_request_sense *command,
