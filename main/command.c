@@ -49,6 +49,7 @@
 #define MMC_OPCODE_READ_12			0x0028
 #define MMC_OPCODE_READ_BUFFER			0x003C
 #define MMC_OPCODE_READ_BUFFER_CAPACITY		0x005C
+#define MMC_OPCODE_READ_CAPACITY		0x0025
 #define MMC_OPCODE_REQUEST_SENSE		0x0003
 
 
@@ -1026,6 +1027,12 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 		return(error);
 	}
 
+	assert(adapter != 0);
+
+	if (adapter == 0) {
+		return(E_POINTER);
+	}
+
 	error = optcl_adapter_get_alignment_mask(adapter, &alignment_mask);
 
 	if (FAILED(error)) {
@@ -1256,6 +1263,12 @@ RESULT optcl_command_get_event_status(const optcl_device *device,
 		return(error);
 	}
 
+	assert(adapter != 0);
+
+	if (adapter == 0) {
+		return(E_POINTER);
+	}
+
 	error = optcl_adapter_get_alignment_mask(adapter, &alignment);
 
 	if (FAILED(error)) {
@@ -1397,6 +1410,12 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 
 	if (FAILED(error)) {
 		return(error);
+	}
+
+	assert(adapter != 0);
+
+	if (adapter == 0) {
+		return(E_POINTER);
 	}
 
 	error = optcl_adapter_get_alignment_mask(adapter, &alignment_mask);
@@ -1580,6 +1599,12 @@ RESULT optcl_command_read_10(const optcl_device *device,
 		return(error);
 	}
 
+	assert(adapter != 0);
+
+	if (adapter == 0) {
+		return(E_POINTER);
+	}
+
 	error = optcl_adapter_get_alignment_mask(adapter, &alignment);
 
 	if (FAILED(error)) {
@@ -1680,6 +1705,12 @@ RESULT optcl_command_read_12(const optcl_device *device,
 
 	if (FAILED(error)) {
 		return(error);
+	}
+
+	assert(adapter != 0);
+
+	if (adapter == 0) {
+		return(E_POINTER);
 	}
 
 	error = optcl_adapter_get_alignment_mask(adapter, &alignment);
@@ -1785,6 +1816,12 @@ RESULT optcl_command_read_buffer(const optcl_device *device,
 
 	if (FAILED(error)) {
 		return(error);
+	}
+
+	assert(adapter != 0);
+
+	if (adapter == 0) {
+		return(E_POINTER);
 	}
 
 	error = optcl_adapter_get_alignment_mask(adapter, &alignment);
@@ -1909,6 +1946,12 @@ RESULT optcl_command_read_buffer_capacity(const optcl_device *device,
 		return(error);
 	}
 
+	assert(adapter != 0);
+
+	if (adapter == 0) {
+		return(E_POINTER);
+	}
+
 	error = optcl_adapter_get_alignment_mask(adapter, &alignment);
 
 	if (FAILED(error)) {
@@ -1983,6 +2026,84 @@ RESULT optcl_command_read_buffer_capacity(const optcl_device *device,
 	return(error);
 }
 
+RESULT optcl_command_read_capacity(const optcl_device *device,
+				   optcl_mmc_response_read_capacity **response)
+{
+	RESULT error;
+	RESULT destroy_error;
+
+	cdb10 cdb;
+	uint32_t alignment;
+	ptr_t mmc_response = 0;
+	optcl_adapter *adapter = 0;
+	optcl_mmc_response_read_capacity *nresponse = 0;
+
+	assert(device != 0);
+	assert(response != 0);
+
+	if (device == 0 || response == 0) {
+		return(E_INVALIDARG);
+	}
+
+	error = optcl_device_get_adapter(device, &adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	error = optcl_adapter_get_alignment_mask(adapter, &alignment);
+
+	if (FAILED(error)) {
+		destroy_error = optcl_adapter_destroy(adapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	error = optcl_adapter_destroy(adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_READ_CAPACITY;
+
+	mmc_response = xmalloc_aligned(8, alignment);
+
+	if (mmc_response == 0) {
+		return(E_OUTOFMEMORY);
+	}
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		mmc_response,
+		8
+		);
+
+	if (FAILED(error)) {
+		xfree_aligned(mmc_response);
+		return(error);
+	}
+
+	nresponse = malloc(sizeof(optcl_mmc_response_read_capacity));
+
+	if (nresponse == 0) {
+		xfree_aligned(mmc_response);
+		return(E_OUTOFMEMORY);
+	}
+
+	nresponse->header.command_opcode = MMC_OPCODE_READ_CAPACITY;
+	nresponse->lba = uint32_from_be(*(uint32_t*)&mmc_response[0]);
+	nresponse->block_len = uint32_from_be(*(uint32_t*)&mmc_response[4]);
+
+	return(error);
+}
 
 RESULT optcl_command_request_sense(const optcl_device *device,
 				   const optcl_mmc_request_sense *command,

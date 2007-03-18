@@ -561,6 +561,17 @@ typedef struct tag_mmc_resopnse_read_buffer_capacity {
 
 
 /*
+ * READ CAPACITY command structures
+ */
+
+typedef struct tag_mmc_response_read_capacity {
+	optcl_mmc_response header;
+	uint32_t lba;
+	uint32_t block_len;
+} optcl_mmc_response_read_capacity;
+
+
+/*
  * REQUEST SENSE command structures
  */
 
@@ -624,6 +635,9 @@ extern RESULT optcl_command_read_buffer(const optcl_device *device,
 extern RESULT optcl_command_read_buffer_capacity(const optcl_device *device,
 						 const optcl_mmc_read_buffer_capacity *command,
 						 optcl_mmc_response_read_buffer_capacity **response);
+
+extern RESULT optcl_command_read_capacity(const optcl_device *device,
+					  optcl_mmc_response_read_capacity **response);
 
 extern RESULT optcl_command_request_sense(const optcl_device *device,
 					  const optcl_mmc_request_sense *command,
