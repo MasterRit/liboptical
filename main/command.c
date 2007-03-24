@@ -42,6 +42,7 @@
 #define MMC_OPCODE_FORMAT_UNIT			0x0004
 #define MMC_OPCODE_GET_CONFIG			0x0046
 #define MMC_OPCODE_GET_EVENT_STATUS		0x004A
+#define MMC_OPCODE_GET_PERFORMANCE		0x00AC
 #define MMC_OPCODE_INQUIRY			0x0012
 #define MMC_OPCODE_LOAD_UNLOAD			0x00A6
 #define MMC_OPCODE_PREVENT_ALLOW_REMOVAL	0x001E
@@ -304,11 +305,6 @@ static RESULT parse_raw_event_status_descriptor_data(uint8_t event_class,
 	return(error);
 }
 
-
-/*
- * Parser functions
- */ 
-
 static RESULT parse_raw_get_configuration_data(const uint8_t mmc_response[], 
 					       uint32_t size,
 					       optcl_mmc_response_get_configuration **response)
@@ -358,7 +354,6 @@ static RESULT parse_raw_get_configuration_data(const uint8_t mmc_response[],
 	offset = 8;
 
 	while (offset + 3U < size) {
-
 		feature = 0;
 		raw_feature = (uint8_t*)&mmc_response[offset];
 		feature_code = uint16_from_be(*(uint16_t*)&raw_feature[0]);
@@ -479,6 +474,630 @@ static RESULT parse_raw_get_event_status_data(const uint8_t mmc_response[],
 	}
 
 	nresponse->descriptors = descriptors;
+	*response = nresponse;
+
+	return(error);
+}
+
+static RESULT parse_raw_get_performance_data_pd(uint8_t data_type,
+						const uint8_t mmc_response[],
+						uint32_t size,
+						optcl_mmc_response_get_performance *response)
+{
+	RESULT error;
+	RESULT destroy_error;
+
+	uint32_t offset = 8;
+	optcl_list *descriptors = 0;
+	optcl_mmc_gpdesc_pd *gpdesc = 0;
+
+	assert(size >= 8);
+	assert(mmc_response != 0);
+	assert(response != 0);
+
+	if (mmc_response == 0 || response == 0 || size >= 8) {
+		return(E_INVALIDARG);
+	}
+
+	error = optcl_list_create(0, &descriptors);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	assert(descriptors != 0);
+
+	if (descriptors == 0) {
+		return(E_POINTER);
+	}
+
+	switch(data_type) {
+		case PERFORMANCE_READ_NOMINAL: 
+		case PERFORMANCE_WRITE_NOMINAL:
+		case PERFORMANCE_READ_ENTIRE: 
+		case PERFORMANCE_WRITE_ENTIRE: {
+			assert((size - 8) % 16 == 0);
+
+			if ((size - 8) % 16 != 0) {
+				error = E_SIZEMISMATCH;
+				break;
+			}
+
+			while(offset <= size - 16) {
+				gpdesc = malloc(sizeof(optcl_mmc_gpdesc_pd));
+
+				if (gpdesc == 0) {
+					error = E_OUTOFMEMORY;
+					break;
+				}
+
+				memset(gpdesc, 0, sizeof(optcl_mmc_gpdesc_pd));
+
+				gpdesc->header.descriptor_type = MMC_GET_PERF_PERFOMANCE_DATA;
+
+				gpdesc->data_type = data_type;
+				gpdesc->nominal.start_lba = uint32_from_be(*(uint32_t*)&mmc_response[offset]);
+				gpdesc->nominal.start_performance = uint32_from_be(*(uint32_t*)&mmc_response[offset + 4]);
+				gpdesc->nominal.end_lba = uint32_from_be(*(uint32_t*)&mmc_response[offset + 8]);
+				gpdesc->nominal.end_performance = uint32_from_be(*(uint32_t*)&mmc_response[offset + 12]);
+
+				error = optcl_list_add_tail(descriptors, (const ptr_t)gpdesc);
+
+				if (FAILED(error)) {
+					free(gpdesc);
+					break;
+				}
+
+				offset += 16;
+			}
+
+			break;
+		}
+		case PERFORMANCE_READ_EXCEPTIONS:
+		case PERFORMANCE_WRITE_EXCEPTIONS: {
+			assert((size - 8) % 6 == 0);
+
+			if ((size - 8) % 6 != 0) {
+				error = E_SIZEMISMATCH;
+				break;
+			}
+
+			while(offset <= size - 6) {
+				gpdesc = malloc(sizeof(optcl_mmc_gpdesc_pd));
+
+				if (gpdesc == 0) {
+					error = E_OUTOFMEMORY;
+					break;
+				}
+
+				memset(gpdesc, 0, sizeof(optcl_mmc_gpdesc_pd));
+
+				gpdesc->header.descriptor_type = MMC_GET_PERF_PERFOMANCE_DATA;
+				
+				gpdesc->data_type = data_type;
+				gpdesc->exceptions.lba = uint32_from_be(*(uint32_t*)&mmc_response[offset]);
+				gpdesc->exceptions.time = uint16_from_be(*(uint16_t*)&mmc_response[offset + 4]);
+
+				error = optcl_list_add_tail(descriptors, (const ptr_t)gpdesc);
+
+				if (FAILED(error)) {
+					free(gpdesc);
+					break;
+				}
+
+				offset += 6;
+			}
+
+			break;
+		}
+		default: {
+			assert(False);
+			error = E_OUTOFRANGE;
+			break;
+		}
+	}
+
+	if (FAILED(error)) {
+		destroy_error = optcl_list_destroy(descriptors, 1);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	assert(response->descriptors == 0);
+
+	if (response->descriptors != 0) {
+		destroy_error = optcl_list_destroy(descriptors, 1);
+		return(SUCCEEDED(destroy_error) ? E_POINTER : destroy_error);
+	}
+
+	response->descriptors = descriptors;
+
+	return(error);	
+}
+
+static RESULT parse_raw_get_performance_data_uad(const uint8_t mmc_response[],
+						 uint32_t size,
+						 optcl_mmc_response_get_performance *response)
+{
+	RESULT error;
+	RESULT destroy_error;
+
+	uint32_t offset = 0;
+	optcl_list *descriptors = 0;
+	optcl_mmc_gpdesc_uad *gpdesc = 0;
+
+	assert(mmc_response != 0);
+	assert(response != 0);
+
+	if (mmc_response == 0 || response == 0) {
+		return(E_INVALIDARG);
+	}
+
+	error = optcl_list_create(0, &descriptors);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	assert(descriptors != 0);
+
+	if (descriptors == 0) {
+		return(E_POINTER);
+	}
+
+	while(offset <= size - 8) {
+		gpdesc = malloc(sizeof(optcl_mmc_gpdesc_uad));
+
+		if (gpdesc == 0) {
+			error = E_OUTOFMEMORY;
+			break;
+		}
+
+		memset(gpdesc, 0, sizeof(optcl_mmc_gpdesc_uad));
+
+		gpdesc->header.descriptor_type = MMC_GET_PERF_UNUSABLE_AREA_DATA;
+
+		gpdesc->lba = uint32_from_be(*(uint32_t*)&mmc_response[offset]);
+		gpdesc->upb_num = uint32_from_be(*(uint32_t*)&mmc_response[offset + 4]);
+
+		error = optcl_list_add_tail(descriptors, (const ptr_t)gpdesc);
+
+		if (FAILED(error)) {
+			free(gpdesc);
+			break;
+		}
+
+		offset += 8;
+	}
+
+	if (FAILED(error)) {
+		destroy_error = optcl_list_destroy(descriptors, 1);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	assert(response->descriptors == 0);
+
+	if (response->descriptors != 0) {
+		destroy_error = optcl_list_destroy(descriptors, 1);
+		return(SUCCEEDED(destroy_error) ? E_POINTER : destroy_error);
+	}
+
+	response->descriptors = descriptors;
+
+	return(error);
+}
+
+static RESULT parse_raw_get_performance_data_dsd(const uint8_t mmc_response[],
+						 uint32_t size,
+						 optcl_mmc_response_get_performance *response)
+{
+	RESULT error;
+	RESULT destroy_error;
+
+	uint32_t offset = 0;
+	optcl_list *descriptors = 0;
+	optcl_mmc_gpdesc_dsd *gpdesc = 0;
+
+	assert(mmc_response != 0);
+	assert(response != 0);
+
+	if (mmc_response == 0 || response == 0) {
+		return(E_INVALIDARG);
+	}
+
+	error = optcl_list_create(0, &descriptors);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	assert(descriptors != 0);
+
+	if (descriptors == 0) {
+		return(E_POINTER);
+	}
+
+	while(offset <= size - 2048) {
+		gpdesc = malloc(sizeof(optcl_mmc_gpdesc_dsd));
+
+		if (gpdesc == 0) {
+			error = E_OUTOFMEMORY;
+			break;
+		}
+
+		memset(gpdesc, 0, sizeof(optcl_mmc_gpdesc_dsd));
+
+		gpdesc->header.descriptor_type = MMC_GET_PERF_DEFECT_STATUS_DATA;
+
+		gpdesc->start_lba = uint32_from_be(*(uint32_t*)&mmc_response[offset]);
+		gpdesc->end_lba = uint32_from_be(*(uint32_t*)&mmc_response[offset + 4]);
+		gpdesc->blocking_factor = mmc_response[offset + 8];
+		gpdesc->fbo = mmc_response[offset + 9] & 0x07;
+
+		xmemcpy(
+			&gpdesc->defect_statuses[0], 
+			sizeof(gpdesc->defect_statuses), 
+			&mmc_response[offset + 10], 
+			sizeof(gpdesc->defect_statuses)
+			);
+
+		error = optcl_list_add_tail(descriptors, (const ptr_t)gpdesc);
+
+		if (FAILED(error)) {
+			free(gpdesc);
+			break;
+		}
+
+		offset += 2048;
+	}
+
+	if (FAILED(error)) {
+		destroy_error = optcl_list_destroy(descriptors, 1);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	assert(response->descriptors == 0);
+
+	if (response->descriptors != 0) {
+		destroy_error = optcl_list_destroy(descriptors, 1);
+		return(SUCCEEDED(destroy_error) ? E_POINTER : destroy_error);
+	}
+
+	response->descriptors = descriptors;
+
+	return(error);
+}
+
+static RESULT parse_raw_get_performance_data_wsd(const uint8_t mmc_response[],
+						 uint32_t size,
+						 optcl_mmc_response_get_performance *response)
+{
+	RESULT error;
+	RESULT destroy_error;
+
+	uint32_t offset =0;
+	optcl_list *descriptors = 0;
+	optcl_mmc_gpdesc_wsd *gpdesc = 0;
+
+	assert(mmc_response != 0);
+	assert(response != 0);
+
+	if (mmc_response == 0 || response == 0) {
+		return(E_INVALIDARG);
+	}
+
+	error = optcl_list_create(0, &descriptors);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	assert(descriptors != 0);
+
+	if (descriptors == 0) {
+		return(E_POINTER);
+	}
+
+	while(offset <= size - 16) {
+		gpdesc = malloc(sizeof(optcl_mmc_gpdesc_wsd));
+
+		if (gpdesc == 0) {
+			error = E_OUTOFMEMORY;
+			break;
+		}
+
+		memset(gpdesc, 0, sizeof(optcl_mmc_gpdesc_wsd));
+
+		gpdesc->header.descriptor_type = MMC_GET_PERF_WRITE_SPEED_DESCRIPTOR;
+
+		gpdesc->wrc = mmc_response[offset] & 0x18;
+		gpdesc->rdd = bool_from_uint8(mmc_response[offset] & 0x04);
+		gpdesc->exact = bool_from_uint8(mmc_response[offset] & 0x02);
+		gpdesc->mrw = bool_from_uint8(mmc_response[offset] & 0x01);
+		gpdesc->end_lba = uint32_from_be(*(uint32_t*)&mmc_response[offset + 4]);
+		gpdesc->read_speed = uint32_from_be(*(uint32_t*)&mmc_response[offset + 8]);
+		gpdesc->write_speed = uint32_from_be(*(uint32_t*)&mmc_response[offset + 12]);
+
+		error = optcl_list_add_tail(descriptors, (const ptr_t)gpdesc);
+
+		if (FAILED(error)) {
+			free(gpdesc);
+			break;
+		}
+
+		offset += 16;
+	}
+
+	if (FAILED(error)) {
+		destroy_error = optcl_list_destroy(descriptors, 1);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	assert(response->descriptors == 0);
+
+	if (response->descriptors != 0) {
+		destroy_error = optcl_list_destroy(descriptors, 1);
+		return(SUCCEEDED(destroy_error) ? E_POINTER : destroy_error);
+	}
+
+	response->descriptors = descriptors;
+
+	return(error);
+}
+
+static RESULT parse_raw_get_performance_data_dbi(const uint8_t mmc_response[],
+						 uint32_t size,
+						 optcl_mmc_response_get_performance *response)
+{
+	RESULT error;
+	RESULT destroy_error;
+
+	uint32_t offset = 8;
+	optcl_list *descriptors = 0;
+	optcl_mmc_gpdesc_dbi *gpdesc = 0;
+
+	assert(size >= 8);
+	assert(mmc_response != 0);
+	assert(response != 0);
+
+	if (mmc_response == 0 || response == 0 || size < 8) {
+		return(E_INVALIDARG);
+	}
+
+	error = optcl_list_create(0, &descriptors);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	assert(descriptors != 0);
+
+	if (descriptors == 0) {
+		return(E_POINTER);
+	}
+
+	while(offset < size - 8) {
+		gpdesc = malloc(sizeof(optcl_mmc_gpdesc_dbi));
+
+		if (gpdesc == 0) {
+			error = E_OUTOFMEMORY;
+			break;
+		}
+
+		memset(gpdesc, 0, sizeof(optcl_mmc_gpdesc_dbi));
+
+		gpdesc->header.descriptor_type = MMC_GET_PERF_DBI;
+
+		gpdesc->start_lba = uint32_from_be(*(uint32_t*)&mmc_response[offset]);
+		gpdesc->def_blocks_num = uint16_from_be(*(uint16_t*)&mmc_response[offset + 4]);
+		gpdesc->dbif = bool_from_uint8(mmc_response[offset + 6] & 0x10);
+		gpdesc->error_level = mmc_response[offset + 6] & 0x0F;
+
+		error = optcl_list_add_tail(descriptors, (const ptr_t)gpdesc);
+
+		if (FAILED(error)) {
+			free(gpdesc);
+			break;
+		}
+
+		offset += 8;
+	}
+
+	if (FAILED(error)) {
+		destroy_error = optcl_list_destroy(descriptors, 1);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	assert(response->descriptors == 0);
+
+	if (response->descriptors != 0) {
+		destroy_error = optcl_list_destroy(descriptors, 1);
+		return(SUCCEEDED(destroy_error) ? E_POINTER : destroy_error);
+	}
+
+	response->descriptors = descriptors;
+
+	return(error);
+}
+
+static RESULT parse_raw_get_performance_data_dbicz(const uint8_t mmc_response[],
+						   uint32_t size,
+						   optcl_mmc_response_get_performance *response)
+{
+	RESULT error;
+	RESULT destroy_error;
+
+	uint32_t offset = 8;
+	optcl_list *descriptors = 0;
+	optcl_mmc_gpdesc_dbicz *gpdesc = 0;
+
+	assert(size >= 8);
+	assert(mmc_response != 0);
+	assert(response != 0);
+
+	if (mmc_response == 0 || response == 0 || size < 8) {
+		return(E_INVALIDARG);
+	}
+
+	error = optcl_list_create(0, &descriptors);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	assert(descriptors != 0);
+
+	if (descriptors == 0) {
+		return(E_POINTER);
+	}
+
+	while(offset < size - 8) {
+		gpdesc = malloc(sizeof(optcl_mmc_gpdesc_dbicz));
+
+		if (gpdesc == 0) {
+			error = E_OUTOFMEMORY;
+			break;
+		}
+
+		memset(gpdesc, 0, sizeof(optcl_mmc_gpdesc_dbicz));
+
+		gpdesc->header.descriptor_type = MMC_GET_PERF_DBI;
+
+		gpdesc->start_lba = uint32_from_be(*(uint32_t*)&mmc_response[offset]);
+
+		error = optcl_list_add_tail(descriptors, (const ptr_t)gpdesc);
+
+		if (FAILED(error)) {
+			free(gpdesc);
+			break;
+		}
+
+		offset += 8;
+	}
+
+	if (FAILED(error)) {
+		destroy_error = optcl_list_destroy(descriptors, 1);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	assert(response->descriptors == 0);
+
+	if (response->descriptors != 0) {
+		destroy_error = optcl_list_destroy(descriptors, 1);
+		return(SUCCEEDED(destroy_error) ? E_POINTER : destroy_error);
+	}
+
+	response->descriptors = descriptors;
+
+	return(error);
+}
+
+static RESULT parse_raw_get_performance_data(uint8_t type,
+					     uint8_t data_type,
+					     const uint8_t mmc_response[],
+					     uint32_t size,
+					     optcl_mmc_response_get_performance **response)
+{
+	RESULT error;
+
+	optcl_mmc_response_get_performance *nresponse = 0;
+
+	assert(mmc_response != 0);
+	assert(response != 0);
+	assert(size >= 8);
+
+	if (mmc_response == 0 || response == 0 || size < 8) {
+		return(E_INVALIDARG);
+	}
+
+	nresponse = malloc(sizeof(optcl_mmc_response_get_performance));
+
+	if (nresponse == 0) {
+		return(E_OUTOFMEMORY);
+	}
+
+	memset(nresponse, 0, sizeof(optcl_mmc_response_get_performance));
+
+	switch(type) {
+		case MMC_GET_PERF_PERFOMANCE_DATA: {
+			nresponse->gp_header.perf_header.perf_data_len = 
+				uint32_from_be(*(uint32_t*)&mmc_response[0]);
+			nresponse->gp_header.perf_header.write = mmc_response[4] & 0x02;
+			nresponse->gp_header.perf_header.except = mmc_response[4] & 0x01;
+
+			error = parse_raw_get_performance_data_pd(
+				data_type,
+				mmc_response, 
+				size, 
+				nresponse
+				);
+
+			break;
+		}
+		case MMC_GET_PERF_UNUSABLE_AREA_DATA: {
+			error = parse_raw_get_performance_data_uad(
+				mmc_response, 
+				size, 
+				nresponse
+				);
+
+			break;
+		}
+		case MMC_GET_PERF_DEFECT_STATUS_DATA: {
+			error = parse_raw_get_performance_data_dsd(
+				mmc_response,
+				size,
+				nresponse
+				);
+
+			break;
+		}
+		case MMC_GET_PERF_WRITE_SPEED_DESCRIPTOR: {
+			error = parse_raw_get_performance_data_wsd(
+				mmc_response,
+				size,
+				nresponse
+				);
+
+			break;
+		}
+		case MMC_GET_PERF_DBI: {
+			nresponse->gp_header.dbi_header.dbi_data_len = 
+				uint32_from_be(*(uint32_t*)&mmc_response[0]);
+
+			error = parse_raw_get_performance_data_dbi(
+				mmc_response,
+				size,
+				nresponse
+				);
+
+			break;
+		}
+		case MMC_GET_PERF_DBI_CACHE_ZONE: {
+			error = parse_raw_get_performance_data_dbicz(
+				mmc_response,
+				size,
+				nresponse
+				);
+
+			break;
+		}
+		default: {
+			assert(False);
+			error = E_OUTOFRANGE;
+			break;
+		}
+	}
+
+	if (FAILED(error)) {
+		free(nresponse);
+		return(error);
+	}
+
+	if (nresponse->descriptors == 0) {
+		free(nresponse);
+		return(E_POINTER);
+	}
+
 	*response = nresponse;
 
 	return(error);
@@ -1376,6 +1995,172 @@ RESULT optcl_command_get_event_status(const optcl_device *device,
 	return(SUCCESS);
 }
 
+RESULT optcl_command_get_performance(const optcl_device *device,
+				     const optcl_mmc_get_performance *command,
+				     optcl_mmc_response_get_performance **response)
+{
+	RESULT error;
+	RESULT destroy_error;
+
+	cdb12 cdb;
+	uint32_t alignment;
+	uint32_t perf_data_len;
+	uint32_t max_transfer_len;
+	ptr_t mmc_response = 0;
+	optcl_adapter *adapter = 0;
+	optcl_mmc_response_get_performance *nresponse = 0;
+
+	assert(device != 0);
+	assert(command != 0);
+	assert(response != 0);
+
+	if (device == 0 || command == 0 || response == 0) {
+		return(E_INVALIDARG);
+	}
+
+	error = optcl_device_get_adapter(device, &adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	assert(adapter != 0);
+
+	if (adapter == 0) {
+		return(E_POINTER);
+	}
+
+	error = optcl_adapter_get_alignment_mask(adapter, &alignment);
+
+	if (FAILED(error)) {
+		destroy_error = optcl_adapter_destroy(adapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	error = optcl_adapter_get_max_transfer_len(adapter, &max_transfer_len);
+
+	if (FAILED(error)) {
+		destroy_error = optcl_adapter_destroy(adapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	error = optcl_adapter_destroy(adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	/*
+	 * Execute command just to get response header
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_GET_PERFORMANCE;
+	cdb[1] = command->data_type & 0x1F;
+	cdb[2] = (uint8_t)(command->start_lba >> 24);
+	cdb[3] = (uint8_t)((command->start_lba << 8) >> 24);
+	cdb[4] = (uint8_t)((command->start_lba << 16) >> 24);
+	cdb[5] = (uint8_t)((command->start_lba << 24) >> 24);
+	cdb[10] = command->type;
+
+	mmc_response = xmalloc_aligned(8, alignment);
+
+	if (mmc_response == 0) {
+		return(E_OUTOFMEMORY);
+	}
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		mmc_response,
+		8
+		);
+
+	if (FAILED(error)) {
+		xfree_aligned(mmc_response);
+		return(error);
+	}
+
+	assert(mmc_response != 0);
+
+	if (mmc_response == 0) {
+		xfree_aligned(mmc_response);
+		return(E_POINTER);
+	}
+
+	perf_data_len = uint32_from_be(*(uint32_t*)&mmc_response[0]);
+
+	xfree_aligned(mmc_response);
+
+	if (perf_data_len > 0xFFFFFFFB) {
+		return(E_OVERFLOW);
+	}
+
+	if (perf_data_len + 4 > max_transfer_len) {
+		return(E_DEVINVALIDSIZE);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	cdb[8] = (uint8_t)(command->max_desc_num >> 8);
+	cdb[9] = (uint8_t)((command->max_desc_num << 8) >> 8);
+
+	mmc_response = xmalloc_aligned(perf_data_len + 4, alignment);
+
+	if (mmc_response == 0) {
+		return(E_OUTOFMEMORY);
+	}
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		mmc_response,
+		8
+		);
+
+	if (FAILED(error)) {
+		xfree_aligned(mmc_response);
+		return(error);
+	}
+
+	assert(mmc_response != 0);
+
+	if (mmc_response == 0) {
+		xfree_aligned(mmc_response);
+		return(E_POINTER);
+	}
+
+	error = parse_raw_get_performance_data(
+		command->type,
+		command->data_type,
+		mmc_response, 
+		perf_data_len + 4, 
+		&nresponse
+		);
+
+	xfree_aligned(mmc_response);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	assert(nresponse != 0);
+
+	if (nresponse == 0) {
+		return(E_POINTER);
+	}
+
+	nresponse->header.command_opcode = MMC_OPCODE_GET_PERFORMANCE;
+
+	*response = nresponse;
+
+	return(SUCCESS);
+}
 
 RESULT optcl_command_inquiry(const optcl_device *device, 
 			     const optcl_mmc_inquiry *command, 
@@ -2289,6 +3074,32 @@ static RESULT deallocator_mmc_response_get_event_status(optcl_mmc_response *resp
 	return(error);
 }
 
+static RESULT deallocator_mmc_response_get_performance(optcl_mmc_response *response)
+{
+	RESULT error;
+	optcl_mmc_response_get_performance *mmc_response = 0;
+
+	if (response == 0) {
+		return(SUCCESS);
+	}
+
+	assert(response->command_opcode == MMC_OPCODE_GET_PERFORMANCE);
+
+	if (response->command_opcode != MMC_OPCODE_GET_PERFORMANCE) {
+		return(E_CMNDINVOPCODE);
+	}
+
+	mmc_response = (optcl_mmc_response_get_performance*)response;
+
+	assert(mmc_response->descriptors != 0);
+
+	error = optcl_list_destroy(mmc_response->descriptors, 1);
+
+	free(mmc_response);
+
+	return(error);
+}
+
 static RESULT deallocator_mmc_response_inquiry(optcl_mmc_response *response)
 {
 	if (response == 0) {
@@ -2420,6 +3231,7 @@ static struct response_deallocator_entry __deallocator_table[] = {
 	{ MMC_OPCODE_INQUIRY,			deallocator_mmc_response_get_configuration	},
 	{ MMC_OPCODE_GET_CONFIG,		deallocator_mmc_response_get_event_status	},
 	{ MMC_OPCODE_GET_EVENT_STATUS,		deallocator_mmc_response_inquiry		},
+	{ MMC_OPCODE_GET_PERFORMANCE,		deallocator_mmc_response_get_performance	},
 	{ MMC_OPCODE_READ_10,			deallocator_mmc_response_read_10		},
 	{ MMC_OPCODE_READ_12,			deallocator_mmc_response_read_10		},
 	{ MMC_OPCODE_READ_BUFFER,		deallocator_mmc_response_read_buffer		},

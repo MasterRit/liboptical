@@ -20,7 +20,6 @@
 #ifndef _COMMAND_H
 #define _COMMAND_H
 
-
 #include "device.h"
 #include "errors.h"
 #include "list.h"
@@ -183,6 +182,39 @@
 #define EVENT_DB_EC_CHANGE		0x01
 #define EVENT_DB_DBS_NOTBUSY		0x00
 #define EVENT_DB_DBS_BUSY		0x01
+
+
+/*
+ * GET PERFORMANCE command field flags
+ */
+
+#define MMC_GET_PERF_PERFOMANCE_DATA		0x00
+#define MMC_GET_PERF_UNUSABLE_AREA_DATA		0x01
+#define MMC_GET_PERF_DEFECT_STATUS_DATA		0x02
+#define MMC_GET_PERF_WRITE_SPEED_DESCRIPTOR	0x03
+#define MMC_GET_PERF_DBI			0x04
+#define MMC_GET_PERF_DBI_CACHE_ZONE		0x05
+
+/* 0x06 - 0xFF Reserved */
+
+#define PERFORMANCE_READ_NOMINAL	0x10
+#define PERFORMANCE_READ_ENTIRE		0x11
+#define PERFORMANCE_READ_EXCEPTIONS	0x12
+#define PERFORMANCE_WRITE_NOMINAL	0x14
+#define PERFORMANCE_WRITE_ENTIRE	0x15
+#define PERFORMANCE_WRITE_EXCEPTIONS	0x16
+
+#define UAE_PBI		0x00
+#define UAE_SAI		0x01
+#define UAE_DBI		0x02
+
+#define WRC_DEFAULT	0x00
+#define WRC_CAV		0x01
+
+#define ELT_RECOVERED_LIGHT		0x00
+#define ELT_RECOVERED_HEAVY_DEFECTS	0x01
+#define ELT_RECOVERED_UNRECOVERED	0x02
+#define ELT_RECOVERED_WRITE_ERROR	0x03
 
 
 /*
@@ -361,6 +393,98 @@ typedef struct tag_mmc_response_get_event_status {
 } optcl_mmc_response_get_event_status;
 
 typedef optcl_mmc_ges_header optcl_mmc_ges_descriptor;
+
+
+/*
+ * GET PERFORMANCE command structures
+ */
+
+typedef struct tag_mmc_get_performance {
+	uint8_t data_type;
+	uint32_t start_lba;
+	uint16_t max_desc_num;
+	uint8_t type;
+} optcl_mmc_get_performance;
+
+typedef struct tag_mmc_gpdesc_header {
+	uint8_t descriptor_type;
+} optcl_mmc_gpdesc_header;
+
+typedef struct tag_mmc_gpdesc_pd {
+	optcl_mmc_gpdesc_header header;
+	uint8_t data_type;
+
+	union tag_nominal {
+		uint32_t start_lba;
+		uint32_t end_lba;
+		uint32_t start_performance;
+		uint32_t end_performance;
+	} nominal;
+	union tag_exceptions {
+		uint32_t lba;
+		uint16_t time;
+	} exceptions;
+}  optcl_mmc_gpdesc_pd;
+
+typedef struct tag_mmc_gpdesc_uad {
+	optcl_mmc_gpdesc_header header;
+	uint32_t lba;
+	uint32_t upb_num;
+} optcl_mmc_gpdesc_uad;
+
+typedef struct tag_mmc_gpdesc_dsd {
+	optcl_mmc_gpdesc_header header;
+	uint32_t start_lba;
+	uint32_t end_lba;
+	uint8_t blocking_factor;
+	uint8_t fbo;
+	uint8_t defect_statuses[2038];
+} optcl_mmc_gpdesc_dsd;
+
+typedef struct tag_mmc_gpdesc_wsd {
+	optcl_mmc_gpdesc_header header;
+	uint8_t wrc;
+	bool_t rdd;
+	bool_t exact;
+	bool_t mrw;
+	uint32_t end_lba;
+	uint32_t read_speed;
+	uint32_t write_speed;
+} optcl_mmc_gpdesc_wsd;
+
+typedef struct tag_mmc_gpdesc_dbi {
+	optcl_mmc_gpdesc_header header;
+	uint32_t start_lba;
+	uint16_t def_blocks_num;
+	bool_t dbif;
+	uint8_t error_level;
+} optcl_mmc_gpdesc_dbi;
+
+typedef struct tag_mmc_gpdesc_dbicz {
+	optcl_mmc_gpdesc_header header;
+	uint32_t start_lba;
+} optcl_mmc_gpdesc_dbicz;
+
+typedef struct tag_mmc_response_get_performance {
+	optcl_mmc_response header;
+	uint8_t type;
+
+	union tag_gp_header {
+		struct tag_perf_header {
+			uint32_t perf_data_len;
+			bool_t write;
+			bool_t except;
+		} perf_header;
+		struct tag_dbi_header {
+			uint32_t dbi_data_len;
+		} dbi_header;
+		struct tag_dbicz_header {
+			uint32_t dbicz_data_len;
+		} dbicz_header;
+	} gp_header;
+
+	optcl_list *descriptors;
+} optcl_mmc_response_get_performance;
 
 
 /*
@@ -610,6 +734,10 @@ extern RESULT optcl_command_get_configuration(const optcl_device *device,
 extern RESULT optcl_command_get_event_status(const optcl_device *device,
 					     const optcl_mmc_get_event_status *command,
 					     optcl_mmc_response_get_event_status **response);
+
+extern RESULT optcl_command_get_performance(const optcl_device *device,
+					    const optcl_mmc_get_performance *command,
+					    optcl_mmc_response_get_performance **response);
 
 extern RESULT optcl_command_inquiry(const optcl_device *device, 
 				    const optcl_mmc_inquiry *command, 
