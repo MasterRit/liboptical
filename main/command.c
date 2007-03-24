@@ -45,6 +45,7 @@
 #define MMC_OPCODE_GET_PERFORMANCE		0x00AC
 #define MMC_OPCODE_INQUIRY			0x0012
 #define MMC_OPCODE_LOAD_UNLOAD			0x00A6
+#define MMC_OPCODE_MECHANISM_SATTUS		0x00BD
 #define MMC_OPCODE_PREVENT_ALLOW_REMOVAL	0x001E
 #define MMC_OPCODE_READ_10			0x0028
 #define MMC_OPCODE_READ_12			0x0028
@@ -61,6 +62,7 @@
 #define READ_BLOCK_SIZE			2048U
 #define MAX_SENSEDATA_LENGTH		252
 #define MAX_GET_CONFIG_TRANSFER_LEN	65530
+#define MECHSTATUS_RESPSIZE	1032
 
 
 /*
@@ -2320,6 +2322,119 @@ RESULT optcl_command_load_unload_medium(const optcl_device *device,
 
 	return(error);
 }
+
+RESULT optcl_command_mechanism_status(const optcl_device *device,
+				      optcl_mmc_response_mechanism_status **response)
+{
+	RESULT error;
+	RESULT destroy_error;
+
+	int i;
+	cdb12 cdb;
+	uint32_t alignment;
+	ptr_t mmc_response = 0;
+	optcl_adapter *adapter = 0;
+	optcl_mmc_response_mechanism_status *nresponse = 0;
+
+	assert(device != 0);
+	assert(response != 0);
+
+	if (device == 0 || response == 0) {
+		return(E_INVALIDARG);
+	}
+
+	error = optcl_device_get_adapter(device, &adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	assert(adapter != 0);
+
+	if (adapter == 0) {
+		return(E_POINTER);
+	}
+
+	error = optcl_adapter_get_alignment_mask(adapter, &alignment);
+
+	if (FAILED(error)) {
+		destroy_error = optcl_adapter_destroy(adapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	error = optcl_adapter_destroy(adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_MECHANISM_SATTUS;
+	cdb[8] = (uint8_t)(MECHSTATUS_RESPSIZE >> 8);
+	cdb[8] = (uint8_t)((MECHSTATUS_RESPSIZE << 8) >> 8);
+
+	mmc_response = xmalloc_aligned(MECHSTATUS_RESPSIZE, alignment);
+
+	if (mmc_response == 0) {
+		return(E_OUTOFMEMORY);
+	}
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		mmc_response,
+		MECHSTATUS_RESPSIZE
+		);
+
+	if (FAILED(error)) {
+		xfree_aligned(mmc_response);
+		return(error);
+	}
+
+	/*
+	 * Parse raw data
+	 */
+
+	nresponse = malloc(sizeof(optcl_mmc_response_mechanism_status));
+
+	if (nresponse == 0) {
+		xfree_aligned(mmc_response);
+		return(E_OUTOFMEMORY);
+	}
+
+	memset(nresponse, 0, sizeof(optcl_mmc_response_mechanism_status));
+
+	nresponse->header.command_opcode = MMC_OPCODE_MECHANISM_SATTUS;
+
+	nresponse->fault = bool_from_uint8(mmc_response[0] & 0x80);		/* 10000000 */
+	nresponse->changer_state = mmc_response[0] & 0x60;			/* 01100000 */
+	nresponse->current_slot = ((mmc_response[1] & 0x07) << 5) | (mmc_response[0] & 0x1F);
+	nresponse->mechanism_state = mmc_response[1] & 0xE0;			/* 11100000 */
+	nresponse->door_open = bool_from_uint8(mmc_response[1] & 0x10);		/* 00010000 */
+	nresponse->current_lba = (mmc_response[2] << 16) | (mmc_response[3] << 8) | mmc_response[4];
+	nresponse->available_slots = mmc_response[5];
+	nresponse->slot_table_len = uint16_from_be(*(uint16_t*)&mmc_response[6]);
+
+	for(i = 0; i < nresponse->available_slots; ++i) {
+		nresponse->slot_entries[i].disk_present = bool_from_uint8(mmc_response[8 + i * 4] & 0x80);
+		nresponse->slot_entries[i].change = bool_from_uint8(mmc_response[8 + i * 4] & 0x01);
+		nresponse->slot_entries[i].cwp_v = bool_from_uint8(mmc_response[9 + i * 4] & 0x02);
+		nresponse->slot_entries[i].cwp = bool_from_uint8(mmc_response[9 + i * 4] & 0x01);
+	}
+
+	xfree_aligned(mmc_response);
+
+	*response = nresponse;
+
+	return(error);
+}
+
 
 RESULT optcl_command_prevent_allow_removal(const optcl_device *device,
 					   const optcl_mmc_prevent_allow_removal *command)
