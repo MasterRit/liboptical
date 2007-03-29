@@ -236,6 +236,74 @@
 
 
 /*
+ * MODE SENSE command field flags
+ */
+
+#define SENSE_PAGECTRL_CURRENT			0x00
+#define SENSE_PAGECTRL_CHANGEABLE		0x01
+#define SENSE_PAGECTRL_DEFAULT			0x02
+#define SENSE_PAGECTRL_SAVED			0x03
+
+#define SENSE_MODEPAGE_VENDOR			0x00
+#define SENSE_MODEPAGE_RW_ERROR			0x01
+#define SENSE_MODEPAGE_MRW			0x02
+#define SENSE_MODEPAGE_WRITE_PARAM		0x05
+#define SENSE_MODEPAGE_CACHING			0x08
+#define SENSE_MODEPAGE_PWR_CONDITION		0x1A
+#define SENSE_MODEPAGE_INFO_EXCEPTIONS		0x1C
+#define SENSE_MODEPAGE_TIMEOUT_PROTECT		0x1D
+
+#define SENSE_WT_PACKET				0x00
+#define SENSE_WT_TAO				0x01
+#define SENSE_WT_SAO				0x02
+#define SENSE_WT_RAW				0x03
+#define SENSE_WT_LJR				0x04
+
+/* 0x05 - 0xFF Reserved */
+
+#define SENSE_MS_NB0PTR				0x00
+#define SENSE_MS_B0PTR_FF			0x01
+
+/* 0x02 - Reserved */
+
+#define SENSE_MS_B0PTR_NPPA			0x03
+
+#define SENSE_DBT_RAW				0x00
+#define SENSE_DBT_RAW_PQSC			0x01
+#define SENSE_DBT_RAW_PWSC			0x02
+#define SENSE_DBT_RAW_PWSC_RAW			0x03
+
+/* 0x04 - 0x06 Reserved */
+
+#define SENSE_DBT_VENDOR0			0x07
+#define SENSE_DBT_MODE1				0x08
+#define SENSE_DBT_MODE2				0x09
+#define SENSE_DBT_MODE2_2048			0x0A
+#define SENSE_DBT_MODE2_2056			0x0B
+#define SENSE_DBT_MODE2_2324			0x0C
+#define SENSE_DBT_MODE_MIXED			0x0D
+
+/* 0x0E - reserved */
+
+#define SENSE_DBT_VENDOR2			0x0F
+
+#define SENSE_SFC_CDDA_CDROM			0x00
+#define SENSE_SFC_CDI				0x10
+#define SENSE_SFC_CDROMXA			0x20
+
+#define SENSE_MRIE_NROIEC			0x00
+#define SENSE_MRIE_AER				0x01
+#define SENSE_MRIE_GUA				0x02
+#define SENSE_MRIE_CGRE				0x03
+#define SENSE_MRIE_UGRE				0x04
+#define SENSE_MRIE_GNS				0x05
+#define SENSE_MRIE_ORIECOR			0x06
+
+/* 0x07 - 0x0B Reserved */
+/* 0x0C - 0x0F Vendor specific */
+
+
+/*
  * READ BUFFER command field flags
  */
 
@@ -595,6 +663,112 @@ typedef struct tag_mmc_response_mechanism_status {
 
 
 /*
+ * MODE SENSE command structures
+ */
+
+typedef struct tag_mmc_mode_sense {
+	bool_t dbd;
+	uint8_t pc;
+	uint8_t page_code;
+} optcl_mmc_mode_sense;
+
+typedef struct tag_mmc_msdesc_header {
+	uint8_t page_code;
+} optcl_mmc_msdesc_header;
+
+typedef struct tag_mmc_msdesc_vendor {
+	optcl_mmc_msdesc_header header;
+	uint8_t page_len;
+	uint8_t vendor_data[254];
+} optcl_mmc_msdesc_vendor;
+
+typedef struct tag_mmc_msdesc_rwrecovery {
+	optcl_mmc_msdesc_header header;
+	bool_t ps;
+	bool_t awre;
+	bool_t arre;
+	bool_t tb;
+	bool_t rc;
+	bool_t per;
+	bool_t dte;
+	bool_t dcr;
+	uint8_t emcdr;
+	uint8_t read_retry_count;
+	uint8_t write_retry_count;
+	uint32_t window_size;
+} optcl_mmc_msdesc_rwrecovery;
+
+typedef struct tag_mmc_msdesc_mrw {
+	optcl_mmc_msdesc_header header;
+	bool_t ps;
+	bool_t lba_space;
+} optcl_mmc_msdesc_mrw;
+
+typedef struct tag_mmc_msdesc_writeparams {
+	optcl_mmc_msdesc_header header;
+	bool_t ps;
+	bool_t bufe;
+	bool_t ls_v;
+	bool_t test_write;
+	uint8_t write_type;
+	uint8_t multi_session;
+	bool_t fp;
+	bool_t copy;
+	uint8_t track_mode;
+	uint8_t dbt;
+	uint8_t link_size;
+	uint8_t hac;
+	uint8_t session_fmt;
+	uint32_t packet_size;
+	uint16_t audio_pause_len;
+	uint8_t mcn[16];
+	uint8_t isrc[16];
+	uint8_t subheader_0;
+	uint8_t subheader_1;
+	uint8_t subheader_2;
+	uint8_t subheader_3;
+	uint8_t vendor_specific;
+} optcl_mmc_msdesc_writeparams;
+
+typedef struct tag_mmc_msdesc_caching {
+	optcl_mmc_msdesc_header header;
+	bool_t ps;
+	bool_t wce;
+	bool_t rcd;
+} optcl_mmc_msdesc_caching;
+
+typedef struct tag_mmc_msdesc_power {
+	optcl_mmc_msdesc_header header;
+	bool_t ps;
+	bool_t spf;
+	bool_t idle;
+	bool_t standby;
+	uint16_t idle_timer;
+	uint16_t standby_timer;
+} optcl_mmc_msdesc_power;
+
+typedef struct tag_mmc_msdesc_infoexceptions {
+	optcl_mmc_msdesc_header header;
+	bool_t ps;
+	bool_t spf;
+	bool_t sperf;
+	bool_t ebf;
+	bool_t ewasc;
+	bool_t dexcpt;
+	bool_t test;
+	bool_t logerr;
+	uint8_t mrie;
+	uint16_t interval_timer;
+	uint16_t report_count;
+} optcl_mmc_msdesc_infoexceptions;
+
+typedef struct tag_mmc_response_mode_sense {
+	optcl_mmc_response header;
+	optcl_list *descriptors;
+} optcl_mmc_response_mode_sense;
+
+
+/*
  * PREVENT ALLOW MEDIA REMOVAL command structures
  */
 
@@ -766,6 +940,10 @@ extern RESULT optcl_command_load_unload_medium(const optcl_device *device,
 
 extern RESULT optcl_command_mechanism_status(const optcl_device *device,
 					     optcl_mmc_response_mechanism_status **response);
+
+extern RESULT optcl_command_mode_sense_10(const optcl_device *device,
+					  const optcl_mmc_mode_sense *command,
+					  optcl_mmc_response_mode_sense **response);
 
 extern RESULT optcl_command_prevent_allow_removal(const optcl_device *device,
 						  const optcl_mmc_prevent_allow_removal *command);

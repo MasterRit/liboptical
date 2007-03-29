@@ -1,4 +1,4 @@
-/*
+/*-
     command.c - Multi-Media Commands - 5 (MMC-5).
     Copyright (C) 2006  Aleksandar Dezelin <dezelin@gmail.com>
 
@@ -45,7 +45,8 @@
 #define MMC_OPCODE_GET_PERFORMANCE		0x00AC
 #define MMC_OPCODE_INQUIRY			0x0012
 #define MMC_OPCODE_LOAD_UNLOAD			0x00A6
-#define MMC_OPCODE_MECHANISM_SATTUS		0x00BD
+#define MMC_OPCODE_MECHANISM_STATUS		0x00BD
+#define MMC_OPCODE_MODE_SENSE			0x005A
 #define MMC_OPCODE_PREVENT_ALLOW_REMOVAL	0x001E
 #define MMC_OPCODE_READ_10			0x0028
 #define MMC_OPCODE_READ_12			0x0028
@@ -1223,6 +1224,255 @@ static RESULT parse_raw_inquiry_data(const uint8_t mmc_response[],
 	return(SUCCESS);
 }
 
+static RESULT parse_raw_mode_sense_data(const uint8_t mmc_response[],
+					uint32_t size,
+					optcl_mmc_response_mode_sense **response)
+{
+	RESULT error = SUCCESS;
+	RESULT destroy_error;
+
+	uint8_t page_len;
+	uint8_t page_code;
+	uint32_t offset = 8;
+	optcl_list *descriptors = 0;
+	optcl_mmc_msdesc_mrw *mrw = 0;
+	optcl_mmc_msdesc_vendor *vendordesc = 0;
+	optcl_mmc_msdesc_rwrecovery *rwrecovery = 0;
+	optcl_mmc_msdesc_writeparams *writeparms = 0;
+	optcl_mmc_response_mode_sense *nresponse = 0;
+
+	assert(mmc_response != 0);
+	assert(response != 0);
+	assert(size >= 8);
+
+	if (mmc_response == 0 || response == 0 || size < 8) {
+		return(E_INVALIDARG);
+	}
+
+	error = optcl_list_create(0, &descriptors);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	nresponse = malloc(sizeof(optcl_mmc_response_mode_sense));
+
+	if (nresponse == 0) {
+		return(E_OUTOFMEMORY);
+	}
+
+	memset(nresponse, 0, sizeof(optcl_mmc_response_mode_sense));
+
+	nresponse->header.command_opcode = MMC_OPCODE_MODE_SENSE;
+
+	while(offset < size) {
+		page_code = mmc_response[0] & 0x3F;
+
+		switch(page_code) {
+			case SENSE_MODEPAGE_VENDOR: {
+
+				page_len = mmc_response[offset + 1];
+
+				assert(page_len > 0 && page_len < 255);
+
+				if (page_len == 0 || page_len >= 255) {
+					error = E_SIZEMISMATCH;
+					break;
+				}
+
+				assert(offset + page_len + 2 < size);
+
+				if (offset + page_len + 2 >= size) {
+					error = E_OUTOFRANGE;
+					break;
+				}
+
+				vendordesc = malloc(sizeof(optcl_mmc_msdesc_vendor));
+
+				if (vendordesc == 0) {
+					error = E_OUTOFMEMORY;
+					break;
+				}
+
+				memset(vendordesc, 0, sizeof(optcl_mmc_msdesc_vendor));
+
+				vendordesc->header.page_code = page_code;
+				vendordesc->page_len = page_len;
+
+				xmemcpy(
+					vendordesc->vendor_data, 
+					sizeof(vendordesc->vendor_data), 
+					&mmc_response[offset + 2], 
+					page_len
+					);
+
+				error = optcl_list_add_tail(descriptors, (const ptr_t)vendordesc);
+
+				if (FAILED(error)) {
+					free(vendordesc);
+					break;
+				}
+
+				offset += page_len + 2;
+
+				break;
+			}
+			case SENSE_MODEPAGE_RW_ERROR: {
+
+				assert(offset + 12 < size);
+
+				if (offset + 12 >= size) {
+					error = E_OUTOFRANGE;
+					break;
+				}
+
+				rwrecovery = malloc(sizeof(optcl_mmc_msdesc_rwrecovery));
+
+				if (rwrecovery == 0) {
+					error = E_OUTOFMEMORY;
+					break;
+				}
+
+				memset(rwrecovery, 0, sizeof(optcl_mmc_msdesc_rwrecovery));
+
+				rwrecovery->header.page_code = page_code;
+				rwrecovery->ps = bool_from_uint8(mmc_response[offset] & 0x80);		/* 10000000 */
+				rwrecovery->awre = bool_from_uint8(mmc_response[offset + 2] & 0x80);	/* 10000000 */
+				rwrecovery->arre = bool_from_uint8(mmc_response[offset + 2] & 0x40);	/* 01000000 */
+				rwrecovery->tb = bool_from_uint8(mmc_response[offset + 2] & 0x20);	/* 00100000 */
+				rwrecovery->rc = bool_from_uint8(mmc_response[offset + 2] & 0x10);	/* 00010000 */
+				rwrecovery->per = bool_from_uint8(mmc_response[offset + 2] & 0x04);	/* 00000100 */
+				rwrecovery->dte = bool_from_uint8(mmc_response[offset + 2] & 0x02);	/* 00000010 */
+				rwrecovery->dcr = bool_from_uint8(mmc_response[offset + 2] & 0x01);	/* 00000001 */
+				rwrecovery->read_retry_count = mmc_response[offset + 3];
+				rwrecovery->emcdr = mmc_response[offset + 7] & 0x03;			/* 00000011 */
+				rwrecovery->write_retry_count = mmc_response[offset + 8];
+
+				rwrecovery->window_size = 
+					(uint32_t)((mmc_response[offset + 9] << 16) 
+					| (mmc_response[offset + 10] << 8) 
+					| mmc_response[offset + 11]
+					);
+
+				error = optcl_list_add_tail(descriptors, (const ptr_t)rwrecovery);
+
+				if (FAILED(error)) {
+					free(rwrecovery);
+					break;
+				}
+
+				offset += 12;
+
+				break;
+			}
+			case SENSE_MODEPAGE_MRW: {
+
+				assert(offset + 8 < size);
+
+				if (offset + 8 >= size) {
+					error = E_OUTOFRANGE;
+					break;
+				}
+
+				mrw = malloc(sizeof(optcl_mmc_msdesc_mrw));
+
+				if (mrw == 0) {
+					error = E_OUTOFMEMORY;
+					break;
+				}
+
+				memset(mrw, 0, sizeof(optcl_mmc_msdesc_mrw));
+
+				mrw->header.page_code = page_code;
+				mrw->ps = bool_from_uint8(mmc_response[offset] & 0x80);			/* 10000000 */
+				mrw->lba_space = bool_from_uint8(mmc_response[offset + 3] & 0x01);	/* 00000001 */
+
+				error = optcl_list_add_tail(descriptors, (const ptr_t)mrw);
+
+				if (FAILED(error)) {
+					free(mrw);
+					break;
+				}
+
+				offset += 8;
+
+				break;
+			}
+			case SENSE_MODEPAGE_WRITE_PARAM: {
+
+				assert(offset + 50 < size);
+
+				if (offset + 50 >= size) {
+					error = E_OUTOFRANGE;
+					break;
+				}
+
+				writeparms = malloc(sizeof(optcl_mmc_msdesc_writeparams));
+
+				if (writeparms == 0) {
+					error = E_OUTOFMEMORY;
+					break;
+				}
+
+				memset(writeparms, 0, sizeof(optcl_mmc_msdesc_writeparams));
+
+				page_len = mmc_response[offset + 1];
+
+				writeparms->header.page_code = page_code;
+				writeparms->ps = bool_from_uint8(mmc_response[offset] & 0x80);		/* 10000000 */
+				writeparms->bufe = bool_from_uint8(mmc_response[offset + 2] & 0x40);	/* 01000000 */
+				writeparms->ls_v = bool_from_uint8(mmc_response[offset + 2] & 0x20);	/* 00100000 */
+				writeparms->test_write = bool_from_uint8(mmc_response[offset + 2] & 0x10);/* 00010000 */
+				writeparms->write_type = mmc_response[offset + 2] & 0x0F;		/* 00001111 */
+				writeparms->multi_session = mmc_response[offset + 3] & 0xC0;		/* 11000000 */
+				writeparms->fp = mmc_response[offset + 3] & 0x20;			/* 00100000 */
+				writeparms->copy = mmc_response[offset + 3] & 0x10;			/* 00010000 */
+				writeparms->track_mode = mmc_response[offset + 3] & 0x0F;		/* 00001111 */
+				writeparms->dbt = mmc_response[offset + 4] & 0x0F;			/* 00001111 */
+				writeparms->link_size = mmc_response[offset + 5];
+				writeparms->hac = mmc_response[offset + 7] & 0x3F;			/* 00111111 */
+				writeparms->session_fmt = mmc_response[offset + 8];
+				writeparms->packet_size = uint32_from_be(*(uint32_t*)&mmc_response[offset + 10]);
+				writeparms->audio_pause_len = uint16_from_be(*(uint16_t*)&mmc_response[offset + 14]);
+				
+				xmemcpy(writeparms->mcn, sizeof(writeparms->mcn), &mmc_response[offset + 16], 16);
+				xmemcpy(writeparms->isrc, sizeof(writeparms->isrc), &mmc_response[offset + 32], 16);
+
+				writeparms->subheader_0 = mmc_response[offset + 48];
+				writeparms->subheader_1 = mmc_response[offset + 49];
+				writeparms->subheader_2 = mmc_response[offset + 50];
+				writeparms->subheader_3 = mmc_response[offset + 51];
+
+
+
+
+				break;
+			}
+			case SENSE_MODEPAGE_CACHING:
+			case SENSE_MODEPAGE_PWR_CONDITION:
+			case SENSE_MODEPAGE_INFO_EXCEPTIONS:
+			case SENSE_MODEPAGE_TIMEOUT_PROTECT:
+			default: {
+				assert(False);
+				error = E_OUTOFRANGE;
+				break;
+			}
+		}
+	}
+
+	if (FAILED(error)) {
+		free(nresponse);
+		destroy_error = optcl_list_destroy(descriptors, True);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	nresponse->descriptors = descriptors;
+
+	*response = nresponse;
+
+	return(error);
+}
+
 static RESULT parse_raw_read_buffer_data(const uint8_t mmc_response[],
 					 uint32_t size,
 					 uint8_t mode,
@@ -2332,6 +2582,7 @@ RESULT optcl_command_mechanism_status(const optcl_device *device,
 	int i;
 	cdb12 cdb;
 	uint32_t alignment;
+	uint16_t response_size;
 	ptr_t mmc_response = 0;
 	optcl_adapter *adapter = 0;
 	optcl_mmc_response_mechanism_status *nresponse = 0;
@@ -2374,9 +2625,11 @@ RESULT optcl_command_mechanism_status(const optcl_device *device,
 
 	memset(cdb, 0, sizeof(cdb));
 
-	cdb[0] = MMC_OPCODE_MECHANISM_SATTUS;
-	cdb[8] = (uint8_t)(MECHSTATUS_RESPSIZE >> 8);
-	cdb[8] = (uint8_t)((MECHSTATUS_RESPSIZE << 8) >> 8);
+	response_size = MECHSTATUS_RESPSIZE;
+
+	cdb[0] = MMC_OPCODE_MECHANISM_STATUS;
+	cdb[8] = (uint8_t)(response_size >> 8);
+	cdb[9] = (uint8_t)((response_size << 8) >> 8);
 
 	mmc_response = xmalloc_aligned(MECHSTATUS_RESPSIZE, alignment);
 
@@ -2410,7 +2663,7 @@ RESULT optcl_command_mechanism_status(const optcl_device *device,
 
 	memset(nresponse, 0, sizeof(optcl_mmc_response_mechanism_status));
 
-	nresponse->header.command_opcode = MMC_OPCODE_MECHANISM_SATTUS;
+	nresponse->header.command_opcode = MMC_OPCODE_MECHANISM_STATUS;
 
 	nresponse->fault = bool_from_uint8(mmc_response[0] & 0x80);		/* 10000000 */
 	nresponse->changer_state = mmc_response[0] & 0x60;			/* 01100000 */
@@ -2435,6 +2688,128 @@ RESULT optcl_command_mechanism_status(const optcl_device *device,
 	return(error);
 }
 
+RESULT optcl_command_mode_sense_10(const optcl_device *device,
+				   const optcl_mmc_mode_sense *command,
+				   optcl_mmc_response_mode_sense **response)
+{
+	RESULT error;
+	RESULT destroy_error;
+
+	cdb10 cdb;
+	uint32_t alignment;
+	uint16_t mode_data_len;
+	ptr_t mmc_response = 0;
+	optcl_adapter *adapter = 0;
+	optcl_mmc_response_mode_sense *nresponse = 0;
+
+	assert(device != 0);
+	assert(command != 0);
+	assert(response != 0);
+
+	if (device == 0 || command == 0 || response == 0) {
+		return(E_INVALIDARG);
+	}
+
+	error = optcl_device_get_adapter(device, &adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	assert(adapter != 0);
+
+	if (adapter == 0) {
+		return(E_POINTER);
+	}
+
+	error = optcl_adapter_get_alignment_mask(adapter, &alignment);
+
+	if (FAILED(error)) {
+		destroy_error = optcl_adapter_destroy(adapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	error = optcl_adapter_destroy(adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	/*
+	 * Execute command to get response buffer size
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_MODE_SENSE;
+	cdb[1] = (command->dbd << 3) & 0x08;			/* 00001000 */
+	cdb[2] = (command->pc << 6) | command->page_code;
+	cdb[4] = 8;	/* get header only */
+
+	mmc_response = xmalloc_aligned(8, alignment);
+
+	if (mmc_response == 0) {
+		return(E_OUTOFMEMORY);
+	}
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		mmc_response,
+		8
+		);
+
+	if (FAILED(error)) {
+		xfree_aligned(mmc_response);
+		return(error);
+	}
+
+	mode_data_len = uint16_from_be(*(uint16_t*)&mmc_response[0]);
+
+	xfree_aligned(mmc_response);
+
+	mmc_response = xmalloc_aligned(mode_data_len + 2, alignment);
+
+	if (mmc_response == 0) {
+		return(E_OUTOFMEMORY);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		mmc_response,
+		mode_data_len + 2
+		);
+
+	if (FAILED(error)) {
+		xfree_aligned(mmc_response);
+		return(error);
+	}
+
+	error = parse_raw_mode_sense_data(mmc_response, mode_data_len + 2, &nresponse);
+
+	xfree_aligned(mmc_response);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	assert(nresponse != 0);
+
+	if (nresponse == 0) {
+		return(E_POINTER);
+	}
+
+	*response = nresponse;
+
+	return(SUCCESS);
+}
 
 RESULT optcl_command_prevent_allow_removal(const optcl_device *device,
 					   const optcl_mmc_prevent_allow_removal *command)
@@ -3215,6 +3590,23 @@ static RESULT deallocator_mmc_response_get_performance(optcl_mmc_response *respo
 	return(error);
 }
 
+static RESULT deallocator_mmc_response_mechanism_status(optcl_mmc_response *response)
+{
+	if (response == 0) {
+		return(SUCCESS);
+	}
+
+	assert(response->command_opcode == MMC_OPCODE_MECHANISM_STATUS);
+
+	if (response->command_opcode != MMC_OPCODE_MECHANISM_STATUS) {
+		return(E_CMNDINVOPCODE);
+	}
+
+	free(response);
+
+	return(SUCCESS);
+}
+
 static RESULT deallocator_mmc_response_inquiry(optcl_mmc_response *response)
 {
 	if (response == 0) {
@@ -3347,6 +3739,7 @@ static struct response_deallocator_entry __deallocator_table[] = {
 	{ MMC_OPCODE_GET_CONFIG,		deallocator_mmc_response_get_event_status	},
 	{ MMC_OPCODE_GET_EVENT_STATUS,		deallocator_mmc_response_inquiry		},
 	{ MMC_OPCODE_GET_PERFORMANCE,		deallocator_mmc_response_get_performance	},
+	{ MMC_OPCODE_MECHANISM_STATUS,		deallocator_mmc_response_mechanism_status	},
 	{ MMC_OPCODE_READ_10,			deallocator_mmc_response_read_10		},
 	{ MMC_OPCODE_READ_12,			deallocator_mmc_response_read_10		},
 	{ MMC_OPCODE_READ_BUFFER,		deallocator_mmc_response_read_buffer		},
