@@ -1,4 +1,4 @@
-/*-
+/*
     command.c - Multi-Media Commands - 5 (MMC-5).
     Copyright (C) 2006  Aleksandar Dezelin <dezelin@gmail.com>
 
@@ -47,6 +47,7 @@
 #define MMC_OPCODE_LOAD_UNLOAD			0x00A6
 #define MMC_OPCODE_MECHANISM_STATUS		0x00BD
 #define MMC_OPCODE_MODE_SENSE			0x005A
+#define MMC_OPCODE_MODE_SELECT			0x0055
 #define MMC_OPCODE_PREVENT_ALLOW_REMOVAL	0x001E
 #define MMC_OPCODE_READ_10			0x0028
 #define MMC_OPCODE_READ_12			0x0028
@@ -119,6 +120,374 @@ static int8_t equalfn_descriptors(const void *left, const void *right)
 	} else {
 		return(1);
 	}
+}
+
+static RESULT create_data_out_from_descriptor(const optcl_mmc_msdesc_header *descriptor,
+					      pptr_t data_out,
+					      uint16_t *data_out_len)
+{
+	RESULT error = SUCCESS;
+
+	ptr_t data = 0;
+	uint16_t datalen;
+	optcl_mmc_msdesc_mrw *mrw = 0;
+	optcl_mmc_msdesc_power *power = 0;
+	optcl_mmc_msdesc_caching *caching = 0;
+	optcl_mmc_msdesc_vendor *vendordesc = 0;
+	optcl_mmc_msdesc_rwrecovery *rwrecovery = 0;
+	optcl_mmc_msdesc_writeparams *writeparms = 0;
+	optcl_mmc_msdesc_timeout_protect *timeoutprot = 0;
+	optcl_mmc_msdesc_infoexceptions *infoexceptions = 0;
+
+	assert(descriptor != 0);
+	assert(data_out != 0);
+	assert(data_out_len != 0);
+
+	if (descriptor == 0 || data_out == 0 || data_out_len == 0) {
+		return(E_INVALIDARG);
+	}
+
+	switch(descriptor->page_code) {
+		case SENSE_MODEPAGE_VENDOR: {
+			vendordesc = (optcl_mmc_msdesc_vendor*)descriptor;
+
+			datalen = vendordesc->page_len + 2;
+
+			data = malloc(datalen);
+
+			if (data == 0) {
+				error = E_OUTOFMEMORY;
+				break;
+			}
+
+			memset(data, 0, datalen);
+
+			data[0] = (vendordesc->ps << 7) | SENSE_MODEPAGE_VENDOR;
+			data[1] = vendordesc->page_len + 1;
+
+			xmemcpy(&data[2], datalen, vendordesc->vendor_data, vendordesc->page_len);
+
+			break;
+		}
+		case SENSE_MODEPAGE_RW_ERROR: {
+			rwrecovery = (optcl_mmc_msdesc_rwrecovery*)descriptor;
+
+			datalen = 12;
+
+			data = malloc(datalen);
+
+			if (data == 0) {
+				error = E_OUTOFMEMORY;
+				break;
+			}
+
+			memset(data, 0, datalen);
+
+			data[0] = (rwrecovery->ps << 7) | SENSE_MODEPAGE_RW_ERROR;
+			data[1] = 0x0A;
+			
+			data[2] = (rwrecovery->awre << 7) 
+				| (rwrecovery->arre << 6) 
+				| (rwrecovery->tb << 5) 
+				| (rwrecovery->rc << 4) 
+				| (rwrecovery->per << 2) 
+				| (rwrecovery->dte << 1) 
+				| rwrecovery->dcr;
+
+			data[3] = rwrecovery->read_retry_count;
+			data[7] = rwrecovery->emcdr;
+			data[8] = rwrecovery->write_retry_count;
+			data[9] = (uint8_t)(rwrecovery->window_size >> 16);
+			data[10] = (uint8_t)(rwrecovery->window_size >> 8);
+			data[11] = (uint8_t)(rwrecovery->window_size);
+
+			break;
+		}
+		case SENSE_MODEPAGE_MRW: {
+			mrw = (optcl_mmc_msdesc_mrw*)descriptor;
+
+			datalen = 8;
+
+			data = malloc(datalen);
+
+			if (data == 0) {
+				error = E_OUTOFMEMORY;
+				break;
+			}
+
+			memset(data, 0, datalen);
+
+			data[0] = (mrw->ps << 7) | SENSE_MODEPAGE_MRW;
+			data[1] = 0x06;
+			data[3] = mrw->lba_space;
+
+			break;
+		}
+		case SENSE_MODEPAGE_WRITE_PARAM: {
+			writeparms = (optcl_mmc_msdesc_writeparams*)descriptor;
+
+			datalen = 52;
+
+			data = malloc(datalen);
+
+			if (data == 0) {
+				error = E_OUTOFMEMORY;
+				break;
+			}
+
+			memset(data, 0, datalen);
+
+			data[0] = (writeparms->ps << 7) | SENSE_MODEPAGE_WRITE_PARAM;
+			data[1] = 0x36;
+
+			data[2] = (writeparms->bufe << 6) 
+				| (writeparms->ls_v << 5) 
+				| (writeparms->test_write << 4) 
+				| (writeparms->write_type);
+
+			data[3] = (writeparms->multi_session << 6) 
+				| (writeparms->fp << 5) 
+				| (writeparms->copy << 4) 
+				| writeparms->track_mode;
+
+			data[4] = writeparms->dbt;
+			data[5] = writeparms->link_size;
+			data[7] = writeparms->hac;
+			data[8] = writeparms->session_fmt;
+			data[10] = (uint8_t)(writeparms->packet_size >> 24);
+			data[11] = (uint8_t)(writeparms->packet_size >> 16);
+			data[12] = (uint8_t)(writeparms->packet_size >> 8);
+			data[13] = (uint8_t)(writeparms->packet_size);
+			data[14] = (uint8_t)(writeparms->audio_pause_len >> 8);
+			data[15] = (uint8_t)(writeparms->audio_pause_len);
+
+			xmemcpy(&data[16], 16, writeparms->mcn, 16);
+			xmemcpy(&data[32], 15, writeparms->isrc, 16);
+
+			data[48] = writeparms->subheader_0;
+			data[49] = writeparms->subheader_1;
+			data[50] = writeparms->subheader_2;
+			data[51] = writeparms->subheader_3;
+
+			break;
+		}
+		case SENSE_MODEPAGE_CACHING: {
+			caching = (optcl_mmc_msdesc_caching*)descriptor;
+
+			datalen = 12;
+
+			data = malloc(datalen);
+
+			if (data == 0) {
+				error = E_OUTOFMEMORY;
+				break;
+			}
+
+			memset(data, 0, datalen);
+
+			data[0] = (caching->ps << 7) | SENSE_MODEPAGE_CACHING;
+			data[1] = 0x0A;
+			data[2] = (caching->wce << 2) | caching->rcd;
+
+			break;
+		}
+		case SENSE_MODEPAGE_PWR_CONDITION: {
+			power = (optcl_mmc_msdesc_power*)descriptor;
+
+			datalen = 12;
+
+			data = malloc(datalen);
+
+			if (data == 0) {
+				error = E_OUTOFMEMORY;
+				break;
+			}
+
+			memset(data, 0, datalen);
+
+			data[0] = (power->ps << 7) | (power->spf << 6) | SENSE_MODEPAGE_PWR_CONDITION;
+			data[1] = 0x0A;
+			data[3] = (power->idle << 1) | power->standby;
+			
+			data[4] = (uint8_t)(power->idle_timer >> 24);
+			data[5] = (uint8_t)(power->idle_timer >> 16);
+			data[6] = (uint8_t)(power->idle_timer >> 8);
+			data[7] = (uint8_t)power->idle_timer;
+			
+			data[8] = (uint8_t)(power->standby_timer >> 24);
+			data[9] = (uint8_t)(power->standby_timer >> 16);
+			data[10] = (uint8_t)(power->standby_timer >> 8);
+			data[11] = (uint8_t)power->standby_timer;
+
+			break;
+		}
+		case SENSE_MODEPAGE_INFO_EXCEPTIONS: {
+			infoexceptions = (optcl_mmc_msdesc_infoexceptions*)descriptor;
+
+			datalen = 12;
+
+			data = malloc(datalen);
+
+			if (data == 0) {
+				error = E_OUTOFMEMORY;
+				break;
+			}
+
+			memset(data, 0, datalen);
+
+			data[0] = (infoexceptions->ps << 7) 
+				| (infoexceptions->spf << 6) 
+				| SENSE_MODEPAGE_INFO_EXCEPTIONS;
+
+			data[1] = 0x0A;
+			
+			data[2] = (infoexceptions->perf << 7) 
+				| (infoexceptions->ebf << 5) 
+				| (infoexceptions->ewasc << 4) 
+				| (infoexceptions->dexcpt << 3) 
+				| (infoexceptions->test << 2) 
+				| infoexceptions->logerr;
+
+			data[3] = infoexceptions->mrie;
+
+			data[4] = (uint8_t)(infoexceptions->interval_timer >> 24);
+			data[5] = (uint8_t)(infoexceptions->interval_timer >> 16);
+			data[6] = (uint8_t)(infoexceptions->interval_timer >> 8);
+			data[7] = (uint8_t)infoexceptions->interval_timer;
+
+			data[8] = (uint8_t)(infoexceptions->report_count >> 24);
+			data[9] = (uint8_t)(infoexceptions->report_count >> 16);
+			data[10] = (uint8_t)(infoexceptions->report_count >> 8);
+			data[11] = (uint8_t)infoexceptions->report_count;
+
+			break;
+		}
+		case SENSE_MODEPAGE_TIMEOUT_PROTECT: {
+			timeoutprot = (optcl_mmc_msdesc_timeout_protect*)descriptor;
+
+			datalen = 12;
+
+			data = malloc(datalen);
+
+			if (data == 0) {
+				error = E_OUTOFMEMORY;
+				break;
+			}
+
+			memset(data, 0, datalen);
+
+			data[0] = (timeoutprot->ps << 7) | SENSE_MODEPAGE_INFO_EXCEPTIONS;
+			data[1] = 0x0A;
+			
+			data[4] = (timeoutprot->g3enable << 3) 
+				| (timeoutprot->tmoe << 2) 
+				| (timeoutprot->disp << 1) 
+				| timeoutprot->swpp;
+
+			data[6] = (uint8_t)(timeoutprot->group1_mintimeout >> 8);
+			data[7] = (uint8_t)timeoutprot->group1_mintimeout;
+			data[8] = (uint8_t)(timeoutprot->group2_mintimeout >> 8);
+			data[9] = (uint8_t)timeoutprot->group2_mintimeout;
+			data[10] = (uint8_t)(timeoutprot->group3_mintimeout >> 8);
+			data[11] = (uint8_t)timeoutprot->group3_mintimeout;
+
+			break;
+		}
+		default : {
+			error = E_OUTOFRANGE;
+			break;
+		}
+	}
+
+	if (FAILED(error)) {
+		free(data);
+		return(error);
+	}
+
+	*data_out = data;
+	*data_out_len = datalen;
+
+	return(error);
+}
+
+static RESULT create_data_out_mode_select(const optcl_mmc_mode_select *command, 
+					  uint32_t alignment, 
+					  pptr_t data_out, 
+					  uint16_t *data_out_len)
+{
+	RESULT error;
+	
+	ptr_t data = 0;
+	ptr_t descdata = 0;
+	uint32_t offset = 0;
+	uint16_t descdatalen;
+	optcl_list_iterator it = 0;
+	optcl_mmc_msdesc_header *descriptor = 0;
+
+	assert(command != 0);
+	assert(data_out != 0);
+	assert(data_out_len != 0);
+
+	if (command == 0 || data_out == 0 || data_out_len == 0) {
+		return(E_INVALIDARG);
+	}
+
+	assert(command->descriptors != 0);
+
+	if (command->descriptors == 0) {
+		return(E_POINTER);
+	}
+
+	error = optcl_list_get_head_pos(command->descriptors, &it);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	while(it != 0) {
+		error = optcl_list_get_at_pos(command->descriptors, it, (const pptr_t)&descriptor);
+
+		if (FAILED(error)) {
+			break;
+		}
+
+		error = create_data_out_from_descriptor(descriptor, &descdata, &descdatalen);
+
+		if (FAILED(error)) {
+			break;
+		}
+
+		if (offset + descdatalen > 0xFFFF) {
+			error = E_OVERFLOW;
+			break;
+		}
+
+		if (descdatalen > 0) {
+			data = xrealloc_aligned(data, offset + descdatalen, alignment);
+
+			if (data == 0) {
+				error = E_OUTOFMEMORY;
+				break;
+			}
+		}
+
+		xmemcpy(data + offset, descdatalen, descdata, descdatalen);
+
+		offset += descdatalen;
+
+		free(descdata);
+	}
+
+	if (FAILED(error)) {
+		free(descdata);
+		xfree_aligned(data);
+		return(error);
+	}
+
+	*data_out = data;
+	*data_out_len = (uint16_t)offset;
+
+	return(error);
 }
 
 /*
@@ -1236,10 +1605,14 @@ static RESULT parse_raw_mode_sense_data(const uint8_t mmc_response[],
 	uint32_t offset = 8;
 	optcl_list *descriptors = 0;
 	optcl_mmc_msdesc_mrw *mrw = 0;
+	optcl_mmc_msdesc_power *power = 0;
+	optcl_mmc_msdesc_caching *caching = 0;
 	optcl_mmc_msdesc_vendor *vendordesc = 0;
 	optcl_mmc_msdesc_rwrecovery *rwrecovery = 0;
 	optcl_mmc_msdesc_writeparams *writeparms = 0;
 	optcl_mmc_response_mode_sense *nresponse = 0;
+	optcl_mmc_msdesc_timeout_protect *timeoutprot = 0;
+	optcl_mmc_msdesc_infoexceptions *infoexceptions = 0;
 
 	assert(mmc_response != 0);
 	assert(response != 0);
@@ -1266,7 +1639,7 @@ static RESULT parse_raw_mode_sense_data(const uint8_t mmc_response[],
 	nresponse->header.command_opcode = MMC_OPCODE_MODE_SENSE;
 
 	while(offset < size) {
-		page_code = mmc_response[0] & 0x3F;
+		page_code = mmc_response[offset] & 0x3F;
 
 		switch(page_code) {
 			case SENSE_MODEPAGE_VENDOR: {
@@ -1297,13 +1670,14 @@ static RESULT parse_raw_mode_sense_data(const uint8_t mmc_response[],
 				memset(vendordesc, 0, sizeof(optcl_mmc_msdesc_vendor));
 
 				vendordesc->header.page_code = page_code;
-				vendordesc->page_len = page_len;
+				vendordesc->ps = bool_from_uint8(mmc_response[offset] & 0x80);		/* 10000000 */
+				vendordesc->page_len = page_len - 1;
 
 				xmemcpy(
 					vendordesc->vendor_data, 
 					sizeof(vendordesc->vendor_data), 
 					&mmc_response[offset + 2], 
-					page_len
+					page_len - 1
 					);
 
 				error = optcl_list_add_tail(descriptors, (const ptr_t)vendordesc);
@@ -1443,15 +1817,137 @@ static RESULT parse_raw_mode_sense_data(const uint8_t mmc_response[],
 				writeparms->subheader_2 = mmc_response[offset + 50];
 				writeparms->subheader_3 = mmc_response[offset + 51];
 
-
-
+				if (page_len == 0x56) {
+					xmemcpy(&writeparms->vendor_specific[0], 
+						sizeof(writeparms->vendor_specific), 
+						&mmc_response[offset + 52], 
+						sizeof(writeparms->vendor_specific)
+						);
+				}
 
 				break;
 			}
-			case SENSE_MODEPAGE_CACHING:
-			case SENSE_MODEPAGE_PWR_CONDITION:
-			case SENSE_MODEPAGE_INFO_EXCEPTIONS:
-			case SENSE_MODEPAGE_TIMEOUT_PROTECT:
+			case SENSE_MODEPAGE_CACHING: {
+				
+				assert(offset + 12 < size);
+
+				if (offset + 12 >= size) {
+					error = E_OUTOFRANGE;
+					break;
+				}
+
+				caching = malloc(sizeof(optcl_mmc_msdesc_caching));
+
+				if (caching == 0) {
+					error = E_OUTOFMEMORY;
+					break;
+				}
+
+				memset(caching, 0, sizeof(optcl_mmc_msdesc_caching));
+
+				page_len = mmc_response[offset + 1];
+
+				caching->header.page_code = page_code;
+				caching->ps = bool_from_uint8(mmc_response[offset] & 0x80);		/* 10000000 */
+				caching->wce = bool_from_uint8(mmc_response[offset + 2] & 0x04);	/* 00000100 */
+				caching->rcd = bool_from_uint8(mmc_response[offset + 2] & 0x01);	/* 00000001 */
+
+				break;
+			}
+			case SENSE_MODEPAGE_PWR_CONDITION: {
+
+				assert(offset + 12 < size);
+
+				if (offset + 12 >= size) {
+					error = E_OUTOFRANGE;
+					break;
+				}
+
+				power = malloc(sizeof(optcl_mmc_msdesc_power));
+
+				if (power == 0) {
+					error = E_OUTOFMEMORY;
+					break;
+				}
+
+				memset(power, 0, sizeof(optcl_mmc_msdesc_power));
+
+				page_len = mmc_response[offset + 1];
+
+				power->header.page_code = page_code;
+				power->ps = bool_from_uint8(mmc_response[offset] & 0x80);		/* 10000000 */
+				power->spf = bool_from_uint8(mmc_response[offset] & 0x40);		/* 01000000 */
+				power->idle = bool_from_uint8(mmc_response[offset + 3] & 0x02);		/* 00000010 */
+				power->standby = bool_from_uint8(mmc_response[offset + 3] & 0x01);	/* 00000001 */
+				power->idle_timer = uint32_from_be(*(uint32_t*)&mmc_response[offset + 4]);
+				power->standby_timer = uint32_from_be(*(uint32_t*)&mmc_response[offset + 8]);
+
+				break;
+			}
+			case SENSE_MODEPAGE_INFO_EXCEPTIONS: {
+
+				assert(offset + 12 < size);
+
+				if (offset + 12 >= size) {
+					error = E_OUTOFRANGE;
+					break;
+				}
+
+				infoexceptions = malloc(sizeof(optcl_mmc_msdesc_infoexceptions));
+
+				if (infoexceptions == 0) {
+					error = E_OUTOFMEMORY;
+					break;
+				}
+
+				memset(infoexceptions, 0, sizeof(optcl_mmc_msdesc_infoexceptions));
+
+				page_len = mmc_response[offset + 1];
+
+				infoexceptions->header.page_code = page_code;
+				infoexceptions->ps = bool_from_uint8(mmc_response[offset] & 0x80);		/* 10000000 */
+				infoexceptions->spf = bool_from_uint8(mmc_response[offset] & 0x40);		/* 01000000 */
+				infoexceptions->perf = bool_from_uint8(mmc_response[offset + 2] & 0x80);	/* 10000000 */
+				infoexceptions->ebf = bool_from_uint8(mmc_response[offset + 2] & 0x20);		/* 00100000 */
+				infoexceptions->ewasc = bool_from_uint8(mmc_response[offset + 2] & 0x10);	/* 00010000 */
+				infoexceptions->dexcpt = bool_from_uint8(mmc_response[offset + 2] & 0x08);	/* 00001000 */
+				infoexceptions->test = bool_from_uint8(mmc_response[offset + 2] & 0x04);	/* 00000100 */
+				infoexceptions->logerr = bool_from_uint8(mmc_response[offset + 2] & 0x01);	/* 00000001 */
+				infoexceptions->mrie = mmc_response[offset + 3] & 0x0F;				/* 00001111 */
+				infoexceptions->interval_timer = uint32_from_be(*(uint32_t*)&mmc_response[offset + 4]);
+				infoexceptions->report_count = uint32_from_be(*(uint32_t*)&mmc_response[offset + 8]);
+
+				break;
+			}
+			case SENSE_MODEPAGE_TIMEOUT_PROTECT: {
+
+				assert(offset + 12 < size);
+
+				if (offset + 12 >= size) {
+					error = E_OUTOFRANGE;
+					break;
+				}
+
+				timeoutprot = malloc(sizeof(optcl_mmc_msdesc_timeout_protect));
+
+				if (timeoutprot == 0) {
+					error = E_OUTOFMEMORY;
+					break;
+				}
+
+				memset(timeoutprot, 0, sizeof(optcl_mmc_msdesc_timeout_protect));
+
+				page_len = mmc_response[offset + 1];
+
+				timeoutprot->header.page_code = page_code;
+				timeoutprot->ps = bool_from_uint8(mmc_response[offset] & 0x80);			/* 10000000 */
+				timeoutprot->g3enable = bool_from_uint8(mmc_response[offset + 4] & 0x08);	/* 00001000 */
+				timeoutprot->tmoe = bool_from_uint8(mmc_response[offset + 4] & 0x04);		/* 00000100 */
+				timeoutprot->disp = bool_from_uint8(mmc_response[offset + 4] & 0x02);		/* 00000010 */
+				timeoutprot->swpp = bool_from_uint8(mmc_response[offset + 4] & 0x01);		/* 00000001 */
+
+				break;
+			}
 			default: {
 				assert(False);
 				error = E_OUTOFRANGE;
@@ -2811,6 +3307,92 @@ RESULT optcl_command_mode_sense_10(const optcl_device *device,
 	return(SUCCESS);
 }
 
+RESULT optcl_command_mode_select_10(const optcl_device *device,
+				    const optcl_mmc_mode_select *command)
+{
+	RESULT error;
+	RESULT destroy_error;
+
+	cdb10 cdb;
+	ptr_t data_out = 0;
+	uint32_t alignment;
+	uint16_t data_out_len;
+	optcl_adapter *adapter = 0;
+
+	assert(device != 0);
+	assert(command != 0);
+
+	if (device == 0 || command == 0) {
+		return(E_INVALIDARG);
+	}
+
+	assert(command->descriptors != 0);
+
+	if (command->descriptors == 0) {
+		return(E_POINTER);
+	}
+
+	error = optcl_device_get_adapter(device, &adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	assert(adapter != 0);
+
+	if (adapter == 0) {
+		return(E_POINTER);
+	}
+
+	error = optcl_adapter_get_alignment_mask(adapter, &alignment);
+
+	if (FAILED(error)) {
+		destroy_error = optcl_adapter_destroy(adapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	error = optcl_adapter_destroy(adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	error = create_data_out_mode_select(command, alignment, &data_out, &data_out_len);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	assert(data_out != 0);
+
+	if (data_out == NULL) {
+		return(E_POINTER);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_MODE_SELECT;
+	cdb[1] = (command->pf << 4) | command->sp;
+	cdb[7] = (uint8_t)(data_out_len >> 8);
+	cdb[8] = (uint8_t)data_out_len;
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		data_out,
+		data_out_len
+		);
+
+	xfree_aligned(data_out);
+
+	return(error);
+}
+
 RESULT optcl_command_prevent_allow_removal(const optcl_device *device,
 					   const optcl_mmc_prevent_allow_removal *command)
 {
@@ -3531,7 +4113,7 @@ static RESULT deallocator_mmc_response_get_configuration(optcl_mmc_response *res
 
 	assert(mmc_response->descriptors != 0);
 
-	error = optcl_list_destroy(mmc_response->descriptors, 1);
+	error = optcl_list_destroy(mmc_response->descriptors, True);
 
 	free(mmc_response);
 
@@ -3557,7 +4139,7 @@ static RESULT deallocator_mmc_response_get_event_status(optcl_mmc_response *resp
 
 	assert(mmc_response->descriptors != 0);
 
-	error = optcl_list_destroy(mmc_response->descriptors, 1);
+	error = optcl_list_destroy(mmc_response->descriptors, True);
 
 	free(mmc_response);
 
@@ -3583,7 +4165,7 @@ static RESULT deallocator_mmc_response_get_performance(optcl_mmc_response *respo
 
 	assert(mmc_response->descriptors != 0);
 
-	error = optcl_list_destroy(mmc_response->descriptors, 1);
+	error = optcl_list_destroy(mmc_response->descriptors, True);
 
 	free(mmc_response);
 
@@ -3605,6 +4187,30 @@ static RESULT deallocator_mmc_response_mechanism_status(optcl_mmc_response *resp
 	free(response);
 
 	return(SUCCESS);
+}
+
+static RESULT deallocator_mmc_response_sense_10(optcl_mmc_response *response)
+{
+	RESULT error;
+	optcl_mmc_response_mode_sense *mmc_response = 0;
+
+	if (response == 0) {
+		return(SUCCESS);
+	}
+
+	assert(response->command_opcode == MMC_OPCODE_MODE_SENSE);
+
+	if (response->command_opcode != MMC_OPCODE_MODE_SENSE) {
+		return(E_CMNDINVOPCODE);
+	}
+
+	mmc_response = (optcl_mmc_response_mode_sense*)response;
+
+	error = optcl_list_destroy(mmc_response->descriptors, True);
+
+	free(mmc_response);
+
+	return(error);
 }
 
 static RESULT deallocator_mmc_response_inquiry(optcl_mmc_response *response)
@@ -3740,6 +4346,7 @@ static struct response_deallocator_entry __deallocator_table[] = {
 	{ MMC_OPCODE_GET_EVENT_STATUS,		deallocator_mmc_response_inquiry		},
 	{ MMC_OPCODE_GET_PERFORMANCE,		deallocator_mmc_response_get_performance	},
 	{ MMC_OPCODE_MECHANISM_STATUS,		deallocator_mmc_response_mechanism_status	},
+	{ MMC_OPCODE_MODE_SENSE,		deallocator_mmc_response_sense_10		},
 	{ MMC_OPCODE_READ_10,			deallocator_mmc_response_read_10		},
 	{ MMC_OPCODE_READ_12,			deallocator_mmc_response_read_10		},
 	{ MMC_OPCODE_READ_BUFFER,		deallocator_mmc_response_read_buffer		},

@@ -678,6 +678,7 @@ typedef struct tag_mmc_msdesc_header {
 
 typedef struct tag_mmc_msdesc_vendor {
 	optcl_mmc_msdesc_header header;
+	bool_t ps;
 	uint8_t page_len;
 	uint8_t vendor_data[254];
 } optcl_mmc_msdesc_vendor;
@@ -727,7 +728,7 @@ typedef struct tag_mmc_msdesc_writeparams {
 	uint8_t subheader_1;
 	uint8_t subheader_2;
 	uint8_t subheader_3;
-	uint8_t vendor_specific;
+	uint8_t vendor_specific[4];
 } optcl_mmc_msdesc_writeparams;
 
 typedef struct tag_mmc_msdesc_caching {
@@ -743,29 +744,51 @@ typedef struct tag_mmc_msdesc_power {
 	bool_t spf;
 	bool_t idle;
 	bool_t standby;
-	uint16_t idle_timer;
-	uint16_t standby_timer;
+	uint32_t idle_timer;
+	uint32_t standby_timer;
 } optcl_mmc_msdesc_power;
 
 typedef struct tag_mmc_msdesc_infoexceptions {
 	optcl_mmc_msdesc_header header;
 	bool_t ps;
 	bool_t spf;
-	bool_t sperf;
+	bool_t perf;
 	bool_t ebf;
 	bool_t ewasc;
 	bool_t dexcpt;
 	bool_t test;
 	bool_t logerr;
 	uint8_t mrie;
-	uint16_t interval_timer;
-	uint16_t report_count;
+	uint32_t interval_timer;
+	uint32_t report_count;
 } optcl_mmc_msdesc_infoexceptions;
+
+typedef struct tag_mmc_msdesc_timeout_protect {
+	optcl_mmc_msdesc_header header;
+	bool_t ps;
+	bool_t g3enable;
+	bool_t tmoe;
+	bool_t disp;
+	bool_t swpp;
+	uint16_t group1_mintimeout;
+	uint16_t group2_mintimeout;
+	uint16_t group3_mintimeout;
+} optcl_mmc_msdesc_timeout_protect;
 
 typedef struct tag_mmc_response_mode_sense {
 	optcl_mmc_response header;
 	optcl_list *descriptors;
 } optcl_mmc_response_mode_sense;
+
+/*
+ * MODE SELECT command structures
+ */
+
+typedef struct tag_mmc_mode_select {
+	bool_t pf;
+	bool_t sp;
+	optcl_list *descriptors;
+} optcl_mmc_mode_select;
 
 
 /*
@@ -944,6 +967,9 @@ extern RESULT optcl_command_mechanism_status(const optcl_device *device,
 extern RESULT optcl_command_mode_sense_10(const optcl_device *device,
 					  const optcl_mmc_mode_sense *command,
 					  optcl_mmc_response_mode_sense **response);
+
+extern RESULT optcl_command_mode_select_10(const optcl_device *device,
+					   const optcl_mmc_mode_select *command);
 
 extern RESULT optcl_command_prevent_allow_removal(const optcl_device *device,
 						  const optcl_mmc_prevent_allow_removal *command);
