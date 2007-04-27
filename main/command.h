@@ -316,8 +316,34 @@
 #define MMC_READ_BUFFER_MODE_EXPANDER		0x1A
 
 /* 0x04 - 0x09 Reserved */
-/* 0x0C - 0x19 reserved */
+/* 0x0C - 0x19 Reserved */
 /* 0x1B - 0x1F Reserved */
+
+
+/*
+ * READ CD command field flags
+ */
+
+/* Expected sector types definitions */
+#define MMC_READ_CD_EST_ALL		0x00
+#define MMC_READ_CD_EST_CDDA		0x01
+#define MMC_READ_CD_EST_MODE1		0x02
+#define MMC_READ_CD_EST_MODE2_FORMLESS	0x03
+#define MMC_READ_CD_EST_MODE2_FORM1	0x04
+#define MMC_READ_CD_EST_MODE2_FORM2	0x05
+
+/* 0x06 - 0x07 Reserved */
+
+/* Main Channel Selection Bits */
+#define MMC_READ_CD_MCSB_NO_HEADER		0x00
+#define MMC_READ_CD_MCSB_4BYTE_HEADER		0x01
+#define MMC_READ_CD_MCSB_8BYTE_SUBHEADER	0x02
+#define MMC_READ_CD_MCSB_BOTH			0x03
+
+/* C2 Error Information */
+#define MMC_READ_CD_C2EI_NO_ERROR		0x00
+#define MMC_READ_CD_C2EI_C2EC294		0x01
+#define MMC_READ_CD_C2EI_C2EC296		0x02
 
 
 /*
@@ -909,6 +935,25 @@ typedef struct tag_mmc_response_read_capacity {
 	uint32_t lba;
 	uint32_t block_len;
 } optcl_mmc_response_read_capacity;
+
+
+/*
+ * READ CD command structures
+ */
+
+typedef struct tag_mmc_read_cd {
+	uint8_t est;
+	bool_t dap;
+	uint32_t starting_lba;
+	uint32_t transfer_len;
+	bool_t sync;
+	uint8_t header_codes;
+	bool_t user_data;
+	bool_t edc_ecc;
+	uint8_t c2_error_info;
+	uint8_t subchannel_sel;
+} optcl_mmc_read_cd;
+
 
 
 /*
