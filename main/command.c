@@ -56,6 +56,7 @@
 #define MMC_OPCODE_READ_CAPACITY		0x0025
 #define MMC_OPCODE_READ_CD			0x00BE
 #define MMC_OPCODE_REQUEST_SENSE		0x0003
+#define MMC_OPCODE_SET_READ_AHEAD		0x00A7
 #define MMC_OPCODE_TEST_UNIT_READY		0x0000
 #define MMC_OPCODE_VERIFY			0x002F
 
@@ -4073,6 +4074,47 @@ RESULT optcl_command_request_sense(const optcl_device *device,
 	*response = nresponse;
 
 	return(SUCCESS);
+}
+
+RESULT optcl_command_set_read_ahead(const optcl_device *device,
+				    const optcl_mmc_set_read_ahead *command)
+{
+	RESULT error;
+
+	cdb12 cdb;
+
+	assert(device != 0);
+	assert(command != 0);
+
+	if (device == 0 || command == 0) {
+		return(E_INVALIDARG);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_SET_READ_AHEAD;
+	cdb[2] = (uint8_t)(command->trigger_lba >> 24);
+	cdb[3] = (uint8_t)((command->trigger_lba << 8) >> 24);
+	cdb[4] = (uint8_t)((command->trigger_lba << 16) >> 24);
+	cdb[5] = (uint8_t)((command->trigger_lba << 24) >> 24);
+	cdb[6] = (uint8_t)(command->read_ahead_lba >> 24);
+	cdb[7] = (uint8_t)((command->read_ahead_lba << 8) >> 24);
+	cdb[8] = (uint8_t)((command->read_ahead_lba << 16) >> 24);
+	cdb[9] = (uint8_t)((command->read_ahead_lba << 24) >> 24);
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		0,
+		0
+		);
+
+	return(error);
 }
 
 RESULT optcl_command_test_unit_ready(const optcl_device *device)

@@ -955,7 +955,6 @@ typedef struct tag_mmc_read_cd {
 } optcl_mmc_read_cd;
 
 
-
 /*
  * REQUEST SENSE command structures
  */
@@ -970,6 +969,16 @@ typedef struct tag_mmc_response_request_sense {
 	uint8_t asc;
 	uint8_t ascq;
 } optcl_mmc_response_request_sense;
+
+
+/*
+ * SET READ AHEAD command structures
+ */
+
+typedef struct tag_mmc_set_read_ahead {
+	uint32_t trigger_lba;
+	uint32_t read_ahead_lba;
+} optcl_mmc_set_read_ahead;
 
 /*
  * VERIFY command structures
@@ -1051,6 +1060,9 @@ extern RESULT optcl_command_read_capacity(const optcl_device *device,
 extern RESULT optcl_command_request_sense(const optcl_device *device,
 					  const optcl_mmc_request_sense *command,
 					  optcl_mmc_response_request_sense **response);
+
+extern RESULT optcl_command_set_read_ahead(const optcl_device *device,
+					   const optcl_mmc_set_read_ahead *command);
 
 extern RESULT optcl_command_test_unit_ready(const optcl_device *device);
 
