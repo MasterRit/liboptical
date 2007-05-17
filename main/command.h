@@ -971,6 +971,16 @@ typedef struct tag_mmc_response_request_sense {
 	uint8_t ascq;
 } optcl_mmc_response_request_sense;
 
+/*
+ * VERIFY command structures
+ */
+
+typedef struct tag_mmc_verify_10 {
+	uint32_t lba;
+	bool_t g3tout;
+	uint16_t block_num;
+} optcl_mmc_verify_10;
+
 
 /*
  * Command functions
@@ -1041,5 +1051,7 @@ extern RESULT optcl_command_read_capacity(const optcl_device *device,
 extern RESULT optcl_command_request_sense(const optcl_device *device,
 					  const optcl_mmc_request_sense *command,
 					  optcl_mmc_response_request_sense **response);
+
+extern RESULT optcl_command_test_unit_ready(const optcl_device *device);
 
 #endif /* _COMMAND_H */

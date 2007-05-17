@@ -56,6 +56,7 @@
 #define MMC_OPCODE_READ_CAPACITY		0x0025
 #define MMC_OPCODE_READ_CD			0x00BE
 #define MMC_OPCODE_REQUEST_SENSE		0x0003
+#define MMC_OPCODE_TEST_UNIT_READY		0x0000
 
 
 /*
@@ -4071,6 +4072,37 @@ RESULT optcl_command_request_sense(const optcl_device *device,
 	*response = nresponse;
 
 	return(SUCCESS);
+}
+
+RESULT optcl_command_test_unit_ready(const optcl_device *device)
+{
+	RESULT error;
+
+	cdb6 cdb;
+
+	assert(device != 0);
+
+	if (device == 0) {
+		return(E_INVALIDARG);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_TEST_UNIT_READY;
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		0,
+		0
+		);
+
+	return(error);
 }
 
 
