@@ -975,11 +975,11 @@ typedef struct tag_mmc_response_request_sense {
  * VERIFY command structures
  */
 
-typedef struct tag_mmc_verify_10 {
+typedef struct tag_mmc_verify {
 	uint32_t lba;
 	bool_t g3tout;
 	uint16_t block_num;
-} optcl_mmc_verify_10;
+} optcl_mmc_verify;
 
 
 /*
@@ -1053,5 +1053,8 @@ extern RESULT optcl_command_request_sense(const optcl_device *device,
 					  optcl_mmc_response_request_sense **response);
 
 extern RESULT optcl_command_test_unit_ready(const optcl_device *device);
+
+extern RESULT optcl_command_verify(const optcl_device *device,
+				   const optcl_mmc_verify *command);
 
 #endif /* _COMMAND_H */

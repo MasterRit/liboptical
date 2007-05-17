@@ -57,6 +57,7 @@
 #define MMC_OPCODE_READ_CD			0x00BE
 #define MMC_OPCODE_REQUEST_SENSE		0x0003
 #define MMC_OPCODE_TEST_UNIT_READY		0x0000
+#define MMC_OPCODE_VERIFY			0x002F
 
 
 /*
@@ -4104,6 +4105,47 @@ RESULT optcl_command_test_unit_ready(const optcl_device *device)
 
 	return(error);
 }
+
+RESULT optcl_command_verify(const optcl_device *device, 
+			    const optcl_mmc_verify *command)
+{
+	RESULT error;
+
+	cdb10 cdb;
+
+	assert(device != 0);
+	assert(command != 0);
+
+	if (device == 0 || command == 0) {
+		return(E_INVALIDARG);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_VERIFY;
+	cdb[2] = (uint8_t)(command->lba >> 24);
+	cdb[3] = (uint8_t)((command->lba << 8) >> 24);
+	cdb[4] = (uint8_t)((command->lba << 16) >> 24);
+	cdb[5] = (uint8_t)((command->lba << 24) >> 24);
+	cdb[6] = (uint8_t)(command->g3tout << 7);
+	cdb[7] = (uint8_t)(command->block_num >> 8);
+	cdb[8] = (uint8_t)((command->block_num << 8) >> 8);
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		0,
+		0
+		);
+
+	return(error);
+}
+
 
 
 /*
