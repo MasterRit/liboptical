@@ -982,6 +982,14 @@ typedef struct tag_mmc_response_request_sense {
 
 
 /*
+ * SEEK command structures
+ */
+
+typedef struct tag_mmc_seek {
+	uint32_t lba;
+} optcl_mmc_seek;
+
+/*
  * SET CD SPEED command structures
  */
 
@@ -1080,6 +1088,9 @@ extern RESULT optcl_command_read_capacity(const optcl_device *device,
 extern RESULT optcl_command_request_sense(const optcl_device *device,
 					  const optcl_mmc_request_sense *command,
 					  optcl_mmc_response_request_sense **response);
+
+extern RESULT optcl_command_seek(const optcl_device *device,
+				 const optcl_mmc_seek *command);
 
 extern RESULT optcl_command_set_cd_speed(const optcl_device *device,
 					 const optcl_mmc_set_cd_speed *command);

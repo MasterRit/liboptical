@@ -56,6 +56,7 @@
 #define MMC_OPCODE_READ_CAPACITY		0x0025
 #define MMC_OPCODE_READ_CD			0x00BE
 #define MMC_OPCODE_REQUEST_SENSE		0x0003
+#define MMC_OPCODE_SEEK				0x002B
 #define MMC_OPCODE_SET_CD_SPEED			0x00BB
 #define MMC_OPCODE_SET_READ_AHEAD		0x00A7
 #define MMC_OPCODE_TEST_UNIT_READY		0x0000
@@ -4076,6 +4077,44 @@ RESULT optcl_command_request_sense(const optcl_device *device,
 
 	return(SUCCESS);
 }
+
+RESULT optcl_command_seek(const optcl_device *device,
+			  const optcl_mmc_seek *command)
+{
+	RESULT error;
+
+	cdb10 cdb;
+
+	assert(device != NULL);
+	assert(command != NULL);
+
+	if (device == 0 || command == 0) {
+		return(E_INVALIDARG);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_SEEK;
+	cdb[2] = (uint8_t)(command->lba >> 24);
+	cdb[3] = (uint8_t)((command->lba << 8) >> 24);
+	cdb[4] = (uint8_t)((command->lba << 16) >> 24);
+	cdb[5] = (uint8_t)((command->lba << 24) >> 24);
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		0,
+		0
+		);
+
+	return(error);
+}
+
 
 RESULT optcl_command_set_cd_speed(const optcl_device *device,
 				  const optcl_mmc_set_cd_speed *command)
