@@ -347,6 +347,16 @@
 
 
 /*
+ * SET READ SPEED command field flags
+ */
+
+#define MMC_SET_CD_SPEED_RC_CLV_NPCAV	0x00
+#define MMC_SET_CD_SPEED_RC_PCAV	0x01
+
+/* 0x02 - 0x03 Reserved */
+
+
+/*
  * Common to all commands
  */
 
@@ -972,6 +982,16 @@ typedef struct tag_mmc_response_request_sense {
 
 
 /*
+ * SET CD SPEED command structures
+ */
+
+typedef struct tag_mmc_set_cd_cpeed {
+	uint8_t rotctrl;
+	uint16_t drive_read_speed;
+	uint16_t drive_write_speed;
+} optcl_mmc_set_cd_speed;
+
+/*
  * SET READ AHEAD command structures
  */
 
@@ -1060,6 +1080,9 @@ extern RESULT optcl_command_read_capacity(const optcl_device *device,
 extern RESULT optcl_command_request_sense(const optcl_device *device,
 					  const optcl_mmc_request_sense *command,
 					  optcl_mmc_response_request_sense **response);
+
+extern RESULT optcl_command_set_cd_speed(const optcl_device *device,
+					 const optcl_mmc_set_cd_speed *command);
 
 extern RESULT optcl_command_set_read_ahead(const optcl_device *device,
 					   const optcl_mmc_set_read_ahead *command);

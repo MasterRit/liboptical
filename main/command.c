@@ -56,6 +56,7 @@
 #define MMC_OPCODE_READ_CAPACITY		0x0025
 #define MMC_OPCODE_READ_CD			0x00BE
 #define MMC_OPCODE_REQUEST_SENSE		0x0003
+#define MMC_OPCODE_SET_CD_SPEED			0x00BB
 #define MMC_OPCODE_SET_READ_AHEAD		0x00A7
 #define MMC_OPCODE_TEST_UNIT_READY		0x0000
 #define MMC_OPCODE_VERIFY			0x002F
@@ -68,7 +69,7 @@
 #define READ_BLOCK_SIZE			2048U
 #define MAX_SENSEDATA_LENGTH		252
 #define MAX_GET_CONFIG_TRANSFER_LEN	65530
-#define MECHSTATUS_RESPSIZE	1032
+#define MECHSTATUS_RESPSIZE		1032
 
 
 /*
@@ -4076,6 +4077,44 @@ RESULT optcl_command_request_sense(const optcl_device *device,
 	return(SUCCESS);
 }
 
+RESULT optcl_command_set_cd_speed(const optcl_device *device,
+				  const optcl_mmc_set_cd_speed *command)
+{
+	RESULT error;
+
+	cdb12 cdb;
+
+	assert(device != NULL);
+	assert(command != NULL);
+
+	if (device == 0 || command == 0) {
+		return(E_INVALIDARG);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_SET_CD_SPEED;
+	cdb[1] = command->rotctrl & 0x03;
+	cdb[2] = (uint8_t)(command->drive_read_speed >> 8);
+	cdb[3] = (uint8_t)((command->drive_read_speed << 8) >> 8);
+	cdb[4] = (uint8_t)(command->drive_write_speed >> 8);
+	cdb[5] = (uint8_t)((command->drive_write_speed << 8) >> 8);
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		0,
+		0
+		);
+
+	return(error);
+}
+
 RESULT optcl_command_set_read_ahead(const optcl_device *device,
 				    const optcl_mmc_set_read_ahead *command)
 {
@@ -4187,7 +4226,6 @@ RESULT optcl_command_verify(const optcl_device *device,
 
 	return(error);
 }
-
 
 
 /*
