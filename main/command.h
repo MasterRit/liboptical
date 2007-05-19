@@ -966,6 +966,17 @@ typedef struct tag_mmc_read_cd {
 
 
 /*
+ * READ MEDIA SERIAL NUMBER command structures
+ */
+
+typedef struct tag_mmc_response_read_msn {
+	optcl_mmc_response header;
+	uint16_t msn_len;
+	ptr_t msn;
+} optcl_mmc_response_read_msn;
+
+
+/*
  * REPAIR TRACK command structures
  */
 
@@ -1094,6 +1105,9 @@ extern RESULT optcl_command_read_buffer_capacity(const optcl_device *device,
 
 extern RESULT optcl_command_read_capacity(const optcl_device *device,
 					  optcl_mmc_response_read_capacity **response);
+
+extern RESULT optcl_command_read_msn(const optcl_device *device,
+				     optcl_mmc_response_read_msn **response);
 
 extern RESULT optcl_command_repair_track(const optcl_device *device,
 					 const optcl_mmc_repair_track *command);

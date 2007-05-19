@@ -55,6 +55,7 @@
 #define MMC_OPCODE_READ_BUFFER_CAPACITY		0x005C
 #define MMC_OPCODE_READ_CAPACITY		0x0025
 #define MMC_OPCODE_READ_CD			0x00BE
+#define MMC_OPCODE_READ_MSN			0x00AB
 #define MMC_OPCODE_REPAIR_TRACK			0x0058
 #define MMC_OPCODE_REQUEST_SENSE		0x0003
 #define MMC_OPCODE_SEEK				0x002B
@@ -3978,6 +3979,141 @@ RESULT optcl_command_read_capacity(const optcl_device *device,
 	return(error);
 }
 
+RESULT optcl_command_read_msn(const optcl_device *device,
+			      optcl_mmc_response_read_msn **response)
+{
+	RESULT error;
+	RESULT destroy_error;
+
+	cdb12 cdb;
+	ptr_t msn = 0;
+	uint32_t msnlen;
+	uint32_t alignment;
+	ptr_t mmc_response = 0;
+	optcl_adapter *adapter = 0;
+	optcl_mmc_response_read_msn *nresponse = 0;
+
+	assert(device != 0);
+	assert(response != 0);
+
+	if (device == 0 || response == 0) {
+		return(E_INVALIDARG);
+	}
+
+	error = optcl_device_get_adapter(device, &adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	assert(adapter != 0);
+
+	if (adapter == 0) {
+		return(E_POINTER);
+	}
+
+	error = optcl_adapter_get_alignment_mask(adapter, &alignment);
+
+	if (FAILED(error)) {
+		destroy_error = optcl_adapter_destroy(adapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	error = optcl_adapter_destroy(adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	/*
+	 * Execute command to get MSN length
+	 */
+	mmc_response = xmalloc_aligned(4, alignment);
+
+	if (mmc_response == 0) {
+		return(E_OUTOFMEMORY);
+	}
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_READ_MSN;
+	cdb[1] = 0x01;	/* service action (0x01) */
+	cdb[9] = 0x04;	/* allocation length (0x0004) */
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		mmc_response,
+		4
+		);
+
+	if (FAILED(error)) {
+		xfree_aligned(mmc_response);
+		return(error);
+	}
+
+	msnlen = uint32_from_be(*(uint32_t*)mmc_response);
+
+	xfree_aligned(mmc_response);
+
+	/*
+	 * Execute command to get MSN
+	 */
+
+	mmc_response = xmalloc_aligned(msnlen, alignment);
+
+	if (mmc_response == 0) {
+		return(E_OUTOFMEMORY);
+	}
+
+	cdb[6] = (uint8_t)(msnlen >> 24);
+	cdb[7] = (uint8_t)((msnlen << 8) >> 24);
+	cdb[8] = (uint8_t)((msnlen << 16) >> 24);
+	cdb[9] = (uint8_t)((msnlen << 24) >> 24);
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		mmc_response,
+		msnlen
+		);
+
+	if (FAILED(error)) {
+		xfree_aligned(mmc_response);
+		return(error);
+	}
+
+	msnlen = uint32_from_be(*(uint32_t*)mmc_response);
+
+	msn = malloc(msnlen);
+
+	if (msn == 0) {
+		xfree_aligned(mmc_response);
+		return(E_OUTOFMEMORY);
+	}
+
+	xmemcpy(msn, msnlen, mmc_response, msnlen);
+
+	nresponse = malloc(sizeof(optcl_mmc_response_read_msn));
+
+	if (nresponse == 0) {
+		free(msn);
+		xfree_aligned(mmc_response);
+		return(E_OUTOFMEMORY);
+	}
+
+	nresponse->header.command_opcode = MMC_OPCODE_READ_MSN;
+	nresponse->msn_len = (uint16_t)msnlen;
+	nresponse->msn = msn;
+
+	*response = nresponse;
+
+	return(error);
+}
+
+
 RESULT optcl_command_repair_track(const optcl_device *device,
 				  const optcl_mmc_repair_track *command)
 {
@@ -4548,6 +4684,28 @@ static RESULT deallocator_mmc_response_read_buffer_capcity(optcl_mmc_response *r
 	return(SUCCESS);
 }
 
+static RESULT deallocator_mmc_response_read_msn(optcl_mmc_response *response)
+{
+	optcl_mmc_response_read_msn *mmc_response = 0;
+
+	if (response == 0) {
+		return(SUCCESS);
+	}
+
+	assert(response->command_opcode == MMC_OPCODE_READ_MSN);
+
+	if (response->command_opcode != MMC_OPCODE_READ_MSN) {
+		return(E_CMNDINVOPCODE);
+	}
+
+	mmc_response = (optcl_mmc_response_read_msn*)response;
+
+	free(mmc_response->msn);
+	free(mmc_response);
+
+	return(SUCCESS);
+}
+
 static RESULT deallocator_mmc_response_request_sense(optcl_mmc_response *response) 
 {
 	if (response == 0) {
@@ -4582,6 +4740,7 @@ static struct response_deallocator_entry __deallocator_table[] = {
 	{ MMC_OPCODE_READ_12,			deallocator_mmc_response_read_10		},
 	{ MMC_OPCODE_READ_BUFFER,		deallocator_mmc_response_read_buffer		},
 	{ MMC_OPCODE_READ_BUFFER_CAPACITY,	deallocator_mmc_response_read_buffer_capcity	},
+	{ MMC_OPCODE_READ_MSN,			deallocator_mmc_response_read_msn		},
 	{ MMC_OPCODE_REQUEST_SENSE,		deallocator_mmc_response_request_sense		}
 };
 
