@@ -55,6 +55,7 @@
 #define MMC_OPCODE_READ_BUFFER_CAPACITY		0x005C
 #define MMC_OPCODE_READ_CAPACITY		0x0025
 #define MMC_OPCODE_READ_CD			0x00BE
+#define MMC_OPCODE_REPAIR_TRACK			0x0058
 #define MMC_OPCODE_REQUEST_SENSE		0x0003
 #define MMC_OPCODE_SEEK				0x002B
 #define MMC_OPCODE_SET_CD_SPEED			0x00BB
@@ -3977,6 +3978,42 @@ RESULT optcl_command_read_capacity(const optcl_device *device,
 	return(error);
 }
 
+RESULT optcl_command_repair_track(const optcl_device *device,
+				  const optcl_mmc_repair_track *command)
+{
+	RESULT error;
+
+	cdb10 cdb;
+
+	assert(device != 0);
+	assert(command != 0);
+
+	if (device == 0 || command == 0) {
+		return(E_INVALIDARG);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_REPAIR_TRACK;
+	cdb[1] = (uint8_t)(command->immed & 0x01);
+	cdb[4] = (uint8_t)(command->ltn >> 8);
+	cdb[5] = (uint8_t)((command->ltn << 8) >> 8);
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		0,
+		0
+		);
+
+	return(error);
+}
+
 RESULT optcl_command_request_sense(const optcl_device *device,
 				   const optcl_mmc_request_sense *command,
 				   optcl_mmc_response_request_sense **response)
@@ -4085,8 +4122,8 @@ RESULT optcl_command_seek(const optcl_device *device,
 
 	cdb10 cdb;
 
-	assert(device != NULL);
-	assert(command != NULL);
+	assert(device != 0);
+	assert(command != 0);
 
 	if (device == 0 || command == 0) {
 		return(E_INVALIDARG);
@@ -4123,8 +4160,8 @@ RESULT optcl_command_set_cd_speed(const optcl_device *device,
 
 	cdb12 cdb;
 
-	assert(device != NULL);
-	assert(command != NULL);
+	assert(device != 0);
+	assert(command != 0);
 
 	if (device == 0 || command == 0) {
 		return(E_INVALIDARG);
