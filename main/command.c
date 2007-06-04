@@ -63,6 +63,7 @@
 #define MMC_OPCODE_SET_READ_AHEAD		0x00A7
 #define MMC_OPCODE_TEST_UNIT_READY		0x0000
 #define MMC_OPCODE_VERIFY			0x002F
+#define MMC_OPCODE_WRITE_BUFFER			0x003B
 
 
 /*
@@ -4437,6 +4438,21 @@ RESULT optcl_command_verify(const optcl_device *device,
 		);
 
 	return(error);
+}
+
+RESULT optcl_command_write_buffer(const optcl_device *device,
+				  const optcl_mmc_write_buffer *command)
+{
+	RESULT error;
+
+	cdb10 cdb;
+
+	assert(device != 0);
+	assert(command != 0);
+
+	if (device == 0 || command == 0) {
+		return(E_INVALIDARG);
+	}
 }
 
 

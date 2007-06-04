@@ -357,6 +357,29 @@
 
 
 /*
+ * WRITE BUFFER command field flags
+ */
+
+#define MMC_WRITE_BUFFER_MODE_COMBINED			0x00
+#define MMC_WRITE_BUFFER_MODE_VENDOR			0x01
+#define MMC_WRITE_BUFFER_MODE_DATA			0x02
+#define MMC_WRITE_BUFFER_MODE_MICROCODE			0x04
+#define MMC_WRITE_BUFFER_MODE_MICROCODE_SAVE		0x05
+#define MMC_WRITE_BUFFER_MODE_MICROCODE_WOFF		0x06
+#define MMC_WRITE_BUFFER_MODE_MICROCODE_WOFF_SAVE	0x07
+#define MMC_WRITE_BUFFER_MODE_ECHO			0x0A
+#define MMC_WRITE_BUFFER_MODE_EN_EXPANDER		0x1A
+#define MMC_WRITE_BUFFER_MODE_DIS_EXPANDER		0x1B
+#define MMC_WRITE_BUFFER_MODE_APPLOG			0x1C
+
+/* 0x03 Reserved */
+/* 0x08 - 0x09 Reserved */
+/* 0x0B - 0x19 Reserved */
+/* 0x1D - 0x1F reserved */
+
+
+
+/*
  * Common to all commands
  */
 
@@ -1041,6 +1064,19 @@ typedef struct tag_mmc_verify {
 
 
 /*
+ * WRITE BUFFER command structures
+ */
+
+typedef struct tag_mmc_write_buffer {
+	uint8_t mode;
+	uint8_t buffer_id;
+	uint32_t buffer_offset;
+	uint32_t param_list_len;
+	ptr_t data;
+} optcl_mmc_write_buffer;
+
+
+/*
  * Command functions
  */
 
@@ -1129,5 +1165,8 @@ extern RESULT optcl_command_test_unit_ready(const optcl_device *device);
 
 extern RESULT optcl_command_verify(const optcl_device *device,
 				   const optcl_mmc_verify *command);
+
+extern RESULT optcl_command_write_buffer(const optcl_device *device,
+					 const optcl_mmc_write_buffer *command);
 
 #endif /* _COMMAND_H */
