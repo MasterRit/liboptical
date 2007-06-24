@@ -1087,6 +1087,15 @@ typedef struct tag_mmc_write_12 {
 } optcl_mmc_write_12;
 
 /*
+ * WRITE AND VERIFY(10) command structures
+ */
+
+typedef struct tag_mmc_write_and_verify_10 {
+	uint32_t lba;
+	uint16_t transfer_len;
+} optcl_mmc_write_and_verify_10;
+
+/*
  * WRITE BUFFER command structures
  */
 
@@ -1198,6 +1207,11 @@ extern RESULT optcl_command_write_12(const optcl_device *device,
 				     const optcl_mmc_write_12 *command,
 				     ptr_t data,
 				     uint32_t data_len);
+
+extern RESULT optcl_command_write_and_verify_10(const optcl_device *device,
+						const optcl_mmc_write_and_verify_10 *command,
+						ptr_t data,
+						uint32_t data_len);
 
 extern RESULT optcl_command_write_buffer(const optcl_device *device,
 					 const optcl_mmc_write_buffer *command);

@@ -65,6 +65,7 @@
 #define MMC_OPCODE_VERIFY			0x002F
 #define MMC_OPCODE_WRITE			0x002A
 #define MMC_OPCODE_WRITE_12			0x00AA
+#define MMC_OPCODE_WRITE_AND_VERIFY_10		0x002E
 #define MMC_OPCODE_WRITE_BUFFER			0x003B
 
 
@@ -4597,6 +4598,88 @@ RESULT optcl_command_write_12(const optcl_device *device,
 	cdb[8] = (uint8_t)((command->transfer_len << 16) >> 24);
 	cdb[9] = (uint8_t)((command->transfer_len << 24) >> 24);
 	cdb[10] = (uint8_t)((command->streaming << 7) | (command->vnr << 6));
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		ndata,
+		data_len
+		);
+
+	xfree_aligned(ndata);
+
+	return(error);
+}
+
+RESULT optcl_command_write_and_verify_10(const optcl_device *device,
+					 const optcl_mmc_write_and_verify_10 *command,
+					 ptr_t data,
+					 uint32_t data_len)
+{
+	RESULT error;
+	RESULT destroy_error;
+
+	cdb10 cdb;
+	ptr_t ndata = 0;
+	uint32_t alignment;
+	optcl_adapter *adapter = 0;
+
+	assert(device != 0);
+	assert(command != 0);
+	assert(data != 0);
+	assert(data_len > 0);
+
+	if (device == 0 || command == 0 || data == 0 || data_len < 1) {
+		return(E_INVALIDARG);
+	}
+
+	error = optcl_device_get_adapter(device, &adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	assert(adapter != 0);
+
+	if (adapter == 0) {
+		return(E_POINTER);
+	}
+
+	error = optcl_adapter_get_alignment_mask(adapter, &alignment);
+
+	if (FAILED(error)) {
+		destroy_error = optcl_adapter_destroy(adapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	error = optcl_adapter_destroy(adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	ndata = xmalloc_aligned(data_len, alignment);
+
+	if (ndata == 0) {
+		return(E_OUTOFMEMORY);
+	}
+
+	xmemcpy(ndata, data_len, data, data_len);
+
+	/*
+	 * Execute command
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_WRITE;
+	cdb[2] = (uint8_t)(command->lba >> 24);
+	cdb[3] = (uint8_t)((command->lba << 8) >> 24);
+	cdb[4] = (uint8_t)((command->lba << 16) >> 24);
+	cdb[5] = (uint8_t)((command->lba << 24) >> 24);
+	cdb[7] = (uint8_t)(command->transfer_len >> 8);
+	cdb[8] = (uint8_t)((command->transfer_len << 8) >> 8);
 
 	error = optcl_device_command_execute(
 		device,
