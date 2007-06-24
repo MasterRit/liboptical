@@ -1053,6 +1053,16 @@ typedef struct tag_mmc_set_read_ahead {
 } optcl_mmc_set_read_ahead;
 
 /*
+ * SYNCHRONIZE CACHE command structures
+ */
+
+typedef struct tag_mmc_synchronize_cache {
+	bool_t immed;
+	uint32_t lba;
+	uint16_t num_of_blocks;
+} optcl_mmc_synchronize_cache;
+
+/*
  * VERIFY command structures
  */
 
@@ -1192,6 +1202,9 @@ extern RESULT optcl_command_set_cd_speed(const optcl_device *device,
 
 extern RESULT optcl_command_set_read_ahead(const optcl_device *device,
 					   const optcl_mmc_set_read_ahead *command);
+
+extern RESULT optcl_command_synchronize_cache(const optcl_device *device,
+					      const optcl_mmc_synchronize_cache *command);
 
 extern RESULT optcl_command_test_unit_ready(const optcl_device *device);
 
