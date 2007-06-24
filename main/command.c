@@ -61,6 +61,7 @@
 #define MMC_OPCODE_SEEK				0x002B
 #define MMC_OPCODE_SET_CD_SPEED			0x00BB
 #define MMC_OPCODE_SET_READ_AHEAD		0x00A7
+#define MMC_OPCODE_START_STOP_UNIT		0x001B
 #define MMC_OPCODE_SYNCHRONIZE_CACHE		0x0035
 #define MMC_OPCODE_TEST_UNIT_READY		0x0000
 #define MMC_OPCODE_VERIFY			0x002F
@@ -4361,6 +4362,48 @@ RESULT optcl_command_set_read_ahead(const optcl_device *device,
 	cdb[7] = (uint8_t)((command->read_ahead_lba << 8) >> 24);
 	cdb[8] = (uint8_t)((command->read_ahead_lba << 16) >> 24);
 	cdb[9] = (uint8_t)((command->read_ahead_lba << 24) >> 24);
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		0,
+		0
+		);
+
+	return(error);
+}
+
+RESULT optcl_command_start_stop_unit(const optcl_device *device,
+				     const optcl_mmc_start_stop_unit *command)
+{
+	RESULT error;
+
+	cdb6 cdb;
+
+	assert(device != 0);
+	assert(command != 0);
+
+	if (device == 0 || command == 0) {
+		return(E_INVALIDARG);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_START_STOP_UNIT;
+	cdb[1] = (uint8_t)command->immed;
+	cdb[3] = (uint8_t)command->fln;
+	
+	cdb[4] = (uint8_t)(
+		(command->pc << 4) 
+		| (command->fl << 2) 
+		| (command->loej << 1) 
+		| command->start
+		);
 
 	error = optcl_device_command_execute(
 		device,

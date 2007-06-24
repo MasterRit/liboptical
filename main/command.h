@@ -357,6 +357,24 @@
 
 
 /*
+ * START STOP UNIT command field flags
+ */
+
+#define MMC_SSUNIT_PWR_NOCHANGE		0x00
+
+/* 0x01 Reserved */
+
+#define MMC_SSUNIT_PWR_GOIDLE		0x02
+#define MMC_SSUNIT_PWR_GOSTANDBY	0x03
+
+/* 0x04 Reserved */
+
+#define MMC_SSUNIT_PWR_GOSLEEP		0x05
+
+/* 0x06 - 0x0F Reserved */
+
+
+/*
  * WRITE BUFFER command field flags
  */
 
@@ -1053,6 +1071,19 @@ typedef struct tag_mmc_set_read_ahead {
 } optcl_mmc_set_read_ahead;
 
 /*
+ * START STOP UNIT command structures
+ */
+
+typedef struct tag_mmc_start_stop_unit {
+	bool_t immed;
+	uint8_t fln;
+	uint8_t pc;
+	bool_t fl;
+	bool_t loej;
+	bool_t start;
+} optcl_mmc_start_stop_unit;
+
+/*
  * SYNCHRONIZE CACHE command structures
  */
 
@@ -1202,6 +1233,9 @@ extern RESULT optcl_command_set_cd_speed(const optcl_device *device,
 
 extern RESULT optcl_command_set_read_ahead(const optcl_device *device,
 					   const optcl_mmc_set_read_ahead *command);
+
+extern RESULT optcl_command_start_stop_unit(const optcl_device *device,
+					    const optcl_mmc_start_stop_unit *command);
 
 extern RESULT optcl_command_synchronize_cache(const optcl_device *device,
 					      const optcl_mmc_synchronize_cache *command);
