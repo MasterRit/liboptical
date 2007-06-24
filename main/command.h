@@ -1062,6 +1062,29 @@ typedef struct tag_mmc_verify {
 	uint16_t block_num;
 } optcl_mmc_verify;
 
+/*
+ * WRITE command structures
+ */
+
+typedef struct tag_mmc_write {
+	bool_t fua;
+	bool_t tsr;
+	uint32_t lba;
+	uint16_t transfer_len;
+} optcl_mmc_write;
+
+/*
+ * WRITE(12) command structures
+ */
+
+typedef struct tag_mmc_write_12 {
+	bool_t fua;
+	bool_t tsr;
+	uint32_t lba;
+	uint32_t transfer_len;
+	bool_t streaming;
+	bool_t vnr;
+} optcl_mmc_write_12;
 
 /*
  * WRITE BUFFER command structures
@@ -1165,6 +1188,16 @@ extern RESULT optcl_command_test_unit_ready(const optcl_device *device);
 
 extern RESULT optcl_command_verify(const optcl_device *device,
 				   const optcl_mmc_verify *command);
+
+extern RESULT optcl_command_write(const optcl_device *device,
+				  const optcl_mmc_write *command,
+				  ptr_t data,
+				  uint32_t data_len);
+
+extern RESULT optcl_command_write_12(const optcl_device *device,
+				     const optcl_mmc_write_12 *command,
+				     ptr_t data,
+				     uint32_t data_len);
 
 extern RESULT optcl_command_write_buffer(const optcl_device *device,
 					 const optcl_mmc_write_buffer *command);
