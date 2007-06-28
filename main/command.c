@@ -59,6 +59,7 @@
 #define MMC_OPCODE_REPAIR_TRACK			0x0058
 #define MMC_OPCODE_REQUEST_SENSE		0x0003
 #define MMC_OPCODE_SEEK				0x002B
+#define MMC_OPCODE_SEND_OPC_INFORMATION		0x0054
 #define MMC_OPCODE_SET_CD_SPEED			0x00BB
 #define MMC_OPCODE_SET_READ_AHEAD		0x00A7
 #define MMC_OPCODE_START_STOP_UNIT		0x001B
@@ -4294,6 +4295,90 @@ RESULT optcl_command_seek(const optcl_device *device,
 	return(error);
 }
 
+RESULT optcl_command_send_opc_information(const optcl_device *device,
+					  const optcl_mmc_send_opc_information *command)
+{
+	RESULT error;
+	RESULT destroy_error;
+
+	cdb10 cdb;
+	ptr_t data = 0;
+	uint32_t alignment;
+	uint16_t param_list_len;
+	optcl_adapter *adapter = 0;
+
+	assert(device != 0);
+	assert(command != 0);
+
+	if (device == 0 || command == 0) {
+		return(E_INVALIDARG);
+	}
+
+	assert(command->opc_entry_num > 0);
+
+	if (command->opc_entry_num < 1) {
+		return(E_INVALIDARG);
+	}
+
+	error = optcl_device_get_adapter(device, &adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	assert(adapter != 0);
+
+	if (adapter == 0) {
+		return(E_POINTER);
+	}
+
+	error = optcl_adapter_get_alignment_mask(adapter, &alignment);
+
+	if (FAILED(error)) {
+		destroy_error = optcl_adapter_destroy(adapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	error = optcl_adapter_destroy(adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	param_list_len = command->opc_entry_num * sizeof(command->opc_table_entries[0]);
+
+	data = xmalloc_aligned(param_list_len, alignment);
+
+	if (data == 0) {
+		return(E_OUTOFMEMORY);
+	}
+
+	xmemcpy(data, param_list_len, &command->opc_table_entries, param_list_len);
+
+	/*
+	 * Execute command
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_SEND_OPC_INFORMATION;
+	cdb[1] = (uint8_t)(command->doopc);
+	cdb[2] = (uint8_t)((command->exclude1 << 1) | command->exclude0);
+	cdb[7] = (uint8_t)(param_list_len >> 8);
+	cdb[8] = (uint8_t)((param_list_len << 8) >> 8);
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		data,
+		param_list_len
+		);
+
+	xfree_aligned(data);
+
+	return(error);
+}
 
 RESULT optcl_command_set_cd_speed(const optcl_device *device,
 				  const optcl_mmc_set_cd_speed *command)

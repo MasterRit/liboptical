@@ -1071,6 +1071,27 @@ typedef struct tag_mmc_set_read_ahead {
 } optcl_mmc_set_read_ahead;
 
 /*
+ * SEND OPC INFORMATION command structures
+ */
+
+typedef struct tag_mmc_send_opc_information {
+	bool_t doopc;
+	bool_t exclude1;
+	bool_t exclude0;
+	uint8_t opc_entry_num;
+
+	struct tag_opc_table_entry {
+		uint16_t kbps;
+		uint8_t value0;
+		uint8_t value1;
+		uint8_t value2;
+		uint8_t value3;
+		uint8_t value4;
+		uint8_t value5;
+	} opc_table_entries[256];
+} optcl_mmc_send_opc_information;
+
+/*
  * START STOP UNIT command structures
  */
 
@@ -1227,6 +1248,9 @@ extern RESULT optcl_command_request_sense(const optcl_device *device,
 
 extern RESULT optcl_command_seek(const optcl_device *device,
 				 const optcl_mmc_seek *command);
+
+extern RESULT optcl_command_send_opc_information(const optcl_device *device,
+						 const optcl_mmc_send_opc_information *command);
 
 extern RESULT optcl_command_set_cd_speed(const optcl_device *device,
 					 const optcl_mmc_set_cd_speed *command);
