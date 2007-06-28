@@ -325,12 +325,12 @@
  */
 
 /* Expected sector types definitions */
-#define MMC_READ_CD_EST_ALL		0x00
-#define MMC_READ_CD_EST_CDDA		0x01
-#define MMC_READ_CD_EST_MODE1		0x02
-#define MMC_READ_CD_EST_MODE2_FORMLESS	0x03
-#define MMC_READ_CD_EST_MODE2_FORM1	0x04
-#define MMC_READ_CD_EST_MODE2_FORM2	0x05
+#define MMC_READ_CD_EST_ALL			0x00
+#define MMC_READ_CD_EST_CDDA			0x01
+#define MMC_READ_CD_EST_MODE1			0x02
+#define MMC_READ_CD_EST_MODE2_FORMLESS		0x03
+#define MMC_READ_CD_EST_MODE2_FORM1		0x04
+#define MMC_READ_CD_EST_MODE2_FORM2		0x05
 
 /* 0x06 - 0x07 Reserved */
 
@@ -350,26 +350,37 @@
  * SET READ SPEED command field flags
  */
 
-#define MMC_SET_CD_SPEED_RC_CLV_NPCAV	0x00
-#define MMC_SET_CD_SPEED_RC_PCAV	0x01
+#define MMC_SET_CD_SPEED_RC_CLV_NPCAV		0x00
+#define MMC_SET_CD_SPEED_RC_PCAV		0x01
 
 /* 0x02 - 0x03 Reserved */
+
+
+/*
+ * SET STREAMING command field flags
+ */
+
+#define MMC_SET_STREAMING_PERFORMANCE		0x00
+
+/* 0x01 - 0x04 Reserved */
+
+#define MMC_SET_STREAMING_DBI_CACHE_ZONE	0x05
 
 
 /*
  * START STOP UNIT command field flags
  */
 
-#define MMC_SSUNIT_PWR_NOCHANGE		0x00
+#define MMC_SSUNIT_PWR_NOCHANGE			0x00
 
 /* 0x01 Reserved */
 
-#define MMC_SSUNIT_PWR_GOIDLE		0x02
-#define MMC_SSUNIT_PWR_GOSTANDBY	0x03
+#define MMC_SSUNIT_PWR_GOIDLE			0x02
+#define MMC_SSUNIT_PWR_GOSTANDBY		0x03
 
 /* 0x04 Reserved */
 
-#define MMC_SSUNIT_PWR_GOSLEEP		0x05
+#define MMC_SSUNIT_PWR_GOSLEEP			0x05
 
 /* 0x06 - 0x0F Reserved */
 
@@ -442,25 +453,21 @@ typedef struct tag_mmc_format_unit {
 	uint32_t num_of_blocks;
 	uint8_t format_type;
 	uint8_t format_subtype;
-
 	union tag_type_dependent {
 		struct tag_ff_with_sparing {
 			uint8_t m;
 			uint8_t n;
 		} ff_with_sparing;
-
 		struct tag_dvd_plus_rw_basicf {
 			bool_t quick_start;
 			bool_t restart;
 		} dvd_plus_rw_basicf;
-
 		struct tag_bd_r_with_spare_areas {
 			bool_t isa_v;
 			bool_t tdma_v;
 			uint8_t sadp;
 			uint8_t tdmadp;
 		} bd_r_with_spare_areas;
-
 		struct tag_other {
 			uint32_t type_dependent;
 		} other;
@@ -576,7 +583,6 @@ typedef struct tag_mmc_gpdesc_header {
 typedef struct tag_mmc_gpdesc_pd {
 	optcl_mmc_gpdesc_header header;
 	uint8_t data_type;
-
 	union tag_nominal {
 		uint32_t start_lba;
 		uint32_t end_lba;
@@ -631,7 +637,6 @@ typedef struct tag_mmc_gpdesc_dbicz {
 typedef struct tag_mmc_response_get_performance {
 	optcl_mmc_response header;
 	uint8_t type;
-
 	union tag_gp_header {
 		struct tag_perf_header {
 			uint32_t perf_data_len;
@@ -645,7 +650,6 @@ typedef struct tag_mmc_response_get_performance {
 			uint32_t dbicz_data_len;
 		} dbicz_header;
 	} gp_header;
-
 	optcl_list *descriptors;
 } optcl_mmc_response_get_performance;
 
@@ -729,7 +733,6 @@ typedef struct tag_mmc_response_mechanism_status {
 	uint32_t current_lba;
 	uint8_t available_slots;
 	uint16_t slot_table_len;
-
 	struct tag_slot_entry {
 		bool_t disk_present;
 		bool_t change;
@@ -915,34 +918,27 @@ typedef struct tag_mmc_read_buffer {
 typedef struct tag_mmc_response_read_buffer {
 	optcl_mmc_response header;
 	uint8_t mode;
-
 	union tag_response {
 		struct tag_combined {
 			uint32_t buffer_capacity;
 			ptr_t buffer;
 		} combined;
-
 		struct tag_data {
 			ptr_t buffer;
 		} data;
-
 		struct tag_descriptor {
 			uint8_t offset_boundary;
 			uint32_t buffer_capacity;
 		} descriptor;
-
 		struct tag_echo {
 			ptr_t buffer;
 		} echo;
-
 		struct tag_echo_desc {
 			uint32_t buffer_capacity;
 		} echo_desc;
-
 		struct tag_expander {
 			ptr_t buffer;
 		} expander;
-
 		struct tag_vendor {
 			ptr_t buffer;
 		} vendor;
@@ -960,14 +956,12 @@ typedef struct tag_mmc_read_buffer_capacity {
 
 typedef struct tag_mmc_resopnse_read_buffer_capacity {
 	optcl_mmc_response header;
-
 	union tag_desc {
 		struct tag_block {
 			bool_t block;
 			uint16_t data_length;
 			uint32_t available_buffer_len;
 		} block;
-
 		struct tag_bytes {
 			uint16_t data_length;
 			uint32_t buffer_len;
@@ -1050,7 +1044,6 @@ typedef struct tag_mmc_response_request_sense {
 typedef struct tag_mmc_reserve_track {
 	bool_t rmz;
 	bool_t arsv;
-	
 	union tag_reservation {
 		uint32_t size;
 		uint32_t lba;
@@ -1066,6 +1059,7 @@ typedef struct tag_mmc_seek {
 	uint32_t lba;
 } optcl_mmc_seek;
 
+
 /*
  * SET CD SPEED command structures
  */
@@ -1076,6 +1070,7 @@ typedef struct tag_mmc_set_cd_cpeed {
 	uint16_t drive_write_speed;
 } optcl_mmc_set_cd_speed;
 
+
 /*
  * SET READ AHEAD command structures
  */
@@ -1084,6 +1079,33 @@ typedef struct tag_mmc_set_read_ahead {
 	uint32_t trigger_lba;
 	uint32_t read_ahead_lba;
 } optcl_mmc_set_read_ahead;
+
+
+/*
+ * SET STREAMING
+ */
+
+typedef struct tag_mmc_set_streaming {
+	uint8_t type;
+	union tag_descriptors {
+		struct tag_performance {
+			uint8_t wrc;
+			bool_t rdd;
+			bool_t exact;
+			bool_t ra;
+			uint32_t start_lba;
+			uint32_t end_lba;
+			uint32_t read_size;
+			uint32_t read_time;
+			uint32_t write_size;
+			uint32_t write_time;
+		} performance;
+		struct tag_dbi_cache_zones {
+			uint16_t desc_num;
+			uint32_t *descriptors;
+		} dbi_cache_zones;
+	} descriptors;
+} optcl_mmc_set_streaming;
 
 /*
  * SEND OPC INFORMATION command structures
@@ -1094,7 +1116,6 @@ typedef struct tag_mmc_send_opc_information {
 	bool_t exclude1;
 	bool_t exclude0;
 	uint8_t opc_entry_num;
-
 	struct tag_opc_table_entry {
 		uint16_t kbps;
 		uint8_t value0;
@@ -1278,6 +1299,9 @@ extern RESULT optcl_command_set_read_ahead(const optcl_device *device,
 
 extern RESULT optcl_command_start_stop_unit(const optcl_device *device,
 					    const optcl_mmc_start_stop_unit *command);
+
+extern RESULT optcl_command_set_streaming(const optcl_device *device,
+					  const optcl_mmc_set_streaming *command);
 
 extern RESULT optcl_command_synchronize_cache(const optcl_device *device,
 					      const optcl_mmc_synchronize_cache *command);

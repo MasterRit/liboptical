@@ -63,6 +63,7 @@
 #define MMC_OPCODE_SEND_OPC_INFORMATION		0x0054
 #define MMC_OPCODE_SET_CD_SPEED			0x00BB
 #define MMC_OPCODE_SET_READ_AHEAD		0x00A7
+#define MMC_OPCODE_SET_STREAMING		0x00B6
 #define MMC_OPCODE_START_STOP_UNIT		0x001B
 #define MMC_OPCODE_SYNCHRONIZE_CACHE		0x0035
 #define MMC_OPCODE_TEST_UNIT_READY		0x0000
@@ -4544,6 +4545,150 @@ RESULT optcl_command_start_stop_unit(const optcl_device *device,
 		0,
 		0
 		);
+
+	return(error);
+}
+
+RESULT optcl_command_set_streaming(const optcl_device *device,
+				   const optcl_mmc_set_streaming *command)
+{
+	RESULT error;
+	RESULT destroy_error;
+
+	cdb12 cdb;
+	uint32_t i;
+	uint32_t index;
+	uint32_t start_lba;
+	ptr_t data = 0;
+	uint32_t alignment;
+	uint32_t param_list_len;
+	optcl_adapter *adapter = 0;
+
+	assert(device != NULL);
+	assert(command != NULL);
+
+	if (device == 0 || command == 0) {
+		return(E_INVALIDARG);
+	}
+
+	error = optcl_device_get_adapter(device, &adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	assert(adapter != 0);
+
+	if (adapter == 0) {
+		return(E_POINTER);
+	}
+
+	error = optcl_adapter_get_alignment_mask(adapter, &alignment);
+
+	if (FAILED(error)) {
+		destroy_error = optcl_adapter_destroy(adapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	error = optcl_adapter_destroy(adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	if (command->type == MMC_SET_STREAMING_PERFORMANCE) {
+		param_list_len = 28;
+		
+		data = xmalloc_aligned(param_list_len, alignment);
+
+		if (data == 0) {
+			return(E_OUTOFMEMORY);
+		}
+
+		memset(data, 0, param_list_len);
+
+		data[0] = (uint8_t)(
+			(command->descriptors.performance.wrc << 3) 
+			| (command->descriptors.performance.rdd << 2)
+			| (command->descriptors.performance.exact << 1)
+			| command->descriptors.performance.ra
+			);
+
+		data[4] = (uint8_t)(command->descriptors.performance.start_lba >> 24);
+		data[5] = (uint8_t)((command->descriptors.performance.start_lba << 8) >> 24);
+		data[6] = (uint8_t)((command->descriptors.performance.start_lba << 16) >> 24);
+		data[7] = (uint8_t)((command->descriptors.performance.start_lba << 24) >> 24);
+		data[8] = (uint8_t)(command->descriptors.performance.end_lba >> 24);
+		data[9] = (uint8_t)((command->descriptors.performance.end_lba << 8) >> 24);
+		data[10] = (uint8_t)((command->descriptors.performance.end_lba << 16) >> 24);
+		data[11] = (uint8_t)((command->descriptors.performance.end_lba << 24) >> 24);
+		data[12] = (uint8_t)(command->descriptors.performance.read_size >> 24);
+		data[13] = (uint8_t)((command->descriptors.performance.read_size << 8) >> 24);
+		data[14] = (uint8_t)((command->descriptors.performance.read_size << 16) >> 24);
+		data[15] = (uint8_t)((command->descriptors.performance.read_size << 24) >> 24);
+		data[16] = (uint8_t)(command->descriptors.performance.read_time >> 24);
+		data[17] = (uint8_t)((command->descriptors.performance.read_time << 8) >> 24);
+		data[18] = (uint8_t)((command->descriptors.performance.read_time << 16) >> 24);
+		data[19] = (uint8_t)((command->descriptors.performance.read_time << 24) >> 24);
+		data[20] = (uint8_t)(command->descriptors.performance.write_size >> 24);
+		data[21] = (uint8_t)((command->descriptors.performance.write_size << 8) >> 24);
+		data[22] = (uint8_t)((command->descriptors.performance.write_size << 16) >> 24);
+		data[23] = (uint8_t)((command->descriptors.performance.write_size << 24) >> 24);
+		data[24] = (uint8_t)(command->descriptors.performance.write_time >> 24);
+		data[25] = (uint8_t)((command->descriptors.performance.write_time << 8) >> 24);
+		data[26] = (uint8_t)((command->descriptors.performance.write_time << 16) >> 24);
+		data[27] = (uint8_t)((command->descriptors.performance.write_time << 24) >> 24);
+	} else if (command->type == MMC_SET_STREAMING_DBI_CACHE_ZONE) {
+		param_list_len = command->descriptors.dbi_cache_zones.desc_num 
+			* sizeof(command->descriptors.dbi_cache_zones.descriptors[0]);
+
+		data = xmalloc_aligned(param_list_len, alignment);
+
+		if (data == 0) {
+			return(E_OUTOFMEMORY);
+		}
+
+		memset(data, 0, param_list_len);
+
+		param_list_len -= 4;
+
+		data[0] = (uint8_t)(param_list_len >> 24);
+		data[1] = (uint8_t)((param_list_len << 8) >> 24);
+		data[2] = (uint8_t)((param_list_len << 16) >> 24);
+		data[3] = (uint8_t)((param_list_len << 24) >> 24);
+
+		for(i = 0; i < command->descriptors.dbi_cache_zones.desc_num; ++i) {
+			index = (i + 1) * 8;
+			start_lba = command->descriptors.dbi_cache_zones.descriptors[i];
+			data[index++] = (uint8_t)(start_lba >> 24);
+			data[index++] = (uint8_t)((start_lba << 8) >> 24);
+			data[index++] = (uint8_t)((start_lba << 16) >> 24);
+			data[index++] = (uint8_t)((start_lba << 24) >> 24);
+		}
+	} else {
+		return(E_INVALIDARG);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_SET_STREAMING;
+	cdb[8] = command->type;
+	cdb[9] = (uint8_t)((param_list_len << 16) >> 24);
+	cdb[10] = (uint8_t)((param_list_len << 24) >> 24);
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		data,
+		param_list_len
+		);
+
+	xfree_aligned(data);
 
 	return(error);
 }
