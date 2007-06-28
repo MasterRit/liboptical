@@ -58,6 +58,7 @@
 #define MMC_OPCODE_READ_MSN			0x00AB
 #define MMC_OPCODE_REPAIR_TRACK			0x0058
 #define MMC_OPCODE_REQUEST_SENSE		0x0003
+#define MMC_OPCODE_RESERVE_TRACK		0x0053
 #define MMC_OPCODE_SEEK				0x002B
 #define MMC_OPCODE_SEND_OPC_INFORMATION		0x0054
 #define MMC_OPCODE_SET_CD_SPEED			0x00BB
@@ -4256,6 +4257,52 @@ RESULT optcl_command_request_sense(const optcl_device *device,
 	*response = nresponse;
 
 	return(SUCCESS);
+}
+
+RESULT optcl_command_reserve_track(const optcl_device *device,
+				   const optcl_mmc_reserve_track *command)
+{
+	RESULT error;
+
+	cdb10 cdb;
+
+	assert(device != 0);
+	assert(command != 0);
+
+	if (device == 0 || command == 0) {
+		return(E_INVALIDARG);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+	
+	cdb[0] = MMC_OPCODE_RESERVE_TRACK;
+	cdb[1] = (uint8_t)((command->rmz << 1) | command->arsv);
+
+	if (command->arsv) {
+		cdb[2] = (uint8_t)(command->reservation.lba >> 24);
+		cdb[3] = (uint8_t)((command->reservation.lba << 8) >> 24);
+		cdb[4] = (uint8_t)((command->reservation.lba << 16) >> 24);
+		cdb[5] = (uint8_t)((command->reservation.lba << 24) >> 24);
+	} else {
+		cdb[5] = (uint8_t)(command->reservation.size >> 24);
+		cdb[6] = (uint8_t)((command->reservation.size << 8) >> 24);
+		cdb[7] = (uint8_t)((command->reservation.size << 16) >> 24);
+		cdb[8] = (uint8_t)((command->reservation.size << 24) >> 24);
+	}
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		0,
+		0
+		);
+
+	return(error);
 }
 
 RESULT optcl_command_seek(const optcl_device *device,

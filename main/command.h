@@ -1044,6 +1044,21 @@ typedef struct tag_mmc_response_request_sense {
 
 
 /*
+ * RESERVE TRACK
+ */
+
+typedef struct tag_mmc_reserve_track {
+	bool_t rmz;
+	bool_t arsv;
+	
+	union tag_reservation {
+		uint32_t size;
+		uint32_t lba;
+	} reservation;
+} optcl_mmc_reserve_track;
+
+
+/*
  * SEEK command structures
  */
 
@@ -1245,6 +1260,9 @@ extern RESULT optcl_command_repair_track(const optcl_device *device,
 extern RESULT optcl_command_request_sense(const optcl_device *device,
 					  const optcl_mmc_request_sense *command,
 					  optcl_mmc_response_request_sense **response);
+
+extern RESULT optcl_command_reserve_track(const optcl_device *device,
+					  const optcl_mmc_reserve_track *command);
 
 extern RESULT optcl_command_seek(const optcl_device *device,
 				 const optcl_mmc_seek *command);
