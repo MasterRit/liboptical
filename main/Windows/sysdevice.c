@@ -100,32 +100,31 @@ typedef struct _SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER {
     UCHAR ucSenseBuf[SPT_SENSE_LENGTH];
 } SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER;
 
+/* Define structures below only if we are compiling against an older SDK */
+#ifndef NTDDI_LONGHORN
 
 typedef enum _STORAGE_PROPERTY_ID {
     StorageDeviceProperty = 0,
     StorageAdapterProperty,
     StorageDeviceIdProperty,
-    StorageDeviceUniqueIdProperty,              // See storduid.h for details
+    StorageDeviceUniqueIdProperty,              /* See storduid.h for details */
     StorageDeviceWriteCacheProperty,
     StorageMiniportProperty,
     StorageAccessAlignmentProperty
 } STORAGE_PROPERTY_ID;
 
-
 typedef enum _STORAGE_QUERY_TYPE {
-    PropertyStandardQuery = 0,          // Retrieves the descriptor
-    PropertyExistsQuery,                // Used to test whether the descriptor is supported
-    PropertyMaskQuery,                  // Used to retrieve a mask of writeable fields in the descriptor
-    PropertyQueryMaxDefined     // use to validate the value
+    PropertyStandardQuery = 0,          /* Retrieves the descriptor */
+    PropertyExistsQuery,                /* Used to test whether the descriptor is supported */
+    PropertyMaskQuery,                  /* Used to retrieve a mask of writeable fields in the descriptor */
+    PropertyQueryMaxDefined		/* use to validate the value */
 } STORAGE_QUERY_TYPE;
-
 
 typedef struct _STORAGE_PROPERTY_QUERY {
     STORAGE_PROPERTY_ID PropertyId;
     STORAGE_QUERY_TYPE QueryType;
     BYTE  AdditionalParameters[1];
 } STORAGE_PROPERTY_QUERY;
-
 
 typedef struct _STORAGE_ADAPTER_DESCRIPTOR {
     DWORD Version;
@@ -148,6 +147,7 @@ typedef struct _STORAGE_ADAPTER_DESCRIPTOR {
     WORD   BusMinorVersion;
 } STORAGE_ADAPTER_DESCRIPTOR, *PSTORAGE_ADAPTER_DESCRIPTOR;
 
+#endif
 
 #define IOCTL_STORAGE_QUERY_PROPERTY	\
 	CTL_CODE(IOCTL_STORAGE_BASE, 0x0500, METHOD_BUFFERED, FILE_ANY_ACCESS)
@@ -178,13 +178,13 @@ static RESULT enumerate_device_adapter(const char *path,
 	}
 
 	hDevice = CreateFileA(
-                path,					// device interface name
-                GENERIC_READ | GENERIC_WRITE,		// dwDesiredAccess
-                FILE_SHARE_READ | FILE_SHARE_WRITE,	// dwShareMode
-                NULL,					// lpSecurityAttributes
-                OPEN_EXISTING,				// dwCreationDistribution
-                0,					// dwFlagsAndAttributes
-                NULL					// hTemplateFile
+                path,					/* device interface name */
+                GENERIC_READ | GENERIC_WRITE,		/* dwDesiredAccess */
+                FILE_SHARE_READ | FILE_SHARE_WRITE,	/* dwShareMode */
+                NULL,					/* lpSecurityAttributes */
+                OPEN_EXISTING,				/* dwCreationDistribution */
+                0,					/* dwFlagsAndAttributes */
+                NULL					/* hTemplateFile */
                 );
 
 	if (hDevice == NULL) {
