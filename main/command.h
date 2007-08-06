@@ -915,34 +915,40 @@ typedef struct tag_mmc_read_buffer {
 	uint32_t allocation_len;
 } optcl_mmc_read_buffer;
 
+typedef union tag_mmc_response_read_buffer_union {
+	struct tag_rb_combined {
+		uint32_t buffer_capacity;
+		ptr_t buffer;
+	} combined;
+	struct tag_rb_data {
+		ptr_t buffer;
+		uint32_t buffer_capacity;
+	} data;
+	struct tag_rb_descriptor {
+		uint8_t offset_boundary;
+		uint32_t buffer_capacity;
+	} descriptor;
+	struct tag_rb_echo {
+		ptr_t buffer;
+	} echo;
+	struct tag_rb_echo_desc {
+		uint32_t buffer_capacity;
+	} echo_desc;
+	struct tag_rb_expander {
+		ptr_t buffer;
+	} expander;
+	struct tag_rb_vendor {
+		ptr_t buffer;
+		uint32_t buffer_len;
+	} vendor;
+} mmc_response_read_buffer_union;
+
+typedef mmc_response_read_buffer_union mmc_read_buffer_union;
+
 typedef struct tag_mmc_response_read_buffer {
 	optcl_mmc_response header;
 	uint8_t mode;
-	union tag_response {
-		struct tag_combined {
-			uint32_t buffer_capacity;
-			ptr_t buffer;
-		} combined;
-		struct tag_data {
-			ptr_t buffer;
-		} data;
-		struct tag_descriptor {
-			uint8_t offset_boundary;
-			uint32_t buffer_capacity;
-		} descriptor;
-		struct tag_echo {
-			ptr_t buffer;
-		} echo;
-		struct tag_echo_desc {
-			uint32_t buffer_capacity;
-		} echo_desc;
-		struct tag_expander {
-			ptr_t buffer;
-		} expander;
-		struct tag_vendor {
-			ptr_t buffer;
-		} vendor;
-	} response;
+	mmc_read_buffer_union readdata;
 } optcl_mmc_response_read_buffer;
 
 
@@ -1197,12 +1203,48 @@ typedef struct tag_mmc_write_and_verify_10 {
  * WRITE BUFFER command structures
  */
 
+typedef union tag_mmc_write_buffer_union {
+	struct tag_wb_combined {
+		uint32_t buffer_capacity;
+		ptr_t buffer;
+	} combined;
+	struct tag_wb_vendor {
+		ptr_t buffer;
+		uint32_t buffer_len;
+	} vendor;
+	struct tag_wb_data {
+		ptr_t buffer;
+		uint32_t buffer_capacity;
+	} data;
+	struct tag_wb_microcode {
+		ptr_t microcode;
+		uint32_t microcode_len;
+	} microcode;
+	struct tag_wb_echo {
+		ptr_t echo_buffer;
+	} echo;
+	struct tag_wb_expander {
+		ptr_t expander_buffer;
+	} expander;
+	struct tag_wb_app_log_data {
+		uint8_t t10_vendor_id[8];
+		uint16_t error_type;
+		uint8_t time_stamp[6];
+		uint8_t code_set;
+		uint8_t error_loc_format;
+		uint16_t error_loc_len;
+		uint16_t vendor_spec_len;
+		ptr_t error_location;
+		ptr_t vendor_specific;
+	} app_log_data;
+} mmc_write_buffer_union;
+
 typedef struct tag_mmc_write_buffer {
 	uint8_t mode;
 	uint8_t buffer_id;
 	uint32_t buffer_offset;
 	uint32_t param_list_len;
-	ptr_t data;
+	mmc_write_buffer_union dataout;
 } optcl_mmc_write_buffer;
 
 

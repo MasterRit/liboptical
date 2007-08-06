@@ -411,6 +411,7 @@ static RESULT create_data_out_from_descriptor(const optcl_mmc_msdesc_header *des
 			break;
 		}
 		default: {
+			assert(False);
 			error = E_OUTOFRANGE;
 			break;
 		}
@@ -474,7 +475,7 @@ static RESULT create_data_out_mode_select(const optcl_mmc_mode_select *command,
 			break;
 		}
 
-		if (offset + descdatalen > 0xFFFF) {
+		if (offset > (uint32_t)(MAX_UINT16 - descdatalen)) {
 			error = E_OVERFLOW;
 			break;
 		}
@@ -507,48 +508,231 @@ static RESULT create_data_out_mode_select(const optcl_mmc_mode_select *command,
 	return(error);
 }
 
-/*
- * Parser functions
- */
-
-static RESULT parse_raw_profile_list(const uint8_t mmc_data[], 
-				     optcl_feature_profile_list **feature)
+static RESULT create_data_out_write_buffer(const optcl_mmc_write_buffer *command, 
+					   pptr_t data_out,
+					   uint32_t *data_out_len)
 {
-	RESULT error;
+	RESULT error = SUCCESS;
 
-	uint32_t index;
-	uint32_t offset;
-	optcl_feature_profile_list *nfeature = 0;
-	optcl_feature_descriptor *descriptor = 0;
+	ptr_t data = 0;
+	uint32_t datalen = 0;
 
-	assert(mmc_data != 0);
-	assert(feature != 0);
+	assert(command != 0);
+	assert(data_out != 0);
+	assert(data_out_len != 0);
 
-	if (mmc_data == 0 || feature == 0) {
+	if (command == 0 || data_out == 0 || data_out_len == 0) {
 		return(E_INVALIDARG);
 	}
 
-	nfeature = malloc(sizeof(optcl_feature_profile_list));
+	switch(command->mode) {
+		case MMC_WRITE_BUFFER_MODE_COMBINED: {
+			assert(command->dataout.combined.buffer_capacity <= MAX_UINT32 - 4);
 
-	if (nfeature == 0) {
-		return(E_OUTOFMEMORY);
+			if (command->dataout.combined.buffer_capacity > MAX_UINT32 - 4) {
+				error = E_OVERFLOW;
+				break;
+			}
+
+			datalen = command->dataout.combined.buffer_capacity + 4;
+
+			data = malloc(datalen);
+
+			if (data == 0) {
+				error = E_OUTOFMEMORY;
+				break;
+			}
+
+			memset(data, 0, datalen);
+
+			data[1] = (uint8_t)(datalen >> 16);
+			data[2] = (uint8_t)(datalen >> 8);
+			data[3] = (uint8_t)datalen;
+
+			xmemcpy(&data[4], datalen - 4, command->dataout.combined.buffer, datalen - 4);
+
+			break;
+		}
+		case MMC_WRITE_BUFFER_MODE_VENDOR: {
+			assert(command->dataout.vendor.buffer_len <= MAX_UINT32);
+
+			if (command->dataout.vendor.buffer_len > MAX_UINT32) {
+				error = E_OVERFLOW;
+				break;
+			}
+
+			datalen = command->dataout.vendor.buffer_len;
+
+			data = malloc(datalen);
+
+			if (data == 0) {
+				error = E_OUTOFMEMORY;
+				break;
+			}
+
+			memset(data, 0, datalen);
+			xmemcpy(data, datalen, command->dataout.vendor.buffer, datalen);
+
+			break;
+		}
+		case MMC_WRITE_BUFFER_MODE_DATA: {
+			assert(command->param_list_len <= (MAX_UINT32 >> 8));
+
+			if (command->param_list_len > (MAX_UINT32 >> 8)) {
+				error = E_OVERFLOW;
+				break;
+			}
+
+			datalen = command->param_list_len;
+
+			data = malloc(datalen);
+
+			if (data == 0) {
+				return(E_OUTOFMEMORY);
+			}
+
+			memset(data, 0, datalen);
+			xmemcpy(data, datalen, command->dataout.data.buffer, datalen);
+
+			break;
+		}
+		case MMC_WRITE_BUFFER_MODE_MICROCODE:
+		case MMC_WRITE_BUFFER_MODE_MICROCODE_SAVE: {
+			datalen = command->dataout.microcode.microcode_len;
+
+			data = malloc(datalen);
+
+			if (data == 0) {
+				error = E_OUTOFMEMORY;
+				break;
+			}
+
+			memset(data, 0, datalen);
+			xmemcpy(data, datalen, command->dataout.microcode.microcode, datalen);
+
+			break;
+		}
+		case MMC_WRITE_BUFFER_MODE_MICROCODE_WOFF:
+		case MMC_WRITE_BUFFER_MODE_MICROCODE_WOFF_SAVE: {
+			datalen = command->param_list_len;
+
+			data = malloc(datalen);
+
+			if (data == 0) {
+				error = E_OUTOFMEMORY;
+				break;
+			}
+
+			memset(data, 0, datalen);
+			xmemcpy(data, datalen, command->dataout.microcode.microcode, datalen);
+
+			break;
+		}
+		case MMC_WRITE_BUFFER_MODE_ECHO: {
+			datalen = command->param_list_len;
+
+			data = malloc(datalen);
+
+			if (data == 0) {
+				error = E_OUTOFMEMORY;
+				break;
+			}
+
+			memset(data, 0, datalen);
+			xmemcpy(data, datalen, command->dataout.echo.echo_buffer, datalen);
+
+			break;
+		}
+		case MMC_WRITE_BUFFER_MODE_EN_EXPANDER: {
+			datalen = command->param_list_len;
+
+			data = malloc(datalen);
+
+			if (data == 0) {
+				error = E_OUTOFMEMORY;
+				break;
+			}
+
+			memset(data, 0, datalen);
+			xmemcpy(data, datalen, command->dataout.expander.expander_buffer, datalen);
+
+			break;
+
+		}
+		case MMC_WRITE_BUFFER_MODE_DIS_EXPANDER: {
+			datalen = 0;
+			data = 0;
+			break;
+		}
+		case MMC_WRITE_BUFFER_MODE_APPLOG: {
+			datalen = command->dataout.app_log_data.error_loc_len 
+				+ command->dataout.app_log_data.vendor_spec_len 
+				+ 26;
+
+			assert(command->param_list_len == datalen);
+
+			if (command->param_list_len != datalen) {
+				error = E_SIZEMISMATCH;
+				break;
+			}
+
+			data = malloc(datalen);
+
+			if (data == 0) {
+				error = E_OUTOFMEMORY;
+				break;
+			}
+
+			memset(data, 0, datalen);
+			xmemcpy(data, 8, command->dataout.app_log_data.t10_vendor_id, 8);
+
+			data[8] = (uint8_t)(command->dataout.app_log_data.error_type >> 8);
+			data[9] = (uint8_t)(command->dataout.app_log_data.error_type);
+
+			xmemcpy(&data[12], 6, command->dataout.app_log_data.time_stamp, 6);
+
+			data[20] = command->dataout.app_log_data.code_set & 0x0F;
+			data[21] = command->dataout.app_log_data.error_loc_format;
+			data[22] = (uint8_t)(command->dataout.app_log_data.error_loc_len >> 8);
+			data[23] = (uint8_t)(command->dataout.app_log_data.error_loc_len);
+			data[24] = (uint8_t)(command->dataout.app_log_data.vendor_spec_len >> 8);
+			data[25] = (uint8_t)(command->dataout.app_log_data.vendor_spec_len);
+
+			xmemcpy(&data[26], 
+				command->dataout.app_log_data.error_loc_len, 
+				command->dataout.app_log_data.error_location, 
+				command->dataout.app_log_data.error_loc_len
+				);
+
+			xmemcpy(&data[command->dataout.app_log_data.error_loc_len + 26],
+				command->dataout.app_log_data.vendor_spec_len,
+				command->dataout.app_log_data.vendor_specific,
+				command->dataout.app_log_data.vendor_spec_len
+				);
+
+			break;
+		}
+		default: {
+			assert(False);
+			error = E_OUTOFRANGE;
+			break;
+		}
 	}
 
-	memset(nfeature, 0, sizeof(optcl_feature_profile_list));
-
-	/* Parse feature descriptor */
-
-	/* 
-	 * Parse profile list feature data 
-	 */
-
-	index = 0;
-	offset = 4;
-
-	while (offset < nfeature->descriptor.additional_length + 4U) {
-		
+	if (FAILED(error)) {
+		free(data);
+		return(error);
 	}
+
+	*data_out = data;
+	*data_out_len = datalen;
+
+	return(error);
 }
+
+/*
+ * Parser functions
+ */
 
 static RESULT parse_raw_event_status_descriptor_data(uint8_t event_class,
 						     const uint8_t raw_data[], 
@@ -2023,7 +2207,7 @@ static RESULT parse_raw_read_buffer_data(const uint8_t mmc_response[],
 				break;
 			}
 
-			nresponse->response.combined.buffer_capacity 
+			nresponse->readdata.combined.buffer_capacity 
 				= (uint32_t)(mmc_response[1] << 16 | mmc_response[2] << 8 | mmc_response[3]);
 
 			if (size == 4) {
@@ -2039,7 +2223,7 @@ static RESULT parse_raw_read_buffer_data(const uint8_t mmc_response[],
 			
 			xmemcpy(data, size - 4, &mmc_response[4], size - 4);
 
-			nresponse->response.combined.buffer = data;
+			nresponse->readdata.combined.buffer = data;
 
 			break;
 		}
@@ -2051,16 +2235,19 @@ static RESULT parse_raw_read_buffer_data(const uint8_t mmc_response[],
 				break;
 			}
 
-			xmemcpy(data, size, mmc_response, size);
+			xmemcpy(data, size - 4, &mmc_response[4], size - 4);
 
-			nresponse->response.data.buffer = data;
+			nresponse->readdata.data.buffer_capacity = 
+				uint32_from_be_bytes(0, mmc_response[1], mmc_response[2], mmc_response[3]);
+
+			nresponse->readdata.data.buffer = data;
 
 			break;
 		}
 		case MMC_READ_BUFFER_MODE_DESCRIPTOR: {
-			nresponse->response.descriptor.offset_boundary = mmc_response[0];
+			nresponse->readdata.descriptor.offset_boundary = mmc_response[0];
 
-			nresponse->response.descriptor.buffer_capacity 
+			nresponse->readdata.descriptor.buffer_capacity 
 				= (uint32_t)(mmc_response[1] << 16 | mmc_response[2] << 8 | mmc_response[3]);
 
 			break;
@@ -2075,13 +2262,13 @@ static RESULT parse_raw_read_buffer_data(const uint8_t mmc_response[],
 
 			xmemcpy(data, size, mmc_response, size);
 
-			nresponse->response.echo.buffer = data;
+			nresponse->readdata.echo.buffer = data;
 
 			break;
 				
 		}
 		case MMC_READ_BUFFER_MODE_ECHO_DESC: {
-			nresponse->response.echo_desc.buffer_capacity
+			nresponse->readdata.echo_desc.buffer_capacity
 				= (uint32_t)((mmc_response[2] & 0x1F) | mmc_response[3]);
 
 			break;
@@ -2096,7 +2283,7 @@ static RESULT parse_raw_read_buffer_data(const uint8_t mmc_response[],
 
 			xmemcpy(data, size, mmc_response, size);
 
-			nresponse->response.expander.buffer = data;
+			nresponse->readdata.expander.buffer = data;
 
 			break;
 		}
@@ -2110,7 +2297,8 @@ static RESULT parse_raw_read_buffer_data(const uint8_t mmc_response[],
 
 			xmemcpy(data, size, mmc_response, size);
 
-			nresponse->response.vendor.buffer = data;
+			nresponse->readdata.vendor.buffer = data;
+			nresponse->readdata.vendor.buffer_len = size;
 
 			break;
 		}
@@ -5059,8 +5247,14 @@ RESULT optcl_command_write_buffer(const optcl_device *device,
 				  const optcl_mmc_write_buffer *command)
 {
 	RESULT error;
+	RESULT destroy_error;
 
 	cdb10 cdb;
+	ptr_t ndata = 0;
+	ptr_t dataout = 0;
+	uint32_t dataoutlen;
+	uint32_t alignment;
+	optcl_adapter *adapter = 0;
 
 	assert(device != 0);
 	assert(command != 0);
@@ -5069,7 +5263,83 @@ RESULT optcl_command_write_buffer(const optcl_device *device,
 		return(E_INVALIDARG);
 	}
 
+	error = optcl_device_get_adapter(device, &adapter);
 
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	assert(adapter != 0);
+
+	if (adapter == 0) {
+		return(E_POINTER);
+	}
+
+	error = optcl_adapter_get_alignment_mask(adapter, &alignment);
+
+	if (FAILED(error)) {
+		destroy_error = optcl_adapter_destroy(adapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	error = optcl_adapter_destroy(adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	error = create_data_out_write_buffer(command, &ndata, &dataoutlen);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	if (command->mode == MMC_WRITE_BUFFER_MODE_ECHO) {
+		// Data in this mode should be aligned on 4 byte boundaries
+		alignment = 4;
+	} else if (command->mode != MMC_WRITE_BUFFER_MODE_DIS_EXPANDER) {
+		dataout = xmalloc_aligned(dataoutlen, alignment);
+
+		if (dataout == 0) {
+			free(ndata);
+			return(E_OUTOFMEMORY);
+		}
+
+		xmemcpy(dataout, dataoutlen, ndata, dataoutlen);
+
+		free(ndata);
+	} else if (ndata == 0 && dataoutlen != 0) {
+		assert(False);
+		return(E_POINTER);
+	}
+
+	/*
+	 * Execute command
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_WRITE_BUFFER;
+	cdb[1] = command->mode & 0x1F;
+	cdb[2] = command->buffer_id;
+	cdb[3] = (uint8_t)(command->buffer_offset >> 16);
+	cdb[4] = (uint8_t)(command->buffer_offset >> 8);
+	cdb[5] = (uint8_t)(command->buffer_offset);
+	cdb[6] = (uint8_t)(command->param_list_len >> 16);
+	cdb[7] = (uint8_t)(command->param_list_len >> 8);
+	cdb[8] = (uint8_t)(command->param_list_len);
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		dataout,
+		dataoutlen
+		);
+
+	xfree_aligned(dataout);
+
+	return(error);
 }
 
 
@@ -5270,29 +5540,29 @@ static RESULT deallocator_mmc_response_read_buffer(optcl_mmc_response *response)
 
 	switch(mmc_response->mode) {
 		case MMC_READ_BUFFER_MODE_COMBINED: {
-			free(mmc_response->response.combined.buffer);
+			free(mmc_response->readdata.combined.buffer);
 			break;
 		}
 		case MMC_READ_BUFFER_MODE_DATA: {
-			free(mmc_response->response.data.buffer);
+			free(mmc_response->readdata.data.buffer);
 			break;
 		}
 		case MMC_READ_BUFFER_MODE_DESCRIPTOR: {
 			break;
 		}
 		case MMC_READ_BUFFER_MODE_ECHO: {
-			free(mmc_response->response.echo.buffer);
+			free(mmc_response->readdata.echo.buffer);
 			break;
 		}
 		case MMC_READ_BUFFER_MODE_ECHO_DESC: {
 			break;
 		}
 		case MMC_READ_BUFFER_MODE_EXPANDER: {
-			free(mmc_response->response.expander.buffer);
+			free(mmc_response->readdata.expander.buffer);
 			break;
 		}
 		case MMC_READ_BUFFER_MODE_VENDOR: {
-			free(mmc_response->response.vendor.buffer);
+			free(mmc_response->readdata.vendor.buffer);
 			break;
 		}
 		default: {
