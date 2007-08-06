@@ -21,6 +21,7 @@
 
 #include "helpers.h"
 
+#include <assert.h>
 #include <malloc.h>
 
 
@@ -54,7 +55,9 @@ char* xstrdup(const char *string)
 
 errno_t xstrncpy(char *dest, size_t dest_size, const char *src, size_t count)
 {
-	return strncpy_s(dest, dest_size, src, count);
+	errno_t errno = strncpy_s(dest, dest_size, src, count);
+	assert(errno == 0);
+	return(errno);
 }
 
 /*
@@ -63,5 +66,7 @@ errno_t xstrncpy(char *dest, size_t dest_size, const char *src, size_t count)
 
 errno_t xmemcpy(void *dest, size_t dest_size, const void *src, size_t count)
 {
-	return memcpy_s(dest, dest_size, src, count);
+	errno_t errno = memcpy_s(dest, dest_size, src, count);
+	assert(errno == 0);
+	return(errno);
 }
