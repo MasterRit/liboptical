@@ -157,4 +157,13 @@ typedef uint8_t**		pptr_t;
 #define bool_from_uint16(val)	bool_from_uint8(val)
 #define bool_from_uint32(val)	bool_from_uint8(val)
 
+#define MIN_UINT8	((uint8_t)0)
+#define MAX_UINT8	((uint8_t)0xFF)
+#define MIN_UINT16	((uint16_t)0)
+#define MAX_UINT16	((uint16_t)0xFFFF)
+#define MIN_UINT32	((uint32_t)0)
+#define MAX_UINT32	((uint32_t)0xFFFFFFFF)
+#define MIN_UINT64	((uint64_t)0)
+#define MAX_UINT64	((uint64_t)0xFFFFFFFFFFFFFFFF)
+
 #endif /* _TYPES_H */
