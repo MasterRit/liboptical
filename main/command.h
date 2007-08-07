@@ -347,6 +347,80 @@
 
 
 /*
+ * SEND DISC STRUCTURE command field flags
+ */
+
+/* Media types  */
+#define MMC_SDS_MEDIA_TYPE_DVD_HDDVD		0x00
+#define MMC_SDS_MEDIA_TYPE_BD			0x01
+
+/* All others - reserved */
+
+/* Format Field Definition for Media Type = 0 (DVD and HD DVD) */
+
+/* 0x00 - 0x03 Reserved */
+
+#define MMC_SDS_FMT_DVD_USD			0x04
+#define MMC_SDS_FMT_DVD_CM			0x05
+
+/* 0x06 - 0x0E Reserved */
+
+#define MMC_SDS_FMT_DVD_TIMESTAMP		0x0F
+
+/* 0x10 - 0x1F Reserved */
+
+#define MMC_SDS_FMT_DVD_LBI			0x20
+#define MMC_SDS_FMT_DVD_SMASA			0x21
+#define MMC_SDS_FMT_DVD_JIS			0x22
+#define MMC_SDS_FMT_DVD_MLJA			0x23
+#define MMC_SDS_FMT_DVD_RA			0x24
+
+/* 0x25 - 0x2F reserved */
+
+#define MMC_SDS_FMT_DVD_DCB			0x30
+
+/* 0x31 - 0xBF reserved */
+
+#define MMC_SDS_FMT_DVD_WP			0xC0
+
+/* 0xC1 - 0xFF reserved */
+
+/* Format Field Definition for Media Type = 1 (BD) */
+
+/* 0x00 - 0x0E Reserved */
+
+#define MMC_SDS_FMT_BD_TIMESTAMP		0x0F
+#define MMC_SDS_FMT_BD_PAC			0x30
+
+/* 0x31 - 0xFF Reserved */
+
+/* CGMS field values for Copyright Management */
+
+#define CGMS_CIPWR				0x00
+
+/* 0x01 Reserved */
+
+#define CGMS_OGOCMBM				0x02
+#define CGMS_NCIP				0x03
+
+/* Virtual Write Enable (VWE) field values */
+
+#define VWE_NOPWD_VIRT_WP_OFF			0x00
+#define VWE_NOPWD_VIRT_WP_ON			0x01
+#define VWE_NOPWD_PHYS_WP_OFF			0x02
+#define VWE_NOPWD_PHYS_WP_ON			0x03
+#define VWE_PWD_VIRT_WP_OFF			0x04
+#define VWE_PWD_VIRT_WP_ON			0x05
+#define VWE_PWD_PHYS_WP_OFF			0x06
+#define VWE_PWD_PHYS_WP_ON			0x07
+
+/* PAC type field values */
+
+#define PAC_GENERAL				0x00
+#define PAC_DWP					0x01
+
+
+/*
  * SET READ SPEED command field flags
  */
 
@@ -1067,6 +1141,76 @@ typedef struct tag_mmc_seek {
 
 
 /*
+ * SEND DISC STRUCTURE command structures
+ */
+
+typedef struct tag_mmc_send_disc_structure {
+	uint8_t media_type;
+	uint8_t format_type;
+	uint8_t pac_type;
+	union tag_data {
+		struct tag_user_spec_data {
+			uint16_t data_len;
+			ptr_t data;
+		} user_spec_data;
+		struct tag_copyright_mngmt {
+			bool_t cpm;
+			uint8_t cgms;
+			uint8_t adp_ty;
+		} copyright_mngmt;
+		struct tag_timestamp {
+			uint32_t year;
+			uint16_t month;
+			uint16_t day;
+			uint16_t hour;
+			uint16_t minute;
+			uint16_t second;
+		} timestamp;
+		struct tag_lbi {
+			uint32_t l0_area_capacity;
+		} lbi;
+		struct tag_smasa {
+			uint32_t smasa;
+		} smasa;
+		struct tag_jis {
+			uint32_t jis;
+		} jis;
+		struct tag_mlja {
+			uint32_t ljlba;
+		} mlja;
+		struct tag_remapping_address {
+			uint16_t apn;
+			uint32_t remapping_address;
+		} remapping_address;
+		struct tag_dcb {
+			bool_t erase;
+			uint16_t dcb_len;
+			ptr_t dcb;
+		} dcb;
+		struct tag_write_protection {
+			bool_t pwp;
+		} write_protection;
+		struct tag_send_pac {
+			bool_t erase;
+			uint16_t pac_header_len;
+			uint16_t pac_info_len;
+			ptr_t pac_header;
+			ptr_t pac_info;
+		} send_pac;
+		struct tag_send_pac_dwp {
+			bool_t vwe;
+			bool_t erase;
+			uint16_t pac_header_len;
+			ptr_t pac_header;
+			uint8_t kpedf;
+			uint8_t wpcb;
+			uint8_t wp_password[32];
+		} send_pac_dwp;
+	} data;
+} optcl_mmc_send_disc_structure;
+
+
+/*
  * SET CD SPEED command structures
  */
 
@@ -1329,6 +1473,9 @@ extern RESULT optcl_command_reserve_track(const optcl_device *device,
 
 extern RESULT optcl_command_seek(const optcl_device *device,
 				 const optcl_mmc_seek *command);
+
+extern RESULT optcl_command_send_disc_structure(const optcl_device *device,
+						const optcl_mmc_send_disc_structure *command);
 
 extern RESULT optcl_command_send_opc_information(const optcl_device *device,
 						 const optcl_mmc_send_opc_information *command);

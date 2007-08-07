@@ -60,6 +60,7 @@
 #define MMC_OPCODE_REQUEST_SENSE		0x0003
 #define MMC_OPCODE_RESERVE_TRACK		0x0053
 #define MMC_OPCODE_SEEK				0x002B
+#define MMC_OPCODE_SEND_DISC_STRUCTURE		0x00BF
 #define MMC_OPCODE_SEND_OPC_INFORMATION		0x0054
 #define MMC_OPCODE_SET_CD_SPEED			0x00BB
 #define MMC_OPCODE_SET_READ_AHEAD		0x00A7
@@ -139,9 +140,9 @@ static int8_t equalfn_descriptors(const ptr_t left, const ptr_t right)
 	}
 }
 
-static RESULT create_data_out_from_descriptor(const optcl_mmc_msdesc_header *descriptor,
-					      pptr_t data_out,
-					      uint16_t *data_out_len)
+static RESULT create_dataout_from_descriptor(const optcl_mmc_msdesc_header *descriptor,
+					     pptr_t data_out,
+					     uint16_t *data_out_len)
 {
 	RESULT error = SUCCESS;
 
@@ -428,10 +429,10 @@ static RESULT create_data_out_from_descriptor(const optcl_mmc_msdesc_header *des
 	return(error);
 }
 
-static RESULT create_data_out_mode_select(const optcl_mmc_mode_select *command, 
-					  uint32_t alignment, 
-					  pptr_t data_out, 
-					  uint16_t *data_out_len)
+static RESULT create_dataout_mode_select(const optcl_mmc_mode_select *command, 
+					 uint32_t alignment, 
+					 pptr_t data_out, 
+					 uint16_t *data_out_len)
 {
 	RESULT error;
 	
@@ -469,7 +470,7 @@ static RESULT create_data_out_mode_select(const optcl_mmc_mode_select *command,
 			break;
 		}
 
-		error = create_data_out_from_descriptor(descriptor, &descdata, &descdatalen);
+		error = create_dataout_from_descriptor(descriptor, &descdata, &descdatalen);
 
 		if (FAILED(error)) {
 			break;
@@ -508,9 +509,422 @@ static RESULT create_data_out_mode_select(const optcl_mmc_mode_select *command,
 	return(error);
 }
 
-static RESULT create_data_out_write_buffer(const optcl_mmc_write_buffer *command, 
-					   pptr_t data_out,
-					   uint32_t *data_out_len)
+static RESULT create_dataout_send_disc_structure(const optcl_mmc_send_disc_structure *command,
+						 pptr_t data_out,
+						 uint16_t *data_out_len)
+{
+	RESULT error = SUCCESS;
+
+	ptr_t data = 0;
+	uint16_t datalen = 0;
+
+	assert(command != 0);
+	assert(data_out != 0);
+	assert(data_out_len != 0);
+
+	if (command == 0 || data_out == 0 || data_out_len == 0) {
+		return(E_INVALIDARG);
+	}
+
+	if (command->media_type == MMC_SDS_MEDIA_TYPE_DVD_HDDVD) {
+		switch(command->format_type) {
+			case MMC_SDS_FMT_DVD_USD: {
+				datalen = command->data.user_spec_data.data_len + 4;
+
+				assert(datalen <= 2052);
+
+				if (datalen > 2052) {
+					error = E_SIZEMISMATCH;
+					break;
+				}
+
+				data = (ptr_t)malloc(datalen);
+
+				if (data == 0) {
+					error = E_OUTOFMEMORY;
+					break;
+				}
+
+				memset(data, 0, datalen);
+
+				data[0] = (uint8_t)((datalen - 2) >> 8);
+				data[1] = (uint8_t)(datalen - 2);
+
+				xmemcpy(&data[4],
+					command->data.user_spec_data.data_len,
+					command->data.user_spec_data.data,
+					command->data.user_spec_data.data_len
+					);
+
+				break;
+			}
+			case MMC_SDS_FMT_DVD_CM: {
+				datalen = 8;
+
+				data = (ptr_t)malloc(datalen);
+
+				if (data == 0) {
+					error = E_OUTOFMEMORY;
+					break;
+				}
+
+				memset(data, 0, datalen);
+
+				data[0] = (uint8_t)((datalen - 2) >> 8);
+				data[1] = (uint8_t)(datalen - 2);
+				data[4] = (uint8_t)(
+					(command->data.copyright_mngmt.cpm << 7
+					| command->data.copyright_mngmt.cgms << 4
+					| command->data.copyright_mngmt.adp_ty << 2)
+					);
+
+				break;
+			}
+			case MMC_SDS_FMT_DVD_TIMESTAMP: {
+				datalen = 22;
+
+				data = (ptr_t)malloc(datalen);
+
+				if (data == 0) {
+					error = E_OUTOFMEMORY;
+					break;
+				}
+
+				memset(data, 0, datalen);
+
+				data[0] = (uint8_t)((datalen - 2) >> 8);
+				data[1] = (uint8_t)(datalen - 2);
+				data[8] = (uint8_t)(command->data.timestamp.year >> 24);
+				data[9] = (uint8_t)(command->data.timestamp.year >> 16);
+				data[10] = (uint8_t)(command->data.timestamp.year >> 8);
+				data[11] = (uint8_t)(command->data.timestamp.year);
+				data[12] = (uint8_t)(command->data.timestamp.month >> 8);
+				data[13] = (uint8_t)(command->data.timestamp.month);
+				data[14] = (uint8_t)(command->data.timestamp.day >> 8);
+				data[15] = (uint8_t)(command->data.timestamp.day);
+				data[16] = (uint8_t)(command->data.timestamp.hour >> 8);
+				data[17] = (uint8_t)(command->data.timestamp.hour);
+				data[18] = (uint8_t)(command->data.timestamp.minute >> 8);
+				data[19] = (uint8_t)(command->data.timestamp.minute);
+				data[20] = (uint8_t)(command->data.timestamp.second >> 8);
+				data[21] = (uint8_t)(command->data.timestamp.second);
+
+				break;
+
+			}
+			case MMC_SDS_FMT_DVD_LBI: {
+				datalen = 12;
+
+				data = (ptr_t)malloc(datalen);
+
+				if (data == 0) {
+					error = E_OUTOFMEMORY;
+					break;
+				}
+
+				memset(data, 0, datalen);
+
+				data[0] = (uint8_t)((datalen - 2) >> 8);
+				data[1] = (uint8_t)(datalen - 2);
+				data[8] = (uint8_t)(command->data.lbi.l0_area_capacity >> 24);
+				data[9] = (uint8_t)(command->data.lbi.l0_area_capacity >> 16);
+				data[10] = (uint8_t)(command->data.lbi.l0_area_capacity >> 8);
+				data[11] = (uint8_t)(command->data.lbi.l0_area_capacity);
+
+				break;
+			}
+			case MMC_SDS_FMT_DVD_SMASA: {
+				datalen = 12;
+
+				data = (ptr_t)malloc(datalen);
+
+				if (data == 0) {
+					error = E_OUTOFMEMORY;
+					break;
+				}
+
+				memset(data, 0, datalen);
+
+				data[0] = (uint8_t)((datalen - 2) >> 8);
+				data[1] = (uint8_t)(datalen - 2);
+				data[8] = (uint8_t)(command->data.smasa.smasa >> 24);
+				data[9] = (uint8_t)(command->data.smasa.smasa >> 16);
+				data[10] = (uint8_t)(command->data.smasa.smasa >> 8);
+				data[11] = (uint8_t)(command->data.smasa.smasa);
+
+				break;
+			}
+			case MMC_SDS_FMT_DVD_JIS: {
+				datalen = 12;
+
+				data = (ptr_t)malloc(datalen);
+
+				if (data == 0) {
+					error = E_OUTOFMEMORY;
+					break;
+				}
+
+				memset(data, 0, datalen);
+
+				data[0] = (uint8_t)((datalen - 2) >> 8);
+				data[1] = (uint8_t)(datalen - 2);
+				data[8] = (uint8_t)(command->data.jis.jis >> 24);
+				data[9] = (uint8_t)(command->data.jis.jis >> 16);
+				data[10] = (uint8_t)(command->data.jis.jis >> 8);
+				data[11] = (uint8_t)(command->data.jis.jis);
+
+				break;
+			}
+			case MMC_SDS_FMT_DVD_MLJA: {
+				datalen = 12;
+
+				data = (ptr_t)malloc(datalen);
+
+				if (data == 0) {
+					error = E_OUTOFMEMORY;
+					break;
+				}
+
+				memset(data, 0, datalen);
+
+				data[0] = (uint8_t)((datalen - 2) >> 8);
+				data[1] = (uint8_t)(datalen - 2);
+				data[8] = (uint8_t)(command->data.mlja.ljlba >> 24);
+				data[9] = (uint8_t)(command->data.mlja.ljlba >> 16);
+				data[10] = (uint8_t)(command->data.mlja.ljlba >> 8);
+				data[11] = (uint8_t)(command->data.mlja.ljlba);
+
+				break;
+			}
+			case MMC_SDS_FMT_DVD_RA: {
+				datalen = 12;
+
+				data = (ptr_t)malloc(datalen);
+
+				if (data == 0) {
+					error = E_OUTOFMEMORY;
+					break;
+				}
+
+				memset(data, 0, datalen);
+
+				data[0] = (uint8_t)((datalen - 2) >> 8);
+				data[1] = (uint8_t)(datalen - 2);
+				data[4] = (uint8_t)(command->data.remapping_address.apn >> 8);
+				data[5] = (uint8_t)(command->data.remapping_address.apn);
+				data[8] = (uint8_t)(command->data.remapping_address.remapping_address >> 24);
+				data[9] = (uint8_t)(command->data.remapping_address.remapping_address >> 16);
+				data[10] = (uint8_t)(command->data.remapping_address.remapping_address >> 8);
+				data[11] = (uint8_t)(command->data.remapping_address.remapping_address);
+
+				break;
+			}
+			case MMC_SDS_FMT_DVD_DCB: {
+				datalen = command->data.dcb.dcb_len + 4;
+
+				assert(datalen <= 32771);
+
+				if (datalen > 32771) {
+					error = E_SIZEMISMATCH;
+					break;
+				}
+
+				data = (ptr_t)malloc(datalen);
+
+				if (data == 0) {
+					error = E_OUTOFMEMORY;
+					break;
+				}
+
+				memset(data, 0, datalen);
+
+				data[0] = (uint8_t)((datalen - 2) >> 8);
+				data[1] = (uint8_t)(datalen - 2);
+				data[2] = (uint8_t)(command->data.dcb.erase);
+
+				xmemcpy(&data[4], 
+					command->data.dcb.dcb_len, 
+					command->data.dcb.dcb,
+					command->data.dcb.dcb_len
+					);
+
+				break;
+			}
+			case MMC_SDS_FMT_DVD_WP: {
+				datalen = 8;
+
+				data = (ptr_t)malloc(datalen);
+
+				if (data == 0) {
+					error = E_OUTOFMEMORY;
+					break;
+				}
+
+				memset(data, 0, datalen);
+
+				data[0] = (uint8_t)((datalen - 2) >> 8);
+				data[1] = (uint8_t)(datalen - 2);
+				data[4] = (uint8_t)(command->data.write_protection.pwp << 1);
+
+				break;
+			}
+			default: {
+				assert(False);
+				error = E_OUTOFRANGE;
+				break;
+			}
+		}
+	} else if (command->media_type == MMC_SDS_MEDIA_TYPE_BD) {
+		switch(command->format_type) {
+			case MMC_SDS_FMT_BD_TIMESTAMP: {
+				datalen = 22;
+
+				data = (ptr_t)malloc(datalen);
+
+				if (data == 0) {
+					error = E_OUTOFMEMORY;
+					break;
+				}
+
+				memset(data, 0, datalen);
+
+				data[0] = (uint8_t)((datalen - 2) >> 8);
+				data[1] = (uint8_t)(datalen - 2);
+				data[8] = (uint8_t)(command->data.timestamp.year >> 24);
+				data[9] = (uint8_t)(command->data.timestamp.year >> 16);
+				data[10] = (uint8_t)(command->data.timestamp.year >> 8);
+				data[11] = (uint8_t)(command->data.timestamp.year);
+				data[12] = (uint8_t)(command->data.timestamp.month >> 8);
+				data[13] = (uint8_t)(command->data.timestamp.month);
+				data[14] = (uint8_t)(command->data.timestamp.day >> 8);
+				data[15] = (uint8_t)(command->data.timestamp.day);
+				data[16] = (uint8_t)(command->data.timestamp.hour >> 8);
+				data[17] = (uint8_t)(command->data.timestamp.hour);
+				data[18] = (uint8_t)(command->data.timestamp.minute >> 8);
+				data[19] = (uint8_t)(command->data.timestamp.minute);
+				data[20] = (uint8_t)(command->data.timestamp.second >> 8);
+				data[21] = (uint8_t)(command->data.timestamp.second);
+
+				break;
+			}
+			case MMC_SDS_FMT_BD_PAC: {
+				switch(command->pac_type) {
+					case PAC_GENERAL: {
+						assert(command->data.send_pac.pac_header_len <= 384);
+
+						if (command->data.send_pac.pac_header_len > 384) {
+							error = E_SIZEMISMATCH;
+							break;
+						}
+
+						datalen = command->data.send_pac.pac_header_len 
+							+ command->data.send_pac.pac_info_len 
+							+ 4;
+
+						data = (ptr_t)malloc(datalen);
+
+						if (data == 0) {
+							error = E_OUTOFMEMORY;
+							break;
+						}
+
+						memset(data, 0, datalen);
+
+						data[0] = (uint8_t)((datalen - 2) >> 8);
+						data[1] = (uint8_t)(datalen - 2);
+						data[2] = (uint8_t)(command->data.send_pac.erase);
+						
+						xmemcpy(&data[4], 
+							command->data.send_pac.pac_header_len, 
+							command->data.send_pac.pac_header, 
+							command->data.send_pac.pac_header_len
+							);
+
+						xmemcpy(&data[388],
+							command->data.send_pac.pac_info_len,
+							command->data.send_pac.pac_info,
+							command->data.send_pac.pac_info_len
+							);
+
+						break;
+					}
+					case PAC_DWP: {
+						assert(command->data.send_pac_dwp.pac_header_len <= 384);
+
+						if (command->data.send_pac_dwp.pac_header_len > 384) {
+							error = E_SIZEMISMATCH;
+							break;
+						}
+
+						datalen = 432;
+
+						data = (ptr_t)malloc(datalen);
+
+						if (data == 0) {
+							error = E_OUTOFMEMORY;
+							break;
+						}
+
+						memset(data, 0, datalen);
+
+						data[0] = (uint8_t)((datalen - 2) >> 8);
+						data[1] = (uint8_t)(datalen - 2);
+						
+						data[2] = (uint8_t)(command->data.send_pac_dwp.erase 
+							| command->data.send_pac_dwp.vwe << 1
+							);
+						
+						xmemcpy(&data[4], 
+							command->data.send_pac_dwp.pac_header_len, 
+							command->data.send_pac_dwp.pac_header, 
+							command->data.send_pac_dwp.pac_header_len
+							);
+
+						data[388] = command->data.send_pac_dwp.kpedf;
+						data[392] = command->data.send_pac_dwp.wpcb;
+
+						xmemcpy(&data[400], 
+							sizeof(command->data.send_pac_dwp.wp_password), 
+							command->data.send_pac_dwp.wp_password, 
+							sizeof(command->data.send_pac_dwp.wp_password)
+							);
+
+						break;
+					}
+					default: {
+						assert(False);
+						error = E_OUTOFRANGE;
+						break;
+					}
+				}
+
+				break;
+			}
+			default: {
+				assert(False);
+				error = E_OUTOFRANGE;
+				break;
+			}
+		}
+	} else {
+		assert(False);
+		return(E_OUTOFRANGE);
+	}
+
+	if (FAILED(error)) {
+		free(data);
+		return(error);
+	}
+
+	*data_out = data;
+	*data_out_len = datalen;
+
+	return(error);
+}
+
+static RESULT create_dataout_write_buffer(const optcl_mmc_write_buffer *command, 
+					  pptr_t data_out,
+					  uint32_t *data_out_len)
 {
 	RESULT error = SUCCESS;
 
@@ -3583,7 +3997,7 @@ RESULT optcl_command_mode_select_10(const optcl_device *device,
 		return(error);
 	}
 
-	error = create_data_out_mode_select(command, alignment, &data_out, &data_out_len);
+	error = create_dataout_mode_select(command, alignment, &data_out, &data_out_len);
 
 	if (FAILED(error)) {
 		return(error);
@@ -4558,6 +4972,106 @@ RESULT optcl_command_seek(const optcl_device *device,
 	return(error);
 }
 
+RESULT optcl_command_send_disc_structure(const optcl_device *device,
+					 const optcl_mmc_send_disc_structure *command)
+{
+	RESULT error;
+	RESULT destroy_error;
+
+	cdb12 cdb;
+	ptr_t ndata = 0;
+	ptr_t dataout = 0;
+	uint32_t alignment;
+	uint16_t dataout_len;
+	optcl_adapter *adapter = 0;
+
+	assert(device != 0);
+	assert(command != 0);
+
+	if (device == 0 || command == 0) {
+		return(E_INVALIDARG);
+	}
+
+	error = optcl_device_get_adapter(device, &adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	assert(adapter != 0);
+
+	if (adapter == 0) {
+		return(E_POINTER);
+	}
+
+	error = optcl_adapter_get_alignment_mask(adapter, &alignment);
+
+	if (FAILED(error)) {
+		destroy_error = optcl_adapter_destroy(adapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	error = optcl_adapter_destroy(adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	error = create_dataout_send_disc_structure(command, &ndata, &dataout_len);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	assert(ndata != 0);
+
+	if (ndata == 0) {
+		return(E_POINTER);
+	}
+
+	assert(dataout_len > 0);
+
+	if (dataout_len < 1) {
+		free(dataout);
+		return(E_UNEXPECTED);
+	}
+
+	dataout = (ptr_t)xmalloc_aligned(dataout_len, alignment);
+
+	if (ndata == 0) {
+		free(ndata);
+		return(E_OUTOFMEMORY);
+	}
+
+	xmemcpy(dataout, dataout_len, ndata, dataout_len);
+
+	free(ndata);
+
+	/*
+	 * Execute command
+	 */
+
+	memset(cdb, 0, sizeof(cdb));
+
+	cdb[0] = MMC_OPCODE_SEND_DISC_STRUCTURE;
+	cdb[1] = command->media_type & 0x0F;
+	cdb[7] = command->format_type;
+	cdb[8] = (uint8_t)(dataout_len >> 8);
+	cdb[9] = (uint8_t)(dataout_len);
+
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		dataout,
+		dataout_len
+		);
+
+	xfree_aligned(dataout);
+
+	return(error);
+}
+
 RESULT optcl_command_send_opc_information(const optcl_device *device,
 					  const optcl_mmc_send_opc_information *command)
 {
@@ -5315,7 +5829,7 @@ RESULT optcl_command_write_buffer(const optcl_device *device,
 		return(error);
 	}
 
-	error = create_data_out_write_buffer(command, &ndata, &dataoutlen);
+	error = create_dataout_write_buffer(command, &ndata, &dataoutlen);
 
 	if (FAILED(error)) {
 		return(error);
