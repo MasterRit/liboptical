@@ -111,7 +111,7 @@ static response_deallocator get_response_deallocator(uint16_t opcode);
  * Helper functions
  */
 
-static int8_t equalfn_descriptors(const void *left, const void *right)
+static int8_t equalfn_descriptors(const ptr_t left, const ptr_t right)
 {
 	optcl_feature_descriptor *ldesc = 0;
 	optcl_feature_descriptor *rdesc = 0;
@@ -170,7 +170,7 @@ static RESULT create_data_out_from_descriptor(const optcl_mmc_msdesc_header *des
 
 			datalen = vendordesc->page_len + 2;
 
-			data = malloc(datalen);
+			data = (ptr_t)malloc(datalen);
 
 			if (data == 0) {
 				error = E_OUTOFMEMORY;
@@ -191,7 +191,7 @@ static RESULT create_data_out_from_descriptor(const optcl_mmc_msdesc_header *des
 
 			datalen = 12;
 
-			data = malloc(datalen);
+			data = (ptr_t)malloc(datalen);
 
 			if (data == 0) {
 				error = E_OUTOFMEMORY;
@@ -225,7 +225,7 @@ static RESULT create_data_out_from_descriptor(const optcl_mmc_msdesc_header *des
 
 			datalen = 8;
 
-			data = malloc(datalen);
+			data = (ptr_t)malloc(datalen);
 
 			if (data == 0) {
 				error = E_OUTOFMEMORY;
@@ -245,7 +245,7 @@ static RESULT create_data_out_from_descriptor(const optcl_mmc_msdesc_header *des
 
 			datalen = 52;
 
-			data = malloc(datalen);
+			data = (ptr_t)malloc(datalen);
 
 			if (data == 0) {
 				error = E_OUTOFMEMORY;
@@ -293,7 +293,7 @@ static RESULT create_data_out_from_descriptor(const optcl_mmc_msdesc_header *des
 
 			datalen = 12;
 
-			data = malloc(datalen);
+			data = (ptr_t)malloc(datalen);
 
 			if (data == 0) {
 				error = E_OUTOFMEMORY;
@@ -313,7 +313,7 @@ static RESULT create_data_out_from_descriptor(const optcl_mmc_msdesc_header *des
 
 			datalen = 12;
 
-			data = malloc(datalen);
+			data = (ptr_t)malloc(datalen);
 
 			if (data == 0) {
 				error = E_OUTOFMEMORY;
@@ -343,7 +343,7 @@ static RESULT create_data_out_from_descriptor(const optcl_mmc_msdesc_header *des
 
 			datalen = 12;
 
-			data = malloc(datalen);
+			data = (ptr_t)malloc(datalen);
 
 			if (data == 0) {
 				error = E_OUTOFMEMORY;
@@ -384,7 +384,7 @@ static RESULT create_data_out_from_descriptor(const optcl_mmc_msdesc_header *des
 
 			datalen = 12;
 
-			data = malloc(datalen);
+			data = (ptr_t)malloc(datalen);
 
 			if (data == 0) {
 				error = E_OUTOFMEMORY;
@@ -481,7 +481,7 @@ static RESULT create_data_out_mode_select(const optcl_mmc_mode_select *command,
 		}
 
 		if (descdatalen > 0) {
-			data = xrealloc_aligned(data, offset + descdatalen, alignment);
+			data = (ptr_t)xrealloc_aligned(data, offset + descdatalen, alignment);
 
 			if (data == 0) {
 				error = E_OUTOFMEMORY;
@@ -536,7 +536,7 @@ static RESULT create_data_out_write_buffer(const optcl_mmc_write_buffer *command
 
 			datalen = command->dataout.combined.buffer_capacity + 4;
 
-			data = malloc(datalen);
+			data = (ptr_t)malloc(datalen);
 
 			if (data == 0) {
 				error = E_OUTOFMEMORY;
@@ -563,7 +563,7 @@ static RESULT create_data_out_write_buffer(const optcl_mmc_write_buffer *command
 
 			datalen = command->dataout.vendor.buffer_len;
 
-			data = malloc(datalen);
+			data = (ptr_t)malloc(datalen);
 
 			if (data == 0) {
 				error = E_OUTOFMEMORY;
@@ -585,7 +585,7 @@ static RESULT create_data_out_write_buffer(const optcl_mmc_write_buffer *command
 
 			datalen = command->param_list_len;
 
-			data = malloc(datalen);
+			data = (ptr_t)malloc(datalen);
 
 			if (data == 0) {
 				return(E_OUTOFMEMORY);
@@ -600,7 +600,7 @@ static RESULT create_data_out_write_buffer(const optcl_mmc_write_buffer *command
 		case MMC_WRITE_BUFFER_MODE_MICROCODE_SAVE: {
 			datalen = command->dataout.microcode.microcode_len;
 
-			data = malloc(datalen);
+			data = (ptr_t)malloc(datalen);
 
 			if (data == 0) {
 				error = E_OUTOFMEMORY;
@@ -616,7 +616,7 @@ static RESULT create_data_out_write_buffer(const optcl_mmc_write_buffer *command
 		case MMC_WRITE_BUFFER_MODE_MICROCODE_WOFF_SAVE: {
 			datalen = command->param_list_len;
 
-			data = malloc(datalen);
+			data = (ptr_t)malloc(datalen);
 
 			if (data == 0) {
 				error = E_OUTOFMEMORY;
@@ -631,7 +631,7 @@ static RESULT create_data_out_write_buffer(const optcl_mmc_write_buffer *command
 		case MMC_WRITE_BUFFER_MODE_ECHO: {
 			datalen = command->param_list_len;
 
-			data = malloc(datalen);
+			data = (ptr_t)malloc(datalen);
 
 			if (data == 0) {
 				error = E_OUTOFMEMORY;
@@ -646,7 +646,7 @@ static RESULT create_data_out_write_buffer(const optcl_mmc_write_buffer *command
 		case MMC_WRITE_BUFFER_MODE_EN_EXPANDER: {
 			datalen = command->param_list_len;
 
-			data = malloc(datalen);
+			data = (ptr_t)malloc(datalen);
 
 			if (data == 0) {
 				error = E_OUTOFMEMORY;
@@ -676,7 +676,7 @@ static RESULT create_data_out_write_buffer(const optcl_mmc_write_buffer *command
 				break;
 			}
 
-			data = malloc(datalen);
+			data = (ptr_t)malloc(datalen);
 
 			if (data == 0) {
 				error = E_OUTOFMEMORY;
@@ -762,9 +762,8 @@ static RESULT parse_raw_event_status_descriptor_data(uint8_t event_class,
 
 	switch(event_class) {
 		case MMC_GET_EVENT_STATUS_OPCHANGE: {
-			opchange = malloc(
-				sizeof(optcl_mmc_ges_operational_change)
-				);
+			opchange = (optcl_mmc_ges_operational_change*)
+				malloc(sizeof(optcl_mmc_ges_operational_change));
 
 			if (opchange == 0) {
 				error = E_OUTOFMEMORY;
@@ -781,9 +780,8 @@ static RESULT parse_raw_event_status_descriptor_data(uint8_t event_class,
 			break;
 		}
 		case MMC_GET_EVENT_STATUS_POWERMGMT: {
-			pwrmngmnt = malloc(
-				sizeof(optcl_mmc_ges_power_management)
-				);
+			pwrmngmnt = (optcl_mmc_ges_power_management*)
+				malloc(sizeof(optcl_mmc_ges_power_management));
 
 			if (pwrmngmnt == 0) {
 				error = E_OUTOFMEMORY;
@@ -798,9 +796,8 @@ static RESULT parse_raw_event_status_descriptor_data(uint8_t event_class,
 			break;
 		}
 		case MMC_GET_EVENT_STATUS_EXTREQUEST: {
-			exterrequest = malloc(
-				sizeof(optcl_mmc_ges_external_request)
-				);
+			exterrequest = (optcl_mmc_ges_external_request*)
+				malloc(sizeof(optcl_mmc_ges_external_request));
 
 			if (exterrequest == 0) {
 				error = E_OUTOFMEMORY;
@@ -817,7 +814,8 @@ static RESULT parse_raw_event_status_descriptor_data(uint8_t event_class,
 			break;
 		}
 		case MMC_GET_EVENT_STATUS_MEDIA: {
-			media = malloc(sizeof(optcl_mmc_ges_media));
+			media = (optcl_mmc_ges_media*)
+				malloc(sizeof(optcl_mmc_ges_media));
 
 			if (media == 0) {
 				error = E_OUTOFMEMORY;
@@ -835,7 +833,8 @@ static RESULT parse_raw_event_status_descriptor_data(uint8_t event_class,
 			break;
 		}
 		case MMC_GET_EVENT_STATUS_MULTIHOST: {
-			multihost = malloc(sizeof(optcl_mmc_ges_multihost));
+			multihost = (optcl_mmc_ges_multihost*)
+				malloc(sizeof(optcl_mmc_ges_multihost));
 
 			if (multihost == 0) {
 				error = E_OUTOFMEMORY;
@@ -852,9 +851,8 @@ static RESULT parse_raw_event_status_descriptor_data(uint8_t event_class,
 			break;
 		}
 		case MMC_GET_EVENT_STATUS_DEVICEBUSY: {
-			devicebusy = malloc(
-				sizeof(optcl_mmc_ges_device_busy)
-				);
+			devicebusy = (optcl_mmc_ges_device_busy*)
+				malloc(sizeof(optcl_mmc_ges_device_busy));
 
 			if (devicebusy == 0) {
 				error = E_OUTOFMEMORY;
@@ -904,7 +902,8 @@ static RESULT parse_raw_get_configuration_data(const uint8_t mmc_response[],
 		return(E_FEATINVHEADER);
 	}
 
-	nresponse = malloc(sizeof(optcl_mmc_response_get_configuration));
+	nresponse = (optcl_mmc_response_get_configuration*)
+		malloc(sizeof(optcl_mmc_response_get_configuration));
 
 	if (nresponse == 0) {
 		return(E_OUTOFMEMORY);
@@ -986,7 +985,8 @@ static RESULT parse_raw_get_event_status_data(const uint8_t mmc_response[],
 		return(E_INVALIDARG);
 	}
 
-	nresponse = malloc(sizeof(optcl_mmc_response_get_event_status));
+	nresponse = (optcl_mmc_response_get_event_status*)
+		malloc(sizeof(optcl_mmc_response_get_event_status));
 
 	if (nresponse == 0) {
 		return(E_OUTOFMEMORY);
@@ -1097,7 +1097,8 @@ static RESULT parse_raw_get_performance_data_pd(uint8_t data_type,
 			}
 
 			while(offset <= size - 16) {
-				gpdesc = malloc(sizeof(optcl_mmc_gpdesc_pd));
+				gpdesc = (optcl_mmc_gpdesc_pd*)
+					malloc(sizeof(optcl_mmc_gpdesc_pd));
 
 				if (gpdesc == 0) {
 					error = E_OUTOFMEMORY;
@@ -1136,7 +1137,8 @@ static RESULT parse_raw_get_performance_data_pd(uint8_t data_type,
 			}
 
 			while(offset <= size - 6) {
-				gpdesc = malloc(sizeof(optcl_mmc_gpdesc_pd));
+				gpdesc = (optcl_mmc_gpdesc_pd*)
+					malloc(sizeof(optcl_mmc_gpdesc_pd));
 
 				if (gpdesc == 0) {
 					error = E_OUTOFMEMORY;
@@ -1218,7 +1220,8 @@ static RESULT parse_raw_get_performance_data_uad(const uint8_t mmc_response[],
 	}
 
 	while(offset <= size - 8) {
-		gpdesc = malloc(sizeof(optcl_mmc_gpdesc_uad));
+		gpdesc = (optcl_mmc_gpdesc_uad*)
+			malloc(sizeof(optcl_mmc_gpdesc_uad));
 
 		if (gpdesc == 0) {
 			error = E_OUTOFMEMORY;
@@ -1290,7 +1293,8 @@ static RESULT parse_raw_get_performance_data_dsd(const uint8_t mmc_response[],
 	}
 
 	while(offset <= size - 2048) {
-		gpdesc = malloc(sizeof(optcl_mmc_gpdesc_dsd));
+		gpdesc = (optcl_mmc_gpdesc_dsd*)
+			malloc(sizeof(optcl_mmc_gpdesc_dsd));
 
 		if (gpdesc == 0) {
 			error = E_OUTOFMEMORY;
@@ -1371,7 +1375,8 @@ static RESULT parse_raw_get_performance_data_wsd(const uint8_t mmc_response[],
 	}
 
 	while(offset <= size - 16) {
-		gpdesc = malloc(sizeof(optcl_mmc_gpdesc_wsd));
+		gpdesc = (optcl_mmc_gpdesc_wsd*)
+			malloc(sizeof(optcl_mmc_gpdesc_wsd));
 
 		if (gpdesc == 0) {
 			error = E_OUTOFMEMORY;
@@ -1449,7 +1454,8 @@ static RESULT parse_raw_get_performance_data_dbi(const uint8_t mmc_response[],
 	}
 
 	while(offset < size - 8) {
-		gpdesc = malloc(sizeof(optcl_mmc_gpdesc_dbi));
+		gpdesc = (optcl_mmc_gpdesc_dbi*)
+			malloc(sizeof(optcl_mmc_gpdesc_dbi));
 
 		if (gpdesc == 0) {
 			error = E_OUTOFMEMORY;
@@ -1524,7 +1530,8 @@ static RESULT parse_raw_get_performance_data_dbicz(const uint8_t mmc_response[],
 	}
 
 	while(offset < size - 8) {
-		gpdesc = malloc(sizeof(optcl_mmc_gpdesc_dbicz));
+		gpdesc = (optcl_mmc_gpdesc_dbicz*)
+			malloc(sizeof(optcl_mmc_gpdesc_dbicz));
 
 		if (gpdesc == 0) {
 			error = E_OUTOFMEMORY;
@@ -1582,7 +1589,8 @@ static RESULT parse_raw_get_performance_data(uint8_t type,
 		return(E_INVALIDARG);
 	}
 
-	nresponse = malloc(sizeof(optcl_mmc_response_get_performance));
+	nresponse = (optcl_mmc_response_get_performance*)
+		malloc(sizeof(optcl_mmc_response_get_performance));
 
 	if (nresponse == 0) {
 		return(E_OUTOFMEMORY);
@@ -1690,7 +1698,8 @@ static RESULT parse_raw_inquiry_data(const uint8_t mmc_response[],
 		return(E_INVALIDARG);
 	}
 
-	nresponse = malloc(sizeof(optcl_mmc_response_inquiry));
+	nresponse = (optcl_mmc_response_inquiry*)
+		malloc(sizeof(optcl_mmc_response_inquiry));
 
 	if (nresponse == 0) {
 		return(E_OUTOFMEMORY);
@@ -1829,7 +1838,8 @@ static RESULT parse_raw_mode_sense_data(const uint8_t mmc_response[],
 		return(error);
 	}
 
-	nresponse = malloc(sizeof(optcl_mmc_response_mode_sense));
+	nresponse = (optcl_mmc_response_mode_sense*)
+		malloc(sizeof(optcl_mmc_response_mode_sense));
 
 	if (nresponse == 0) {
 		return(E_OUTOFMEMORY);
@@ -1861,7 +1871,8 @@ static RESULT parse_raw_mode_sense_data(const uint8_t mmc_response[],
 					break;
 				}
 
-				vendordesc = malloc(sizeof(optcl_mmc_msdesc_vendor));
+				vendordesc = (optcl_mmc_msdesc_vendor*)
+					malloc(sizeof(optcl_mmc_msdesc_vendor));
 
 				if (vendordesc == 0) {
 					error = E_OUTOFMEMORY;
@@ -1901,7 +1912,8 @@ static RESULT parse_raw_mode_sense_data(const uint8_t mmc_response[],
 					break;
 				}
 
-				rwrecovery = malloc(sizeof(optcl_mmc_msdesc_rwrecovery));
+				rwrecovery = (optcl_mmc_msdesc_rwrecovery*)
+					malloc(sizeof(optcl_mmc_msdesc_rwrecovery));
 
 				if (rwrecovery == 0) {
 					error = E_OUTOFMEMORY;
@@ -1949,7 +1961,8 @@ static RESULT parse_raw_mode_sense_data(const uint8_t mmc_response[],
 					break;
 				}
 
-				mrw = malloc(sizeof(optcl_mmc_msdesc_mrw));
+				mrw = (optcl_mmc_msdesc_mrw*)
+					malloc(sizeof(optcl_mmc_msdesc_mrw));
 
 				if (mrw == 0) {
 					error = E_OUTOFMEMORY;
@@ -1982,7 +1995,8 @@ static RESULT parse_raw_mode_sense_data(const uint8_t mmc_response[],
 					break;
 				}
 
-				writeparms = malloc(sizeof(optcl_mmc_msdesc_writeparams));
+				writeparms = (optcl_mmc_msdesc_writeparams*)
+					malloc(sizeof(optcl_mmc_msdesc_writeparams));
 
 				if (writeparms == 0) {
 					error = E_OUTOFMEMORY;
@@ -2037,7 +2051,8 @@ static RESULT parse_raw_mode_sense_data(const uint8_t mmc_response[],
 					break;
 				}
 
-				caching = malloc(sizeof(optcl_mmc_msdesc_caching));
+				caching = (optcl_mmc_msdesc_caching*)
+					malloc(sizeof(optcl_mmc_msdesc_caching));
 
 				if (caching == 0) {
 					error = E_OUTOFMEMORY;
@@ -2064,7 +2079,8 @@ static RESULT parse_raw_mode_sense_data(const uint8_t mmc_response[],
 					break;
 				}
 
-				power = malloc(sizeof(optcl_mmc_msdesc_power));
+				power = (optcl_mmc_msdesc_power*)
+					malloc(sizeof(optcl_mmc_msdesc_power));
 
 				if (power == 0) {
 					error = E_OUTOFMEMORY;
@@ -2094,7 +2110,8 @@ static RESULT parse_raw_mode_sense_data(const uint8_t mmc_response[],
 					break;
 				}
 
-				infoexceptions = malloc(sizeof(optcl_mmc_msdesc_infoexceptions));
+				infoexceptions = (optcl_mmc_msdesc_infoexceptions*)
+					malloc(sizeof(optcl_mmc_msdesc_infoexceptions));
 
 				if (infoexceptions == 0) {
 					error = E_OUTOFMEMORY;
@@ -2129,7 +2146,8 @@ static RESULT parse_raw_mode_sense_data(const uint8_t mmc_response[],
 					break;
 				}
 
-				timeoutprot = malloc(sizeof(optcl_mmc_msdesc_timeout_protect));
+				timeoutprot = (optcl_mmc_msdesc_timeout_protect*)
+					malloc(sizeof(optcl_mmc_msdesc_timeout_protect));
 
 				if (timeoutprot == 0) {
 					error = E_OUTOFMEMORY;
@@ -2188,7 +2206,8 @@ static RESULT parse_raw_read_buffer_data(const uint8_t mmc_response[],
 		return(E_INVALIDARG);
 	}
 
-	nresponse = malloc(sizeof(optcl_mmc_response_read_buffer));
+	nresponse = (optcl_mmc_response_read_buffer*)
+		malloc(sizeof(optcl_mmc_response_read_buffer));
 
 	if (nresponse == 0) {
 		return(E_OUTOFMEMORY);
@@ -2214,7 +2233,7 @@ static RESULT parse_raw_read_buffer_data(const uint8_t mmc_response[],
 				break;
 			}
 
-			data = malloc(size - 4);
+			data = (ptr_t)malloc(size - 4);
 
 			if (data == 0) {
 				error = E_OUTOFMEMORY;
@@ -2228,7 +2247,7 @@ static RESULT parse_raw_read_buffer_data(const uint8_t mmc_response[],
 			break;
 		}
 		case MMC_READ_BUFFER_MODE_DATA: {
-			data = malloc(size);
+			data = (ptr_t)malloc(size);
 
 			if (data == 0) {
 				error = E_OUTOFMEMORY;
@@ -2253,7 +2272,7 @@ static RESULT parse_raw_read_buffer_data(const uint8_t mmc_response[],
 			break;
 		}
 		case MMC_READ_BUFFER_MODE_ECHO: {
-			data = malloc(size);
+			data = (ptr_t)malloc(size);
 
 			if (data == 0) {
 				error = E_OUTOFMEMORY;
@@ -2274,7 +2293,7 @@ static RESULT parse_raw_read_buffer_data(const uint8_t mmc_response[],
 			break;
 		}
 		case MMC_READ_BUFFER_MODE_EXPANDER: {
-			data = malloc(size);
+			data = (ptr_t)malloc(size);
 
 			if (data == 0) {
 				error = E_OUTOFMEMORY;
@@ -2288,7 +2307,7 @@ static RESULT parse_raw_read_buffer_data(const uint8_t mmc_response[],
 			break;
 		}
 		case MMC_READ_BUFFER_MODE_VENDOR: {
-			data = malloc(size);
+			data = (ptr_t)malloc(size);
 
 			if (data == 0) {
 				error = E_OUTOFMEMORY;
@@ -2639,7 +2658,7 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 	cdb[3] = (uint8_t)((start_feature << 8) >> 8);
 	cdb[8] = 8; /* enough to get feature descriptor header */
 
-	mmc_response = xmalloc_aligned(cdb[8], alignment_mask);
+	mmc_response = (ptr_t)xmalloc_aligned(cdb[8], alignment_mask);
 
 	if (mmc_response == 0) {
 		return(E_OUTOFMEMORY);
@@ -2658,7 +2677,8 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 		return(error);
 	}
 
-	nresponse0 = malloc(sizeof(optcl_mmc_response_get_configuration));
+	nresponse0 = (optcl_mmc_response_get_configuration*)
+		malloc(sizeof(optcl_mmc_response_get_configuration));
 
 	if (nresponse0 == 0) {
 		xfree_aligned(mmc_response);
@@ -2708,7 +2728,7 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 		cdb[7] = (uint8_t)((uint16_t)transfer_size >> 8);
 		cdb[8] = (uint8_t)((((uint16_t)transfer_size) << 8) >> 8);
 
-		mmc_response = xmalloc_aligned(transfer_size, alignment_mask);
+		mmc_response = (ptr_t)xmalloc_aligned(transfer_size, alignment_mask);
 
 		if (mmc_response == 0) {
 			error = E_OUTOFMEMORY;
@@ -2863,7 +2883,7 @@ RESULT optcl_command_get_event_status(const optcl_device *device,
 	cdb[4] = command->class_request;
 	cdb[8] = 4; /* request only event header */
 
-	mmc_response = xmalloc_aligned(cdb[8], alignment);
+	mmc_response = (ptr_t)xmalloc_aligned(cdb[8], alignment);
 
 	if (mmc_response == 0) {
 		return(E_OUTOFMEMORY);
@@ -2905,7 +2925,7 @@ RESULT optcl_command_get_event_status(const optcl_device *device,
 	cdb[7] = (uint8_t)(descriptor_len >> 8);
 	cdb[8] = (uint8_t)((descriptor_len << 8) >> 8) + 4;
 
-	mmc_response = xmalloc_aligned(
+	mmc_response = (ptr_t)xmalloc_aligned(
 		descriptor_len + 4, 
 		alignment
 		);
@@ -3017,7 +3037,7 @@ RESULT optcl_command_get_performance(const optcl_device *device,
 	cdb[5] = (uint8_t)((command->start_lba << 24) >> 24);
 	cdb[10] = command->type;
 
-	mmc_response = xmalloc_aligned(8, alignment);
+	mmc_response = (ptr_t)xmalloc_aligned(8, alignment);
 
 	if (mmc_response == 0) {
 		return(E_OUTOFMEMORY);
@@ -3062,7 +3082,7 @@ RESULT optcl_command_get_performance(const optcl_device *device,
 	cdb[8] = (uint8_t)(command->max_desc_num >> 8);
 	cdb[9] = (uint8_t)((command->max_desc_num << 8) >> 8);
 
-	mmc_response = xmalloc_aligned(perf_data_len + 4, alignment);
+	mmc_response = (ptr_t)xmalloc_aligned(perf_data_len + 4, alignment);
 
 	if (mmc_response == 0) {
 		return(E_OUTOFMEMORY);
@@ -3177,7 +3197,7 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 	cdb[0] = MMC_OPCODE_INQUIRY;
 	cdb[4] = 5; /* the allocation length should be at least five */
 
-	mmc_response = xmalloc_aligned(cdb[4], alignment_mask);
+	mmc_response = (ptr_t)xmalloc_aligned(cdb[4], alignment_mask);
 
 	if (mmc_response == 0) {
 		return(E_OUTOFMEMORY);
@@ -3202,7 +3222,7 @@ RESULT optcl_command_inquiry(const optcl_device *device,
 
 	xfree_aligned(mmc_response);
 
-	mmc_response = xmalloc_aligned((size_t)cdb[4], alignment_mask);
+	mmc_response = (ptr_t)xmalloc_aligned((size_t)cdb[4], alignment_mask);
 
 	if (mmc_response == 0) {
 		return(E_OUTOFMEMORY);
@@ -3332,7 +3352,7 @@ RESULT optcl_command_mechanism_status(const optcl_device *device,
 	cdb[8] = (uint8_t)(response_size >> 8);
 	cdb[9] = (uint8_t)((response_size << 8) >> 8);
 
-	mmc_response = xmalloc_aligned(MECHSTATUS_RESPSIZE, alignment);
+	mmc_response = (ptr_t)xmalloc_aligned(MECHSTATUS_RESPSIZE, alignment);
 
 	if (mmc_response == 0) {
 		return(E_OUTOFMEMORY);
@@ -3355,7 +3375,8 @@ RESULT optcl_command_mechanism_status(const optcl_device *device,
 	 * Parse raw data
 	 */
 
-	nresponse = malloc(sizeof(optcl_mmc_response_mechanism_status));
+	nresponse = (optcl_mmc_response_mechanism_status*)
+		malloc(sizeof(optcl_mmc_response_mechanism_status));
 
 	if (nresponse == 0) {
 		xfree_aligned(mmc_response);
@@ -3447,7 +3468,7 @@ RESULT optcl_command_mode_sense_10(const optcl_device *device,
 	cdb[2] = (command->pc << 6) | command->page_code;
 	cdb[4] = 8;	/* get header only */
 
-	mmc_response = xmalloc_aligned(8, alignment);
+	mmc_response = (ptr_t)xmalloc_aligned(8, alignment);
 
 	if (mmc_response == 0) {
 		return(E_OUTOFMEMORY);
@@ -3470,7 +3491,7 @@ RESULT optcl_command_mode_sense_10(const optcl_device *device,
 
 	xfree_aligned(mmc_response);
 
-	mmc_response = xmalloc_aligned(mode_data_len + 2, alignment);
+	mmc_response = (ptr_t)xmalloc_aligned(mode_data_len + 2, alignment);
 
 	if (mmc_response == 0) {
 		return(E_OUTOFMEMORY);
@@ -3687,7 +3708,8 @@ RESULT optcl_command_read_10(const optcl_device *device,
 		return(error);
 	}
 
-	nresponse = malloc(sizeof(optcl_mmc_response_read));
+	nresponse = (optcl_mmc_response_read*)
+		malloc(sizeof(optcl_mmc_response_read));
 
 	if (nresponse == 0) {
 		return(E_OUTOFMEMORY);
@@ -3714,7 +3736,7 @@ RESULT optcl_command_read_10(const optcl_device *device,
 	cdb[7] = (uint8_t)(command->transfer_length >> 8);
 	cdb[8] = (uint8_t)((command->transfer_length << 8) >> 8);
 	
-	mmc_response = xmalloc_aligned(transfer_size, alignment);
+	mmc_response = (ptr_t)xmalloc_aligned(transfer_size, alignment);
 
 	if (mmc_response == 0) {
 		return(E_OUTOFMEMORY);
@@ -3733,7 +3755,7 @@ RESULT optcl_command_read_10(const optcl_device *device,
 		xfree_aligned(mmc_response);
 	}
 
-	nresponse->data = malloc(transfer_size);
+	nresponse->data = (ptr_t)malloc(transfer_size);
 
 	if (nresponse->data == 0) {
 		free(nresponse);
@@ -3804,7 +3826,8 @@ RESULT optcl_command_read_12(const optcl_device *device,
 		return(error);
 	}
 
-	nresponse = malloc(sizeof(optcl_mmc_response_read));
+	nresponse = (optcl_mmc_response_read*)
+		malloc(sizeof(optcl_mmc_response_read));
 
 	if (nresponse == 0) {
 		return(E_OUTOFMEMORY);
@@ -3832,7 +3855,7 @@ RESULT optcl_command_read_12(const optcl_device *device,
 	cdb[9] = (uint8_t)((command->transfer_length << 24) >> 24);
 	cdb[10] = (command->streaming << 7);
 
-	mmc_response = xmalloc_aligned(
+	mmc_response = (ptr_t)xmalloc_aligned(
 		command->transfer_length * READ_BLOCK_SIZE, 
 		alignment
 		);
@@ -3947,7 +3970,7 @@ RESULT optcl_command_read_buffer(const optcl_device *device,
 	cdb[7] = (uint8_t)((command->allocation_len << 16) >> 24);
 	cdb[8] = (uint8_t)((command->allocation_len << 24) >> 24);
 
-	mmc_response = xmalloc_aligned(command->allocation_len, alignment);
+	mmc_response = (ptr_t)xmalloc_aligned(command->allocation_len, alignment);
 
 	if (mmc_response == 0) {
 		return(E_OUTOFMEMORY);
@@ -4046,7 +4069,7 @@ RESULT optcl_command_read_buffer_capacity(const optcl_device *device,
 	cdb[1] = command->block & 0x01;
 	cdb[8] = 12; /* size of the response buffer */
 
-	mmc_response = xmalloc_aligned(12, alignment);
+	mmc_response = (ptr_t)xmalloc_aligned(12, alignment);
 
 	if (mmc_response == 0) {
 		return(E_OUTOFMEMORY);
@@ -4065,7 +4088,8 @@ RESULT optcl_command_read_buffer_capacity(const optcl_device *device,
 		return(error);
 	}
 
-	nresponse = malloc(sizeof(optcl_mmc_response_read_buffer_capacity));
+	nresponse = (optcl_mmc_response_read_buffer_capacity*)
+		malloc(sizeof(optcl_mmc_response_read_buffer_capacity));
 
 	if (nresponse == 0) {
 		return(E_OUTOFMEMORY);
@@ -4143,7 +4167,7 @@ RESULT optcl_command_read_capacity(const optcl_device *device,
 
 	cdb[0] = MMC_OPCODE_READ_CAPACITY;
 
-	mmc_response = xmalloc_aligned(8, alignment);
+	mmc_response = (ptr_t)xmalloc_aligned(8, alignment);
 
 	if (mmc_response == 0) {
 		return(E_OUTOFMEMORY);
@@ -4162,7 +4186,8 @@ RESULT optcl_command_read_capacity(const optcl_device *device,
 		return(error);
 	}
 
-	nresponse = malloc(sizeof(optcl_mmc_response_read_capacity));
+	nresponse = (optcl_mmc_response_read_capacity*)
+		malloc(sizeof(optcl_mmc_response_read_capacity));
 
 	if (nresponse == 0) {
 		xfree_aligned(mmc_response);
@@ -4225,7 +4250,7 @@ RESULT optcl_command_read_msn(const optcl_device *device,
 	/*
 	 * Execute command to get MSN length
 	 */
-	mmc_response = xmalloc_aligned(4, alignment);
+	mmc_response = (ptr_t)xmalloc_aligned(4, alignment);
 
 	if (mmc_response == 0) {
 		return(E_OUTOFMEMORY);
@@ -4258,7 +4283,7 @@ RESULT optcl_command_read_msn(const optcl_device *device,
 	 * Execute command to get MSN
 	 */
 
-	mmc_response = xmalloc_aligned(msnlen, alignment);
+	mmc_response = (ptr_t)xmalloc_aligned(msnlen, alignment);
 
 	if (mmc_response == 0) {
 		return(E_OUTOFMEMORY);
@@ -4284,7 +4309,7 @@ RESULT optcl_command_read_msn(const optcl_device *device,
 
 	msnlen = uint32_from_be(*(uint32_t*)mmc_response);
 
-	msn = malloc(msnlen);
+	msn = (ptr_t)malloc(msnlen);
 
 	if (msn == 0) {
 		xfree_aligned(mmc_response);
@@ -4293,7 +4318,8 @@ RESULT optcl_command_read_msn(const optcl_device *device,
 
 	xmemcpy(msn, msnlen, mmc_response, msnlen);
 
-	nresponse = malloc(sizeof(optcl_mmc_response_read_msn));
+	nresponse = (optcl_mmc_response_read_msn*)
+		malloc(sizeof(optcl_mmc_response_read_msn));
 
 	if (nresponse == 0) {
 		free(msn);
@@ -4404,7 +4430,7 @@ RESULT optcl_command_request_sense(const optcl_device *device,
 	cdb[1] = (uint8_t)command->desc;
 	cdb[4] = MAX_SENSEDATA_LENGTH;
 
-	mmc_response = xmalloc_aligned(MAX_SENSEDATA_LENGTH, alignment);
+	mmc_response = (ptr_t)xmalloc_aligned(MAX_SENSEDATA_LENGTH, alignment);
 
 	if (mmc_response == 0) {
 		return(E_OUTOFMEMORY);
@@ -4431,7 +4457,8 @@ RESULT optcl_command_request_sense(const optcl_device *device,
 		return(error);
 	}
 
-	nresponse = malloc(sizeof(optcl_mmc_response_request_sense));
+	nresponse = (optcl_mmc_response_request_sense*)
+		malloc(sizeof(optcl_mmc_response_request_sense));
 
 	if (nresponse == 0) {
 		return(E_OUTOFMEMORY);
@@ -4583,7 +4610,7 @@ RESULT optcl_command_send_opc_information(const optcl_device *device,
 
 	param_list_len = command->opc_entry_num * sizeof(command->opc_table_entries[0]);
 
-	data = xmalloc_aligned(param_list_len, alignment);
+	data = (ptr_t)xmalloc_aligned(param_list_len, alignment);
 
 	if (data == 0) {
 		return(E_OUTOFMEMORY);
@@ -4787,7 +4814,7 @@ RESULT optcl_command_set_streaming(const optcl_device *device,
 	if (command->type == MMC_SET_STREAMING_PERFORMANCE) {
 		param_list_len = 28;
 		
-		data = xmalloc_aligned(param_list_len, alignment);
+		data = (ptr_t)xmalloc_aligned(param_list_len, alignment);
 
 		if (data == 0) {
 			return(E_OUTOFMEMORY);
@@ -4830,7 +4857,7 @@ RESULT optcl_command_set_streaming(const optcl_device *device,
 		param_list_len = command->descriptors.dbi_cache_zones.desc_num 
 			* sizeof(command->descriptors.dbi_cache_zones.descriptors[0]);
 
-		data = xmalloc_aligned(param_list_len, alignment);
+		data = (ptr_t)xmalloc_aligned(param_list_len, alignment);
 
 		if (data == 0) {
 			return(E_OUTOFMEMORY);
@@ -5039,7 +5066,7 @@ RESULT optcl_command_write(const optcl_device *device,
 		return(error);
 	}
 
-	ndata = xmalloc_aligned(data_len, alignment);
+	ndata = (ptr_t)xmalloc_aligned(data_len, alignment);
 
 	if (ndata == 0) {
 		return(E_OUTOFMEMORY);
@@ -5122,7 +5149,7 @@ RESULT optcl_command_write_12(const optcl_device *device,
 		return(error);
 	}
 
-	ndata = xmalloc_aligned(data_len, alignment);
+	ndata = (ptr_t)xmalloc_aligned(data_len, alignment);
 
 	if (ndata == 0) {
 		return(E_OUTOFMEMORY);
@@ -5208,7 +5235,7 @@ RESULT optcl_command_write_and_verify_10(const optcl_device *device,
 		return(error);
 	}
 
-	ndata = xmalloc_aligned(data_len, alignment);
+	ndata = (ptr_t)xmalloc_aligned(data_len, alignment);
 
 	if (ndata == 0) {
 		return(E_OUTOFMEMORY);
@@ -5298,7 +5325,7 @@ RESULT optcl_command_write_buffer(const optcl_device *device,
 		// Data in this mode should be aligned on 4 byte boundaries
 		alignment = 4;
 	} else if (command->mode != MMC_WRITE_BUFFER_MODE_DIS_EXPANDER) {
-		dataout = xmalloc_aligned(dataoutlen, alignment);
+		dataout = (ptr_t)xmalloc_aligned(dataoutlen, alignment);
 
 		if (dataout == 0) {
 			free(ndata);

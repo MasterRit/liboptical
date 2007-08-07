@@ -903,7 +903,7 @@ RESULT optcl_device_set_feature(optcl_device *device,
 		return(E_INVALIDARG);
 	}
 
-	key = malloc(sizeof(uint16_t));
+	key = (uint16_t*)malloc(sizeof(uint16_t));
 
 	if (key == 0) {
 		return(E_OUTOFMEMORY);

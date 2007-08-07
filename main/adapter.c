@@ -49,7 +49,7 @@ RESULT optcl_adapter_create(optcl_adapter **adapter)
 		return(E_INVALIDARG);
 	}
 
-	*adapter = malloc(sizeof(optcl_adapter));
+	*adapter = (optcl_adapter*)malloc(sizeof(optcl_adapter));
 
 	if (*adapter == 0) {
 		return(E_OUTOFMEMORY);

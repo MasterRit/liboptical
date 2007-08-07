@@ -541,7 +541,7 @@ RESULT optcl_array_set_size(optcl_array *array,
 		}
 	}
 
-	nbuffer = realloc(buffer, size * sizeof(ptr_t));
+	nbuffer = (ptr_t)realloc(buffer, size * sizeof(ptr_t));
 
 	if (nbuffer == 0 && size > 0) {
 		return(E_OUTOFMEMORY);

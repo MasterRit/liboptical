@@ -53,8 +53,8 @@ int optcl_profile_check_feature(const optcl_profile *profile,
 
 	error = optcl_hashtable_lookup(
 		profile->features, 
-		&feature_code, 
-		&descriptor);
+		(ptr_t)&feature_code, 
+		(pptr_t)&descriptor);
 
 	if (FAILED(error))
 		return error;
@@ -87,16 +87,16 @@ int optcl_profile_clear(optcl_profile *profile)
 
 int optcl_profile_copy(optcl_profile *dest, const optcl_profile *src)
 {
-	int error;
+	//int error;
 
-	assert(src);
-	assert(dest);
+	//assert(src);
+	//assert(dest);
 
-	if (!src || !dest)
-		return E_INVALIDARG;
-
-	
-
+	//if (!src || !dest)
+	//	return E_INVALIDARG;
 
 	return SUCCESS;
+
+	(void)dest;
+	(void)src;
 }

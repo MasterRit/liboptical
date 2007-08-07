@@ -417,7 +417,8 @@ static RESULT enumerate_device(int index,
 	 * This contains the devicepath we need to open the device
 	 */
 
-	pInterfaceDetailData = malloc(dwReqSize);
+	pInterfaceDetailData = (PSP_DEVICE_INTERFACE_DETAIL_DATA_A)
+		malloc(dwReqSize);
 
 	if (pInterfaceDetailData == 0) {
 		return(E_OUTOFMEMORY);

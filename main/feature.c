@@ -92,7 +92,8 @@ static RESULT parse_feature_descriptor(const uint8_t mmc_data[],
 		return(E_FEATINVHEADER);
 	}
 
-	ndescriptor = malloc(sizeof(optcl_feature_descriptor));
+	ndescriptor = (optcl_feature_descriptor*)
+		malloc(sizeof(optcl_feature_descriptor));
 
 	if (ndescriptor == 0) {
 		return(E_OUTOFMEMORY);
@@ -3044,7 +3045,7 @@ RESULT optcl_feature_copy(optcl_feature **dest, const optcl_feature *src)
 
 	free(*dest);
 
-	*dest = malloc(size);
+	*dest = (optcl_feature*)malloc(size);
 
 	if (*dest == 0) {
 		return(E_OUTOFMEMORY);
@@ -3073,7 +3074,7 @@ RESULT optcl_feature_create(uint16_t feature_code, optcl_feature **feature)
 		size = sizeof(optcl_feature_descriptor);
 	}
 
-	nfeature = malloc(size);
+	nfeature = (optcl_feature*)malloc(size);
 
 	if (nfeature == 0) {
 		return(E_OUTOFMEMORY);
