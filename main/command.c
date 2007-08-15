@@ -5032,7 +5032,7 @@ RESULT optcl_command_send_disc_structure(const optcl_device *device,
 	assert(dataout_len > 0);
 
 	if (dataout_len < 1) {
-		free(dataout);
+		free(ndata);
 		return(E_UNEXPECTED);
 	}
 
