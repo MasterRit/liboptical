@@ -22,9 +22,6 @@
 
 //#ifdef WIN32
 
-#define True			((bool_t)1)
-#define False			((bool_t)0)
-
 typedef unsigned __int8		bool_t;
 
 typedef __int8			int8_t;
@@ -41,6 +38,14 @@ typedef unsigned __int64	uint64_t;
 
 typedef uint8_t*		ptr_t;
 typedef uint8_t**		pptr_t;
+
+/*
+ * Boolean constants
+ */
+
+#define True			((bool_t)1)
+#define False			((bool_t)0)
+
 
 /*
  * Macros to convert from little-endian SCSI values to host endiannes
