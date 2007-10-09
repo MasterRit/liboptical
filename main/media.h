@@ -24,6 +24,7 @@
 
 
 /* Media info */
+struct tag_media_info;
 typedef struct tag_media_info optcl_media_info;
 
 

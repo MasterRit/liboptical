@@ -17,8 +17,6 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <stdafx.h>
-
 #include "adapter.h"
 #include "errors.h"
 #include "types.h"
@@ -29,13 +27,12 @@
 
 
 /* Adapter structure */
-typedef struct tag_adapter {
+struct tag_adapter {
 	uint32_t bus_type;
 	uint32_t max_transfer_len;
 	uint32_t max_physical_pages;
 	uint32_t alignment_mask;
-} optcl_adapter;
-
+};
 
 /*
  * Adapter functions

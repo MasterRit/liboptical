@@ -1396,126 +1396,148 @@ typedef struct tag_mmc_write_buffer {
  * Command functions
  */
 
-extern RESULT optcl_command_blank(const optcl_device *device,
-				  const optcl_mmc_blank *command);
+extern RESULT 
+optcl_command_blank(const optcl_device *device, const optcl_mmc_blank *command);
 
-extern RESULT optcl_command_close_track_session(const optcl_device *device,
-						const optcl_mmc_close_track_session *command);
+extern RESULT 
+optcl_command_close_track_session(const optcl_device *device, 
+	const optcl_mmc_close_track_session *command);
 
 extern RESULT optcl_command_destroy_response(optcl_mmc_response *response);
 
-extern RESULT optcl_command_format_unit(const optcl_device *device,
-					const optcl_mmc_format_unit *command);
+extern RESULT 
+optcl_command_format_unit(const optcl_device *device, 
+	const optcl_mmc_format_unit *command);
 
-extern RESULT optcl_command_get_configuration(const optcl_device *device,
-					      const optcl_mmc_get_configuration *command,
-					      optcl_mmc_response_get_configuration **response);
+extern RESULT 
+optcl_command_get_configuration(const optcl_device *device, 
+	const optcl_mmc_get_configuration *command, 
+	optcl_mmc_response_get_configuration **response);
 
-extern RESULT optcl_command_get_event_status(const optcl_device *device,
-					     const optcl_mmc_get_event_status *command,
-					     optcl_mmc_response_get_event_status **response);
+extern RESULT 
+optcl_command_get_event_status(const optcl_device *device,
+	const optcl_mmc_get_event_status *command, 
+	optcl_mmc_response_get_event_status **response);
 
-extern RESULT optcl_command_get_performance(const optcl_device *device,
-					    const optcl_mmc_get_performance *command,
-					    optcl_mmc_response_get_performance **response);
+extern RESULT 
+optcl_command_get_performance(const optcl_device *device,
+	const optcl_mmc_get_performance *command,
+	optcl_mmc_response_get_performance **response);
 
-extern RESULT optcl_command_inquiry(const optcl_device *device, 
-				    const optcl_mmc_inquiry *command, 
-				    optcl_mmc_response_inquiry **response);
+extern RESULT 
+optcl_command_inquiry(const optcl_device *device,
+	const optcl_mmc_inquiry *command, optcl_mmc_response_inquiry **response);
 
-extern RESULT optcl_command_load_unload_medium(const optcl_device *device,
-					       const optcl_mmc_load_unload_medium *command);
+extern RESULT 
+optcl_command_load_unload_medium(const optcl_device *device,
+	const optcl_mmc_load_unload_medium *command);
 
-extern RESULT optcl_command_mechanism_status(const optcl_device *device,
-					     optcl_mmc_response_mechanism_status **response);
+extern RESULT 
+optcl_command_mechanism_status(const optcl_device *device,
+	optcl_mmc_response_mechanism_status **response);
 
-extern RESULT optcl_command_mode_sense_10(const optcl_device *device,
-					  const optcl_mmc_mode_sense *command,
-					  optcl_mmc_response_mode_sense **response);
+extern RESULT 
+optcl_command_mode_sense_10(const optcl_device *device,
+	const optcl_mmc_mode_sense *command,
+	optcl_mmc_response_mode_sense **response);
 
-extern RESULT optcl_command_mode_select_10(const optcl_device *device,
-					   const optcl_mmc_mode_select *command);
+extern RESULT 
+optcl_command_mode_select_10(const optcl_device *device,
+	const optcl_mmc_mode_select *command);
 
-extern RESULT optcl_command_prevent_allow_removal(const optcl_device *device,
-						  const optcl_mmc_prevent_allow_removal *command);
+extern RESULT 
+optcl_command_prevent_allow_removal(const optcl_device *device,
+	const optcl_mmc_prevent_allow_removal *command);
 
-extern RESULT optcl_command_read_10(const optcl_device *device,
-				    const optcl_mmc_read_10 *command,
-				    optcl_mmc_response_read **response);
+extern RESULT 
+optcl_command_read_10(const optcl_device *device,
+	const optcl_mmc_read_10 *command, optcl_mmc_response_read **response);
 
-extern RESULT optcl_command_read_12(const optcl_device *device,
-				    const optcl_mmc_read_12 *command,
-				    optcl_mmc_response_read **response);
+extern RESULT 
+optcl_command_read_12(const optcl_device *device,
+	const optcl_mmc_read_12 *command, optcl_mmc_response_read **response);
 
-extern RESULT optcl_command_read_buffer(const optcl_device *device,
-					const optcl_mmc_read_buffer *command,
-					optcl_mmc_response_read_buffer **response);
+extern RESULT 
+optcl_command_read_buffer(const optcl_device *device,
+	const optcl_mmc_read_buffer *command, 
+	optcl_mmc_response_read_buffer **response);
 
-extern RESULT optcl_command_read_buffer_capacity(const optcl_device *device,
-						 const optcl_mmc_read_buffer_capacity *command,
-						 optcl_mmc_response_read_buffer_capacity **response);
+extern RESULT 
+optcl_command_read_buffer_capacity(const optcl_device *device,
+	const optcl_mmc_read_buffer_capacity *command, 
+	optcl_mmc_response_read_buffer_capacity **response);
 
-extern RESULT optcl_command_read_capacity(const optcl_device *device,
-					  optcl_mmc_response_read_capacity **response);
+extern RESULT 
+optcl_command_read_capacity(const optcl_device *device, 
+	optcl_mmc_response_read_capacity **response);
 
-extern RESULT optcl_command_read_msn(const optcl_device *device,
-				     optcl_mmc_response_read_msn **response);
+extern RESULT 
+optcl_command_read_msn(const optcl_device *device,
+	optcl_mmc_response_read_msn **response);
 
-extern RESULT optcl_command_repair_track(const optcl_device *device,
-					 const optcl_mmc_repair_track *command);
+extern RESULT 
+optcl_command_repair_track(const optcl_device *device,
+	const optcl_mmc_repair_track *command);
 
-extern RESULT optcl_command_request_sense(const optcl_device *device,
-					  const optcl_mmc_request_sense *command,
-					  optcl_mmc_response_request_sense **response);
+extern RESULT 
+optcl_command_request_sense(const optcl_device *device, 
+	const optcl_mmc_request_sense *command, 
+	optcl_mmc_response_request_sense **response);
 
-extern RESULT optcl_command_reserve_track(const optcl_device *device,
-					  const optcl_mmc_reserve_track *command);
+extern RESULT 
+optcl_command_reserve_track(const optcl_device *device, 
+	const optcl_mmc_reserve_track *command);
 
-extern RESULT optcl_command_seek(const optcl_device *device,
-				 const optcl_mmc_seek *command);
+extern RESULT 
+optcl_command_seek(const optcl_device *device, const optcl_mmc_seek *command);
 
-extern RESULT optcl_command_send_disc_structure(const optcl_device *device,
-						const optcl_mmc_send_disc_structure *command);
+extern RESULT 
+optcl_command_send_disc_structure(const optcl_device *device, 
+	const optcl_mmc_send_disc_structure *command);
 
-extern RESULT optcl_command_send_opc_information(const optcl_device *device,
-						 const optcl_mmc_send_opc_information *command);
+extern RESULT 
+optcl_command_send_opc_information(const optcl_device *device, 
+	const optcl_mmc_send_opc_information *command);
 
-extern RESULT optcl_command_set_cd_speed(const optcl_device *device,
-					 const optcl_mmc_set_cd_speed *command);
+extern RESULT 
+optcl_command_set_cd_speed(const optcl_device *device,
+	const optcl_mmc_set_cd_speed *command);
 
-extern RESULT optcl_command_set_read_ahead(const optcl_device *device,
-					   const optcl_mmc_set_read_ahead *command);
+extern RESULT 
+optcl_command_set_read_ahead(const optcl_device *device,
+	const optcl_mmc_set_read_ahead *command);
 
-extern RESULT optcl_command_start_stop_unit(const optcl_device *device,
-					    const optcl_mmc_start_stop_unit *command);
+extern RESULT 
+optcl_command_start_stop_unit(const optcl_device *device,
+	const optcl_mmc_start_stop_unit *command);
 
-extern RESULT optcl_command_set_streaming(const optcl_device *device,
-					  const optcl_mmc_set_streaming *command);
+extern RESULT 
+optcl_command_set_streaming(const optcl_device *device,
+	const optcl_mmc_set_streaming *command);
 
-extern RESULT optcl_command_synchronize_cache(const optcl_device *device,
-					      const optcl_mmc_synchronize_cache *command);
+extern RESULT 
+optcl_command_synchronize_cache(const optcl_device *device,
+	const optcl_mmc_synchronize_cache *command);
 
 extern RESULT optcl_command_test_unit_ready(const optcl_device *device);
 
-extern RESULT optcl_command_verify(const optcl_device *device,
-				   const optcl_mmc_verify *command);
+extern RESULT 
+optcl_command_verify(const optcl_device *device, const optcl_mmc_verify *command);
 
-extern RESULT optcl_command_write(const optcl_device *device,
-				  const optcl_mmc_write *command,
-				  ptr_t data,
-				  uint32_t data_len);
+extern RESULT 
+optcl_command_write(const optcl_device *device,
+	const optcl_mmc_write *command, ptr_t data, uint32_t data_len);
 
-extern RESULT optcl_command_write_12(const optcl_device *device,
-				     const optcl_mmc_write_12 *command,
-				     ptr_t data,
-				     uint32_t data_len);
+extern RESULT 
+optcl_command_write_12(const optcl_device *device,
+	const optcl_mmc_write_12 *command, ptr_t data, uint32_t data_len);
 
-extern RESULT optcl_command_write_and_verify_10(const optcl_device *device,
-						const optcl_mmc_write_and_verify_10 *command,
-						ptr_t data,
-						uint32_t data_len);
+extern RESULT 
+optcl_command_write_and_verify_10(const optcl_device *device,
+	const optcl_mmc_write_and_verify_10 *command, ptr_t data, uint32_t data_len);
 
-extern RESULT optcl_command_write_buffer(const optcl_device *device,
-					 const optcl_mmc_write_buffer *command);
+extern RESULT 
+optcl_command_write_buffer(const optcl_device *device, 
+	const optcl_mmc_write_buffer *command);
 
 #endif /* _COMMAND_H */

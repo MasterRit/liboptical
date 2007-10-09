@@ -17,10 +17,9 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "stdafx.h"
-
 #include "debug.h"
 #include "errors.h"
+#include "helpers.h"
 #include "types.h"
 
 #include <assert.h>
@@ -53,7 +52,7 @@ RESULT optcl_debug_log_bytes(const char message[],
 {
 	uint32_t i;
 	FILE *stream;
-	errno_t errno;
+	errno_t error;
 
 	assert(message != 0);
 
@@ -65,22 +64,22 @@ RESULT optcl_debug_log_bytes(const char message[],
 		stream = stderr;
 	} else {
 #ifdef _WIN32
-		errno = fopen_s(&stream, _log_file, "a+");
+		error = fopen_s(&stream, _log_file, "a");
 #else
-		stream = fopen(_log_file, "a+");
-		_get_errno(&errno);
+		stream = fopen(_log_file, "a");
+		error = errno;
 #endif
 
-		if (stream == 0 || errno != 0) {
+		if (stream == 0) {
 			return(MAKE_ERRORCODE(
 				SEVERITY_ERROR,
 				FACILITY_GENERAL,
-				errno
+				error
 				));
 		}
 	}
 
-	fprintf(stream, "%s\r\n\n\n", message);
+	fprintf(stream, "%s\r\n\n", message);
 
 	if (data != 0 && size > 0) {
 		for(i = 0; i < size; ++i) {
@@ -94,7 +93,7 @@ RESULT optcl_debug_log_bytes(const char message[],
 		fprintf(stream, "%s", "null");
 	}
 
-	fprintf(stream, "%s", "\r\n\n\n");
+	fprintf(stream, "%s", "\r\n\n");
 	fclose(stream);
 
 	return(SUCCESS);

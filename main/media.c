@@ -17,8 +17,6 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <stdafx.h>
-
 #include <assert.h>
 #include <malloc.h>
 
@@ -35,10 +33,10 @@
 #endif
 
 /* Media info */
-typedef struct tag_media_info {
+struct tag_media_info {
 	int type;
 	optcl_hashtable *profiles;
-} optcl_media_info;
+};
 
 
 int optcl_media_info_create(optcl_media_info **media)

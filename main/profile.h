@@ -80,6 +80,7 @@
 
 
 /* Device profile */
+struct tag_profile;
 typedef struct tag_profile optcl_profile;
 
 /*

@@ -17,8 +17,6 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <stdafx.h>
-
 #include "sensedata.h"
 
 #include <assert.h>
@@ -84,6 +82,7 @@
 
 #define SPT_SENSE_LENGTH	32U
 #define SPTWB_DATA_LENGTH	256U
+#define SCSI_COMMAND_TIMEOUT	30000U
 
 
 typedef struct _SCSI_PASS_THROUGH_WITH_BUFFERS {
@@ -499,7 +498,7 @@ static RESULT enumerate_device(int index,
 	error = optcl_device_set_type(ndevice, response->device_type);
 
 	if (FAILED(error)) {
-		free(response);
+		optcl_command_destroy_response(response);
 		destroy_error = optcl_device_destroy(ndevice);
 		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
@@ -507,7 +506,7 @@ static RESULT enumerate_device(int index,
 	tmp = xstrdup((char*)response->product);
 
 	if (tmp == 0 && response->product != 0) {
-		free(response);
+		optcl_command_destroy_response(response);
 		destroy_error = optcl_device_destroy(ndevice);
 		return(SUCCEEDED(destroy_error) ? E_OUTOFMEMORY : destroy_error);
 	}
@@ -515,7 +514,7 @@ static RESULT enumerate_device(int index,
 	error = optcl_device_set_product(ndevice, tmp);
 
 	if (FAILED(error)) {
-		free(response);
+		optcl_command_destroy_response(response);
 		destroy_error = optcl_device_destroy(ndevice);
 		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
@@ -523,7 +522,7 @@ static RESULT enumerate_device(int index,
 	tmp = xstrdup((char*)response->vendor);
 
 	if (tmp == 0 && response->vendor != 0) {
-		free(response);
+		optcl_command_destroy_response(response);
 		destroy_error = optcl_device_destroy(ndevice);
 		return(SUCCEEDED(destroy_error) ? error : E_OUTOFMEMORY);
 	}
@@ -531,7 +530,7 @@ static RESULT enumerate_device(int index,
 	error = optcl_device_set_vendor(ndevice, tmp);
 
 	if (FAILED(error)) {
-		free(response);
+		optcl_command_destroy_response(response);
 		destroy_error = optcl_device_destroy(ndevice);
 		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
@@ -539,7 +538,7 @@ static RESULT enumerate_device(int index,
 	tmp = xstrdup((char*)response->vendor_string);
 
 	if (tmp == 0 && response->vendor_string != 0) {
-		free(response);
+		optcl_command_destroy_response(response);
 		destroy_error = optcl_device_destroy(ndevice);
 		return(SUCCEEDED(destroy_error) ? error : E_OUTOFMEMORY);
 	}
@@ -547,12 +546,12 @@ static RESULT enumerate_device(int index,
 	error = optcl_device_set_vendor_string(ndevice, tmp);
 
 	if (FAILED(error)) {
-		free(response);
+		optcl_command_destroy_response(response);
 		destroy_error = optcl_device_destroy(ndevice);
 		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
-	free(response);
+	optcl_command_destroy_response(response);
 
 	error = enumerate_device_features(ndevice);
 
@@ -640,10 +639,10 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 	RESULT error;
 	RESULT sense_code;
 
-	char *path;
 	DWORD bytes;
 	BOOL success;
 	HANDLE hDevice;
+	char *path = 0;
 	DWORD dwErrorCode;
 	SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER sptdwb;
 
@@ -691,8 +690,8 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 	sptdwb.sptd.Length = sizeof(sptdwb.sptd);
 	sptdwb.sptd.SenseInfoLength = sizeof(sptdwb.ucSenseBuf);
 	sptdwb.sptd.SenseInfoOffset = offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER, ucSenseBuf);
+	sptdwb.sptd.TimeOutValue = SCSI_COMMAND_TIMEOUT;
 	sptdwb.sptd.TargetId = 1;
-	sptdwb.sptd.TimeOutValue = 2;
 
 	OPTCL_TRACE_ARRAY_MSG("CDB bytes:", cdb, cdb_size);
 	OPTCL_TRACE_ARRAY_MSG("CDB parameter bytes:", param, param_size);
@@ -711,16 +710,10 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 
 	CloseHandle(hDevice);
 
-	dwErrorCode = GetLastError();
-
-	OPTCL_TRACE_ARRAY_MSG("DeviceIoControl error code:", (uint8_t*)&dwErrorCode, sizeof(dwErrorCode));
-
 	if (success == FALSE && dwErrorCode != ERROR_INSUFFICIENT_BUFFER) {
-		error = MAKE_ERRORCODE(
-			SEVERITY_ERROR, 
-			FACILITY_DEVICE, 
-			dwErrorCode
-			);
+		dwErrorCode = GetLastError();
+		OPTCL_TRACE_ARRAY_MSG("DeviceIoControl error code:", (uint8_t*)&dwErrorCode, sizeof(dwErrorCode));
+		error = MAKE_ERRORCODE(SEVERITY_ERROR, FACILITY_DEVICE, dwErrorCode);
 	}
 
 	if (success == FALSE && bytes != 0) {

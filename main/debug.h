@@ -35,9 +35,8 @@
 extern RESULT optcl_debug_set_log_file(char filename[]);
 
 /* Log array of bytes to log file */
-extern RESULT optcl_debug_log_bytes(const char message[],
-				    const uint8_t data[],
-				    uint32_t size);
+extern RESULT 
+optcl_debug_log_bytes(const char message[], const uint8_t data[], uint32_t size);
 
 
 /*

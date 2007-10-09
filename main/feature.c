@@ -17,8 +17,6 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "stdafx.h"
-
 #include "errors.h"
 #include "feature.h"
 #include "helpers.h"
@@ -2616,7 +2614,6 @@ static RESULT parse_drive_serial_number(const uint8_t mmc_data[],
 {
 	RESULT error;
 	bool_t check;
-	uint32_t length;
 	optcl_feature_descriptor *descriptor = 0;
 	optcl_feature_drive_serial_number *feature = 0;
 
@@ -2658,15 +2655,11 @@ static RESULT parse_drive_serial_number(const uint8_t mmc_data[],
 	free(descriptor);
 
 	if (feature->descriptor.additional_length > 0) {
-		length = (feature->descriptor.additional_length < sizeof(feature->serial_number))
-			? feature->descriptor.additional_length
-			: sizeof(feature->serial_number);
-
 		xstrncpy(
 			(char*)&feature->serial_number,
 			sizeof(feature->serial_number),
 			(const char*)&mmc_data[4], 
-			length
+			feature->descriptor.additional_length
 			);
 	}
 

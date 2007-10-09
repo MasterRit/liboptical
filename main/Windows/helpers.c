@@ -17,8 +17,6 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "stdafx.h"
-
 #include "helpers.h"
 
 #include <assert.h>
@@ -56,6 +54,13 @@ char* xstrdup(const char *string)
 errno_t xstrncpy(char *dest, size_t dest_size, const char *src, size_t count)
 {
 	errno_t errno = strncpy_s(dest, dest_size, src, count);
+	assert(errno == 0);
+	return(errno);
+}
+
+errno_t xstrcat(char *dest, size_t dest_size, const char *src)
+{
+	errno_t errno = strcat_s(dest, dest_size, src);
 	assert(errno == 0);
 	return(errno);
 }

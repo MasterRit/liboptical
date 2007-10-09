@@ -34,6 +34,7 @@
 
 
 /* Device descriptor */
+struct tag_device;
 typedef struct tag_device optcl_device;
 
 /* Bind device to an image file */

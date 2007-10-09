@@ -17,8 +17,6 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "stdafx.h"
-
 #include "array.h"
 #include "errors.h"
 
@@ -28,17 +26,14 @@
 
 
 /*
- * Array internal structures
+ * Array structure
  */
-
 struct tag_optcl_array {
 	ptr_t buffer;
 	uint32_t count;
 	uint32_t element_size;
 	optcl_array_equalfn equalfn;
 };
-
-typedef struct tag_optcl_array optcl_array;
 
 
 /*

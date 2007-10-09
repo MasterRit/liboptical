@@ -20,9 +20,7 @@
 #ifndef _TYPES_H
 #define _TYPES_H
 
-//#ifdef WIN32
-
-typedef unsigned __int8		bool_t;
+#ifdef WIN32
 
 typedef __int8			int8_t;
 typedef __int16			int16_t;
@@ -34,8 +32,13 @@ typedef unsigned __int16	uint16_t;
 typedef unsigned __int32	uint32_t;
 typedef unsigned __int64	uint64_t;
 
-//#endif
+#elif defined __GNUC__
 
+#include <stdint.h>
+
+#endif
+
+typedef uint8_t			bool_t;
 typedef uint8_t*		ptr_t;
 typedef uint8_t**		pptr_t;
 
@@ -150,12 +153,12 @@ typedef uint8_t**		pptr_t;
  * Helper macros
  */
 
-#define uint32_from_le_bytes(b0, b1, b2, b3)	((uint32_t)uint32_from_le(		\
-	(uint8_t)b0 << 24 | (uint8_t)b1 << 16 | (uint8_t)b2 << 8 | (uint8_t)b3		\
+#define uint32_from_le_bytes(b0, b1, b2, b3)	((uint32_t)uint32_from_le(	\
+	(uint8_t)b0 << 24 | (uint8_t)b1 << 16 | (uint8_t)b2 << 8 | (uint8_t)b3	\
 	))
 
-#define uint32_from_be_bytes(b0, b1, b2, b3)	((uint32_t)uint32_from_be(		\
-	(uint8_t)b3 << 24 | (uint8_t)b2 << 16 | (uint8_t)b1 << 8 | (uint8_t)b0		\
+#define uint32_from_be_bytes(b0, b1, b2, b3)	((uint32_t)uint32_from_be(	\
+	(uint8_t)b3 << 24 | (uint8_t)b2 << 16 | (uint8_t)b1 << 8 | (uint8_t)b0	\
 	))
 
 #define bool_from_uint8(val)	((bool_t)((val) > 0))

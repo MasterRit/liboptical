@@ -19,8 +19,6 @@
     $Id$
 */
 
-#include <stdafx.h>
-
 #include "device.h"
 #include "errors.h"
 #include "transport.h"

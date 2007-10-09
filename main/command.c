@@ -17,8 +17,6 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <stdafx.h>
-
 #include "adapter.h"
 #include "command.h"
 #include "errors.h"
@@ -3016,12 +3014,6 @@ RESULT optcl_command_get_configuration(const optcl_device *device,
 		&& command->rt != MMC_GET_CONFIG_RT_CURRENT 
 		&& command->rt != MMC_GET_CONFIG_RT_FROM)
 	{
-		return(E_INVALIDARG);
-	}
-
-	assert(command->start_feature >= 0);
-
-	if (command->start_feature < 0) {
 		return(E_INVALIDARG);
 	}
 

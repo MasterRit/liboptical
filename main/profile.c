@@ -17,8 +17,6 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "stdafx.h"
-
 #include "errors.h"
 #include "feature.h"
 #include "hashtable.h"
@@ -27,9 +25,9 @@
 #include <assert.h>
 
 /* Device profile */
-typedef struct tag_profile {
+struct tag_profile {
 	optcl_hashtable *features;
-} optcl_profile;
+};
 
 int optcl_profile_check_feature(const optcl_profile *profile, 
 				int feature_code,

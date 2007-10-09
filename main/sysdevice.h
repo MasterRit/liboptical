@@ -20,6 +20,7 @@
 #ifndef _SYSDEVICE_H
 #define _SYSDEVICE_H
 
+#include "device.h"
 #include "errors.h"
 #include "list.h"
 #include "types.h"

@@ -17,8 +17,6 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <stdafx.h>
-
 #include "adapter.h"
 #include "errors.h"
 #include "device.h"
@@ -46,17 +44,14 @@ typedef struct tag_device_info {
 	optcl_hashtable *features;
 } optcl_device_info;
 
-/* Device info */
-typedef struct tag_device_info optcl_device_info;
-
 /* Device descriptor */
-typedef struct tag_device {
+struct tag_device {
 	char *path;
 	uint16_t type;
 	optcl_list *medias;
 	optcl_adapter *adapter;
 	optcl_device_info *info;
-} optcl_device;
+};
 
 
 /*
@@ -277,7 +272,7 @@ RESULT optcl_device_bind2file(optcl_device *device, const char *filename)
 		return(error);
 	}
 
-	devicepath = _strdup(filename);
+	devicepath = xstrdup(filename);
 
 	if (devicepath == 0) {
 		return(E_OUTOFMEMORY);
