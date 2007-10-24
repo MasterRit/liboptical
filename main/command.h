@@ -155,7 +155,6 @@
 #define EVENT_ER_ER_FASTFORWARD			0x0103
 #define EVENT_ER_ER_PAUSE			0x0104
 #define EVENT_ER_ER_STOP			0x0106
-
 /* 0x0200 - 0x02FF ASCII button */
 /* 0xF000 - 0xFFFF Vendor unique */
 
@@ -195,8 +194,6 @@
 #define MMC_GET_PERF_DBI			0x04
 #define MMC_GET_PERF_DBI_CACHE_ZONE		0x05
 
-/* 0x06 - 0xFF Reserved */
-
 #define PERFORMANCE_READ_NOMINAL		0x10
 #define PERFORMANCE_READ_ENTIRE			0x11
 #define PERFORMANCE_READ_EXCEPTIONS		0x12
@@ -230,8 +227,6 @@
 #define MECHANISM_STATE_LEGACY_SCANNING		0x02
 #define MECHANISM_STATE_LEGACY_ACTIVE		0x03
 
-/* 0x04 - 0x06 reserved */
-
 #define MECHANISM_STATE_LEGACY_NO_STATE		0x07
 
 
@@ -259,12 +254,8 @@
 #define SENSE_WT_RAW				0x03
 #define SENSE_WT_LJR				0x04
 
-/* 0x05 - 0xFF Reserved */
-
 #define SENSE_MS_NB0PTR				0x00
 #define SENSE_MS_B0PTR_FF			0x01
-
-/* 0x02 - Reserved */
 
 #define SENSE_MS_B0PTR_NPPA			0x03
 
@@ -273,8 +264,6 @@
 #define SENSE_DBT_RAW_PWSC			0x02
 #define SENSE_DBT_RAW_PWSC_RAW			0x03
 
-/* 0x04 - 0x06 Reserved */
-
 #define SENSE_DBT_VENDOR0			0x07
 #define SENSE_DBT_MODE1				0x08
 #define SENSE_DBT_MODE2				0x09
@@ -282,8 +271,6 @@
 #define SENSE_DBT_MODE2_2056			0x0B
 #define SENSE_DBT_MODE2_2324			0x0C
 #define SENSE_DBT_MODE_MIXED			0x0D
-
-/* 0x0E - reserved */
 
 #define SENSE_DBT_VENDOR2			0x0F
 
@@ -298,7 +285,6 @@
 #define SENSE_MRIE_UGRE				0x04
 #define SENSE_MRIE_GNS				0x05
 #define SENSE_MRIE_ORIECOR			0x06
-
 /* 0x07 - 0x0B Reserved */
 /* 0x0C - 0x0F Vendor specific */
 
@@ -315,10 +301,6 @@
 #define MMC_READ_BUFFER_MODE_ECHO_DESC		0x0B
 #define MMC_READ_BUFFER_MODE_EXPANDER		0x1A
 
-/* 0x04 - 0x09 Reserved */
-/* 0x0C - 0x19 Reserved */
-/* 0x1B - 0x1F Reserved */
-
 
 /*
  * READ CD command field flags
@@ -332,8 +314,6 @@
 #define MMC_READ_CD_EST_MODE2_FORM1		0x04
 #define MMC_READ_CD_EST_MODE2_FORM2		0x05
 
-/* 0x06 - 0x07 Reserved */
-
 /* Main Channel Selection Bits */
 #define MMC_READ_CD_MCSB_NO_HEADER		0x00
 #define MMC_READ_CD_MCSB_4BYTE_HEADER		0x01
@@ -345,6 +325,27 @@
 #define MMC_READ_CD_C2EI_C2EC294		0x01
 #define MMC_READ_CD_C2EI_C2EC296		0x02
 
+/* Sub-channel Selection Bits */
+#define MMC_READ_CD_SCSB_NO_DATA		0x00
+#define MMC_READ_CD_SCSB_FORMQ_SUBCH		0x02
+#define MMC_READ_CD_SCSB_CORINTRW_SUBCH		0x04
+
+
+/*
+ * READ TRACK INFORMATION command field flags
+ */
+
+/* Logical BlockAddress/Track/Session Number Fields */
+#define MMC_READ_TRACK_INFO_LBA			0x00
+#define MMC_READ_TRACK_INFO_LTN			0x01
+#define MMC_READ_TRACK_INFO_SN			0x02
+
+/* Layer Jump Recording Status (LJRS) */
+#define RTI_LJRS_DAO_INCREMENTAL		0x00
+#define RTI_LJRS_LJ_UNSPECIFIED			0x01
+#define RTI_LJRS_LJ_MANUAL			0x10
+#define RTI_LJRS_LJ_REGULAR_INTERVAL		0x11 
+
 
 /*
  * SEND DISC STRUCTURE command field flags
@@ -354,57 +355,28 @@
 #define MMC_SDS_MEDIA_TYPE_DVD_HDDVD		0x00
 #define MMC_SDS_MEDIA_TYPE_BD			0x01
 
-/* All others - reserved */
-
 /* Format Field Definition for Media Type = 0 (DVD and HD DVD) */
-
-/* 0x00 - 0x03 Reserved */
-
 #define MMC_SDS_FMT_DVD_USD			0x04
 #define MMC_SDS_FMT_DVD_CM			0x05
-
-/* 0x06 - 0x0E Reserved */
-
 #define MMC_SDS_FMT_DVD_TIMESTAMP		0x0F
-
-/* 0x10 - 0x1F Reserved */
-
 #define MMC_SDS_FMT_DVD_LBI			0x20
 #define MMC_SDS_FMT_DVD_SMASA			0x21
 #define MMC_SDS_FMT_DVD_JIS			0x22
 #define MMC_SDS_FMT_DVD_MLJA			0x23
 #define MMC_SDS_FMT_DVD_RA			0x24
-
-/* 0x25 - 0x2F reserved */
-
 #define MMC_SDS_FMT_DVD_DCB			0x30
-
-/* 0x31 - 0xBF reserved */
-
 #define MMC_SDS_FMT_DVD_WP			0xC0
 
-/* 0xC1 - 0xFF reserved */
-
 /* Format Field Definition for Media Type = 1 (BD) */
-
-/* 0x00 - 0x0E Reserved */
-
 #define MMC_SDS_FMT_BD_TIMESTAMP		0x0F
 #define MMC_SDS_FMT_BD_PAC			0x30
 
-/* 0x31 - 0xFF Reserved */
-
 /* CGMS field values for Copyright Management */
-
 #define CGMS_CIPWR				0x00
-
-/* 0x01 Reserved */
-
 #define CGMS_OGOCMBM				0x02
 #define CGMS_NCIP				0x03
 
 /* Virtual Write Enable (VWE) field values */
-
 #define VWE_NOPWD_VIRT_WP_OFF			0x00
 #define VWE_NOPWD_VIRT_WP_ON			0x01
 #define VWE_NOPWD_PHYS_WP_OFF			0x02
@@ -415,7 +387,6 @@
 #define VWE_PWD_PHYS_WP_ON			0x07
 
 /* PAC type field values */
-
 #define PAC_GENERAL				0x00
 #define PAC_DWP					0x01
 
@@ -427,17 +398,12 @@
 #define MMC_SET_CD_SPEED_RC_CLV_NPCAV		0x00
 #define MMC_SET_CD_SPEED_RC_PCAV		0x01
 
-/* 0x02 - 0x03 Reserved */
-
 
 /*
  * SET STREAMING command field flags
  */
 
 #define MMC_SET_STREAMING_PERFORMANCE		0x00
-
-/* 0x01 - 0x04 Reserved */
-
 #define MMC_SET_STREAMING_DBI_CACHE_ZONE	0x05
 
 
@@ -446,17 +412,9 @@
  */
 
 #define MMC_SSUNIT_PWR_NOCHANGE			0x00
-
-/* 0x01 Reserved */
-
 #define MMC_SSUNIT_PWR_GOIDLE			0x02
 #define MMC_SSUNIT_PWR_GOSTANDBY		0x03
-
-/* 0x04 Reserved */
-
 #define MMC_SSUNIT_PWR_GOSLEEP			0x05
-
-/* 0x06 - 0x0F Reserved */
 
 
 /*
@@ -474,12 +432,6 @@
 #define MMC_WRITE_BUFFER_MODE_EN_EXPANDER		0x1A
 #define MMC_WRITE_BUFFER_MODE_DIS_EXPANDER		0x1B
 #define MMC_WRITE_BUFFER_MODE_APPLOG			0x1C
-
-/* 0x03 Reserved */
-/* 0x08 - 0x09 Reserved */
-/* 0x0B - 0x19 Reserved */
-/* 0x1D - 0x1F reserved */
-
 
 
 /*
@@ -1079,6 +1031,10 @@ typedef struct tag_mmc_read_cd {
 	uint8_t subchannel_sel;
 } optcl_mmc_read_cd;
 
+typedef struct tag_mmc_response_read_cd {
+	
+} optcl_mmc_response_read_cd;
+
 
 /*
  * READ MEDIA SERIAL NUMBER command structures
@@ -1090,6 +1046,44 @@ typedef struct tag_mmc_response_read_msn {
 	ptr_t msn;
 } optcl_mmc_response_read_msn;
 
+/*
+ * READ TRACK INFORMATION command structures
+ */
+typedef struct tag_mmc_read_track_info {
+	bool_t open;
+	uint8_t addrnum_type;
+	uint32_t lbatsnum;
+	uint16_t alloc_len; 
+} optcl_mmc_read_track_info;
+
+typedef struct tag_mmc_response_read_track_info {
+	optcl_mmc_response header;
+	uint16_t data_len;
+	uint8_t ltn_lsb;
+	uint8_t sn_lsb;
+	uint8_t ljrs;
+	bool_t damage;
+	bool_t copy;
+	uint8_t track_mode;
+	bool_t rt;
+	bool_t blank;
+	bool_t packet_inc;
+	bool_t fp;
+	uint8_t data_mode;
+	bool_t lra_v;
+	bool_t nwa_v;
+	uint32_t ltsa;
+	uint32_t nwa;
+	uint32_t free_blocks;
+	uint32_t fps_bf;
+	uint32_t lts;
+	uint32_t lra;
+	uint8_t ltn_msb;
+	uint8_t sn_msb;
+	uint32_t rclba;
+	uint32_t nlja;
+	uint32_t llja;
+} optcl_mmc_response_read_track_info;
 
 /*
  * REPAIR TRACK command structures
@@ -1403,7 +1397,8 @@ extern RESULT
 optcl_command_close_track_session(const optcl_device *device, 
 	const optcl_mmc_close_track_session *command);
 
-extern RESULT optcl_command_destroy_response(optcl_mmc_response *response);
+extern RESULT 
+optcl_command_destroy_response(optcl_mmc_response *response);
 
 extern RESULT 
 optcl_command_format_unit(const optcl_device *device, 
@@ -1426,7 +1421,8 @@ optcl_command_get_performance(const optcl_device *device,
 
 extern RESULT 
 optcl_command_inquiry(const optcl_device *device,
-	const optcl_mmc_inquiry *command, optcl_mmc_response_inquiry **response);
+	const optcl_mmc_inquiry *command, 
+	optcl_mmc_response_inquiry **response);
 
 extern RESULT 
 optcl_command_load_unload_medium(const optcl_device *device,
@@ -1451,11 +1447,13 @@ optcl_command_prevent_allow_removal(const optcl_device *device,
 
 extern RESULT 
 optcl_command_read_10(const optcl_device *device,
-	const optcl_mmc_read_10 *command, optcl_mmc_response_read **response);
+	const optcl_mmc_read_10 *command, 
+	optcl_mmc_response_read **response);
 
 extern RESULT 
 optcl_command_read_12(const optcl_device *device,
-	const optcl_mmc_read_12 *command, optcl_mmc_response_read **response);
+	const optcl_mmc_read_12 *command, 
+	optcl_mmc_response_read **response);
 
 extern RESULT 
 optcl_command_read_buffer(const optcl_device *device,
@@ -1471,9 +1469,19 @@ extern RESULT
 optcl_command_read_capacity(const optcl_device *device, 
 	optcl_mmc_response_read_capacity **response);
 
+extern RESULT
+optcl_command_read_cd(const optcl_device *device,
+	const optcl_mmc_read_cd *command,
+	optcl_mmc_response_read_cd **response);
+
 extern RESULT 
 optcl_command_read_msn(const optcl_device *device,
 	optcl_mmc_response_read_msn **response);
+
+extern RESULT
+optcl_command_read_track_information(const optcl_device *device,
+	const optcl_mmc_read_track_info *command,
+	optcl_mmc_response_read_track_info **response);
 
 extern RESULT 
 optcl_command_repair_track(const optcl_device *device,
@@ -1519,22 +1527,29 @@ extern RESULT
 optcl_command_synchronize_cache(const optcl_device *device,
 	const optcl_mmc_synchronize_cache *command);
 
-extern RESULT optcl_command_test_unit_ready(const optcl_device *device);
+extern RESULT 
+optcl_command_test_unit_ready(const optcl_device *device);
 
 extern RESULT 
-optcl_command_verify(const optcl_device *device, const optcl_mmc_verify *command);
+optcl_command_verify(const optcl_device *device, 
+	const optcl_mmc_verify *command);
 
 extern RESULT 
 optcl_command_write(const optcl_device *device,
-	const optcl_mmc_write *command, ptr_t data, uint32_t data_len);
+	const optcl_mmc_write *command, ptr_t data, 
+	uint32_t data_len);
 
 extern RESULT 
 optcl_command_write_12(const optcl_device *device,
-	const optcl_mmc_write_12 *command, ptr_t data, uint32_t data_len);
+	const optcl_mmc_write_12 *command, 
+	ptr_t data, 
+	uint32_t data_len);
 
 extern RESULT 
 optcl_command_write_and_verify_10(const optcl_device *device,
-	const optcl_mmc_write_and_verify_10 *command, ptr_t data, uint32_t data_len);
+	const optcl_mmc_write_and_verify_10 *command, 
+	ptr_t data, 
+	uint32_t data_len);
 
 extern RESULT 
 optcl_command_write_buffer(const optcl_device *device, 

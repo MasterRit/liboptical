@@ -54,6 +54,7 @@
 #define MMC_OPCODE_READ_CAPACITY		0x0025
 #define MMC_OPCODE_READ_CD			0x00BE
 #define MMC_OPCODE_READ_MSN			0x00AB
+#define MMC_OPCODE_READ_TRACK_INFORMATION	0x0052
 #define MMC_OPCODE_REPAIR_TRACK			0x0058
 #define MMC_OPCODE_REQUEST_SENSE		0x0003
 #define MMC_OPCODE_RESERVE_TRACK		0x0053
@@ -4607,6 +4608,13 @@ RESULT optcl_command_read_capacity(const optcl_device *device,
 	return(error);
 }
 
+RESULT optcl_command_read_cd(const optcl_device *device,
+			     const optcl_mmc_read_cd *command,
+			     optcl_mmc_response_read_cd **response)
+{
+	
+}
+
 RESULT optcl_command_read_msn(const optcl_device *device,
 			      optcl_mmc_response_read_msn **response)
 {
@@ -4742,6 +4750,125 @@ RESULT optcl_command_read_msn(const optcl_device *device,
 	return(error);
 }
 
+RESULT optcl_command_read_track_information(const optcl_device *device,
+					    const optcl_mmc_read_track_info *command,
+					    optcl_mmc_response_read_track_info **response)
+{
+	RESULT error;
+	RESULT destroy_error;
+	
+	cdb10 cdb;
+	uint32_t alignment;
+	ptr_t mmc_response = 0;
+	optcl_adapter *adapter = 0;
+	optcl_mmc_response_read_track_info *nresponse = 0;
+	
+	assert(device != NULL);
+	assert(command != NULL);
+	assert(response != NULL);
+	
+	if (device == 0 || command == 0 || response == 0) {
+		return(E_INVALIDARG);
+	}
+	
+	error = optcl_device_get_adapter(device, &adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+
+	assert(adapter != 0);
+
+	if (adapter == 0) {
+		return(E_POINTER);
+	}
+
+	error = optcl_adapter_get_alignment_mask(adapter, &alignment);
+
+	if (FAILED(error)) {
+		destroy_error = optcl_adapter_destroy(adapter);
+		return(SUCCEEDED(destroy_error) ? error : destroy_error);
+	}
+
+	error = optcl_adapter_destroy(adapter);
+
+	if (FAILED(error)) {
+		return(error);
+	}
+	
+	/*
+	 * Execute command
+	 */
+	
+	mmc_response = (ptr_t)xmalloc_aligned(48, alignment);
+	
+	if (mmc_response == 0) {
+		return(E_OUTOFMEMORY);
+	}
+	
+	memset(cdb, 0, sizeof(cdb));
+	
+	cdb[0] = MMC_OPCODE_READ_TRACK_INFORMATION;
+	cdb[1] = (uint8_t)(command->open << 2 | command->addrnum_type);
+	cdb[2] = (uint8_t)(command->lbatsnum >> 24);
+	cdb[3] = (uint8_t)((command->lbatsnum << 8) >> 24);
+	cdb[4] = (uint8_t)((command->lbatsnum << 16) >> 24);
+	cdb[5] = (uint8_t)((command->lbatsnum << 24) >> 24);
+	cdb[7] = (uint8_t)(command->alloc_len >> 8);
+	cdb[8] = (uint8_t)((command->alloc_len << 8) >> 8);
+	
+	error = optcl_device_command_execute(
+		device,
+		cdb,
+		sizeof(cdb),
+		mmc_response,
+		48
+		);
+	
+	if (FAILED(error)) {
+		xfree_aligned(mmc_response);
+		return(error);
+	}
+	
+	nresponse = (optcl_mmc_response_read_track_info*)
+		malloc(sizeof(optcl_mmc_response_read_track_info));
+	
+	if (nresponse == 0) {
+		xfree_aligned(mmc_response);
+		return(E_OUTOFMEMORY);
+	}
+	
+	nresponse->ltn_lsb = mmc_response[2];
+	nresponse->sn_lsb = mmc_response[3];
+	nresponse->ljrs = mmc_response[5] & 0xC0; 			/* 11000000 */
+	nresponse->damage = bool_from_uint8(mmc_response[5] & 0x20);	/* 00100000 */
+	nresponse->copy = bool_from_uint8(mmc_response[5] & 0x10);	/* 00010000 */
+	nresponse->track_mode = mmc_response[5] & 0x0F;			/* 00001111 */
+	nresponse->rt = bool_from_uint8(mmc_response[6] & 0x80);	/* 10000000 */
+	nresponse->blank = bool_from_uint8(mmc_response[6] & 0x40);	/* 01000000 */
+	nresponse->packet_inc = bool_from_uint8(mmc_response[6] & 0x20);/* 00100000 */
+	nresponse->fp = bool_from_uint8(mmc_response[6] & 0x10);	/* 00010000 */
+	nresponse->data_mode = mmc_response[6] & 0x0F;			/* 00001111 */
+	nresponse->lra_v = bool_from_uint8(mmc_response[7] & 0x02);	/* 00000010 */
+	nresponse->nwa_v = bool_from_uint8(mmc_response[7] & 0x01);	/* 00000001 */
+	nresponse->ltsa = uint32_from_be(*(uint32_t*)&mmc_response[8]);
+	nresponse->nwa = uint32_from_be(*(uint32_t*)&mmc_response[12]);
+	nresponse->free_blocks = uint32_from_be(*(uint32_t*)&mmc_response[16]);
+	nresponse->fps_bf = uint32_from_be(*(uint32_t*)&mmc_response[20]);
+	nresponse->lts = uint32_from_be(*(uint32_t*)&mmc_response[24]);
+	nresponse->lra = uint32_from_be(*(uint32_t*)&mmc_response[28]);
+	nresponse->ltn_msb = mmc_response[32];
+	nresponse->sn_msb = mmc_response[33];
+	nresponse->rclba = uint32_from_be(*(uint32_t*)&mmc_response[36]);
+	nresponse->nlja = uint32_from_be(*(uint32_t*)&mmc_response[40]);
+	nresponse->llja = uint32_from_be(*(uint32_t*)&mmc_response[44]);
+	
+	xfree_aligned(mmc_response);
+	
+	*response = nresponse;
+	
+	return(error);
+}
 
 RESULT optcl_command_repair_track(const optcl_device *device,
 				  const optcl_mmc_repair_track *command)
@@ -6142,6 +6269,31 @@ static RESULT deallocator_mmc_response_read_msn(optcl_mmc_response *response)
 	return(SUCCESS);
 }
 
+static RESULT deallocator_mmc_response_read_track_information(optcl_mmc_response *response)
+{
+	optcl_mmc_response_read_track_info *mmc_response = 0;
+	
+	if (response == 0) {
+		return(SUCCESS);
+	}
+	
+	assert(response->command_opcode == MMC_OPCODE_READ_TRACK_INFORMATION);
+	
+	if (response->command_opcode != MMC_OPCODE_READ_TRACK_INFORMATION) {
+		return(E_CMNDINVOPCODE);
+	}
+	
+	mmc_response = (optcl_mmc_response_read_track_info*)response;
+	
+	free(mmc_response);
+	
+	return(SUCCESS);
+}
+
+static RESULT deallocator_mmc_response_read_cd(optcl_mmc_response *response)
+{
+}
+
 static RESULT deallocator_mmc_response_request_sense(optcl_mmc_response *response) 
 {
 	if (response == 0) {
@@ -6176,7 +6328,9 @@ static struct response_deallocator_entry __deallocator_table[] = {
 	{ MMC_OPCODE_READ_12,			deallocator_mmc_response_read_10		},
 	{ MMC_OPCODE_READ_BUFFER,		deallocator_mmc_response_read_buffer		},
 	{ MMC_OPCODE_READ_BUFFER_CAPACITY,	deallocator_mmc_response_read_buffer_capcity	},
+	{ MMC_OPCODE_READ_CD,			deallocator_mmc_response_read_cd		},
 	{ MMC_OPCODE_READ_MSN,			deallocator_mmc_response_read_msn		},
+	{ MMC_OPCODE_READ_TRACK_INFORMATION,	deallocator_mmc_response_read_track_information },
 	{ MMC_OPCODE_REQUEST_SENSE,		deallocator_mmc_response_request_sense		}
 };
 
