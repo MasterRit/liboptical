@@ -29,7 +29,17 @@
 
 void* xmalloc_aligned(size_t size, size_t alignment)
 {
-	return _aligned_malloc(size, alignment);
+	ptr_t memptr = 0;
+	
+	memptr = _aligned_malloc(size, alignment);
+	
+	if (memptr == 0) {
+		return(0);
+	}
+	
+	memset(memptr, 0, size);
+	
+	return(memptr);
 }
 
 void* xrealloc_aligned(void *memblock, size_t size, size_t alignment)
