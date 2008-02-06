@@ -4612,7 +4612,7 @@ RESULT optcl_command_read_cd(const optcl_device *device,
 			     const optcl_mmc_read_cd *command,
 			     optcl_mmc_response_read_cd **response)
 {
-	
+    return SUCCESS;	
 }
 
 RESULT optcl_command_read_msn(const optcl_device *device,
@@ -6292,6 +6292,7 @@ static RESULT deallocator_mmc_response_read_track_information(optcl_mmc_response
 
 static RESULT deallocator_mmc_response_read_cd(optcl_mmc_response *response)
 {
+    return SUCCESS;
 }
 
 static RESULT deallocator_mmc_response_request_sense(optcl_mmc_response *response) 

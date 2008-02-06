@@ -498,7 +498,7 @@ static RESULT enumerate_device(int index,
 	error = optcl_device_set_type(ndevice, response->device_type);
 
 	if (FAILED(error)) {
-		optcl_command_destroy_response(response);
+		optcl_command_destroy_response((optcl_mmc_response*)response);
 		destroy_error = optcl_device_destroy(ndevice);
 		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
@@ -506,7 +506,7 @@ static RESULT enumerate_device(int index,
 	tmp = xstrdup((char*)response->product);
 
 	if (tmp == 0 && response->product != 0) {
-		optcl_command_destroy_response(response);
+		optcl_command_destroy_response((optcl_mmc_response*)response);
 		destroy_error = optcl_device_destroy(ndevice);
 		return(SUCCEEDED(destroy_error) ? E_OUTOFMEMORY : destroy_error);
 	}
@@ -514,7 +514,7 @@ static RESULT enumerate_device(int index,
 	error = optcl_device_set_product(ndevice, tmp);
 
 	if (FAILED(error)) {
-		optcl_command_destroy_response(response);
+		optcl_command_destroy_response((optcl_mmc_response*)response);
 		destroy_error = optcl_device_destroy(ndevice);
 		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
@@ -522,7 +522,7 @@ static RESULT enumerate_device(int index,
 	tmp = xstrdup((char*)response->vendor);
 
 	if (tmp == 0 && response->vendor != 0) {
-		optcl_command_destroy_response(response);
+		optcl_command_destroy_response((optcl_mmc_response*)response);
 		destroy_error = optcl_device_destroy(ndevice);
 		return(SUCCEEDED(destroy_error) ? error : E_OUTOFMEMORY);
 	}
@@ -530,7 +530,7 @@ static RESULT enumerate_device(int index,
 	error = optcl_device_set_vendor(ndevice, tmp);
 
 	if (FAILED(error)) {
-		optcl_command_destroy_response(response);
+		optcl_command_destroy_response((optcl_mmc_response*)response);
 		destroy_error = optcl_device_destroy(ndevice);
 		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
@@ -538,7 +538,7 @@ static RESULT enumerate_device(int index,
 	tmp = xstrdup((char*)response->vendor_string);
 
 	if (tmp == 0 && response->vendor_string != 0) {
-		optcl_command_destroy_response(response);
+		optcl_command_destroy_response((optcl_mmc_response*)response);
 		destroy_error = optcl_device_destroy(ndevice);
 		return(SUCCEEDED(destroy_error) ? error : E_OUTOFMEMORY);
 	}
@@ -546,12 +546,12 @@ static RESULT enumerate_device(int index,
 	error = optcl_device_set_vendor_string(ndevice, tmp);
 
 	if (FAILED(error)) {
-		optcl_command_destroy_response(response);
+		optcl_command_destroy_response((optcl_mmc_response*)response);
 		destroy_error = optcl_device_destroy(ndevice);
 		return(SUCCEEDED(destroy_error) ? error : destroy_error);
 	}
 
-	optcl_command_destroy_response(response);
+	optcl_command_destroy_response((optcl_mmc_response*)response);
 
 	error = enumerate_device_features(ndevice);
 
@@ -710,8 +710,9 @@ RESULT optcl_device_command_execute(const optcl_device *device,
 
 	CloseHandle(hDevice);
 
+    dwErrorCode = GetLastError();
+
 	if (success == FALSE && dwErrorCode != ERROR_INSUFFICIENT_BUFFER) {
-		dwErrorCode = GetLastError();
 		OPTCL_TRACE_ARRAY_MSG("DeviceIoControl error code:", (uint8_t*)&dwErrorCode, sizeof(dwErrorCode));
 		error = MAKE_ERRORCODE(SEVERITY_ERROR, FACILITY_DEVICE, dwErrorCode);
 	}

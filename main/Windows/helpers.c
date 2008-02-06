@@ -18,9 +18,12 @@
 */
 
 #include "helpers.h"
+#include "types.h"
 
 #include <assert.h>
 #include <malloc.h>
+#include <memory.h>
+#include <string.h>
 
 
 /*
@@ -31,7 +34,7 @@ void* xmalloc_aligned(size_t size, size_t alignment)
 {
 	ptr_t memptr = 0;
 	
-	memptr = _aligned_malloc(size, alignment);
+	memptr = (ptr_t)_aligned_malloc(size, alignment);
 	
 	if (memptr == 0) {
 		return(0);
@@ -63,16 +66,16 @@ char* xstrdup(const char *string)
 
 errno_t xstrncpy(char *dest, size_t dest_size, const char *src, size_t count)
 {
-	errno_t errno = strncpy_s(dest, dest_size, src, count);
-	assert(errno == 0);
-	return(errno);
+	errno_t err = strncpy_s(dest, dest_size, src, count);
+	assert(err == 0);
+	return(err);
 }
 
 errno_t xstrcat(char *dest, size_t dest_size, const char *src)
 {
-	errno_t errno = strcat_s(dest, dest_size, src);
-	assert(errno == 0);
-	return(errno);
+	errno_t err = strcat_s(dest, dest_size, src);
+	assert(err == 0);
+	return(err);
 }
 
 /*
@@ -81,7 +84,7 @@ errno_t xstrcat(char *dest, size_t dest_size, const char *src)
 
 errno_t xmemcpy(void *dest, size_t dest_size, const void *src, size_t count)
 {
-	errno_t errno = memcpy_s(dest, dest_size, src, count);
-	assert(errno == 0);
-	return(errno);
+	errno_t err = memcpy_s(dest, dest_size, src, count);
+	assert(err == 0);
+	return(err);
 }
