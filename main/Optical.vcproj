@@ -6,6 +6,7 @@
 	ProjectGUID="{B0F0D5E9-2C8F-4ED7-BD3D-05353E17D6FE}"
 	RootNamespace="Optical"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -53,7 +54,7 @@
 				RuntimeLibrary="3"
 				EnableFunctionLevelLinking="true"
 				RuntimeTypeInfo="false"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="$(OutDir)\$(TargetName).pch"
 				ObjectFile="$(OutDir)\"
 				ProgramDataBaseFileName="$(OutDir)\vc80.pdb"
@@ -61,7 +62,7 @@
 				BrowseInformation="1"
 				BrowseInformationFile="$(OutDir)\"
 				WarningLevel="4"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 				CompileAs="2"
 				EnablePREfast="true"
@@ -204,13 +205,13 @@
 				ExceptionHandling="0"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="false"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="$(OutDir)\$(TargetName).pch"
 				ObjectFile="$(OutDir)\"
 				ProgramDataBaseFileName="$(OutDir)\vc80.pdb"
 				XMLDocumentationFileName="$(OutDir)\"
 				WarningLevel="4"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				CompileAs="1"
 				EnablePREfast="true"
@@ -350,7 +351,7 @@
 				ExceptionHandling="0"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="false"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="$(OutDir)\$(TargetName).pch"
 				ObjectFile="$(OutDir)\"
 				ProgramDataBaseFileName="$(OutDir)\vc80.pdb"
@@ -358,7 +359,7 @@
 				BrowseInformation="1"
 				BrowseInformationFile="$(OutDir)\"
 				WarningLevel="4"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				CompileAs="1"
 				EnablePREfast="true"
@@ -534,58 +535,6 @@
 			<File
 				RelativePath=".\sensedata.c"
 				>
-			</File>
-			<File
-				RelativePath=".\stdafx.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Profile|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Profile|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\Windows\sysdevice.c"
