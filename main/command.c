@@ -6236,7 +6236,7 @@ static RESULT deallocator_mmc_response_read_buffer(optcl_mmc_response *response)
 	return(SUCCESS);
 }
 
-static RESULT deallocator_mmc_response_read_buffer_capcity(optcl_mmc_response *response)
+static RESULT deallocator_mmc_response_read_buffer_capacity(optcl_mmc_response *response)
 {
 	if (response == 0) {
 		return(SUCCESS);
@@ -6328,7 +6328,7 @@ static struct response_deallocator_entry __deallocator_table[] = {
 	{ MMC_OPCODE_READ_10,			deallocator_mmc_response_read_10		},
 	{ MMC_OPCODE_READ_12,			deallocator_mmc_response_read_10		},
 	{ MMC_OPCODE_READ_BUFFER,		deallocator_mmc_response_read_buffer		},
-	{ MMC_OPCODE_READ_BUFFER_CAPACITY,	deallocator_mmc_response_read_buffer_capcity	},
+	{ MMC_OPCODE_READ_BUFFER_CAPACITY,	deallocator_mmc_response_read_buffer_capacity	},
 	{ MMC_OPCODE_READ_CD,			deallocator_mmc_response_read_cd		},
 	{ MMC_OPCODE_READ_MSN,			deallocator_mmc_response_read_msn		},
 	{ MMC_OPCODE_READ_TRACK_INFORMATION,	deallocator_mmc_response_read_track_information },
