@@ -34,99 +34,99 @@
 
 /* Media info */
 struct tag_media_info {
-	int type;
-	optcl_hashtable *profiles;
+    int type;
+    optcl_hashtable *profiles;
 };
 
 
 int optcl_media_info_create(optcl_media_info **media)
 {
-	assert(media);
+    assert(media);
 
-	if (!media)
-		return E_INVALIDARG;
+    if (!media)
+        return E_INVALIDARG;
 
-	*media = (optcl_media_info*)malloc(sizeof(optcl_media_info));
+    *media = (optcl_media_info*)malloc(sizeof(optcl_media_info));
 
-	if (!*media)
-		return E_OUTOFMEMORY;
+    if (!*media)
+        return E_OUTOFMEMORY;
 
-	(*media)->type = -1;
+    (*media)->type = -1;
 
-	return optcl_hashtable_create(sizeof(int), 0, &(*media)->profiles);
+    return optcl_hashtable_create(sizeof(int), 0, &(*media)->profiles);
 }
 
 int optcl_media_info_clear(optcl_media_info *media)
 {
-	assert(media);
+    assert(media);
 
-	if (!media)
-		return E_INVALIDARG;
+    if (!media)
+        return E_INVALIDARG;
 
-	media->type = -1;
+    media->type = -1;
 
-	return optcl_hashtable_clear(media->profiles, 1);
+    return optcl_hashtable_clear(media->profiles, 1);
 }
 
-int optcl_media_info_copy(optcl_media_info *dest, 
-			  const optcl_media_info *src)
+int optcl_media_info_copy(optcl_media_info *dest,
+                          const optcl_media_info *src)
 {
-	assert(src);
-	assert(dest);
+    assert(src);
+    assert(dest);
 
-	if (!src || !dest)
-		return E_INVALIDARG;
+    if (!src || !dest)
+        return E_INVALIDARG;
 
-	dest->type = src->type;
+    dest->type = src->type;
 
-	return optcl_hashtable_copy(dest->profiles, src->profiles);
+    return optcl_hashtable_copy(dest->profiles, src->profiles);
 }
 
 int optcl_media_info_destroy(optcl_media_info *media)
 {
-	int error = SUCCESS;
+    int error = SUCCESS;
 
-	assert(media);
+    assert(media);
 
-	if (!media)
-		return E_INVALIDARG;
+    if (!media)
+        return E_INVALIDARG;
 
-	assert(media->profiles);
+    assert(media->profiles);
 
-	if (media->profiles)
-		error = optcl_hashtable_destroy(media->profiles, 1);
+    if (media->profiles)
+        error = optcl_hashtable_destroy(media->profiles, 1);
 
 #ifdef _DEBUG
-	media->profiles = (optcl_hashtable*)POISON;
+    media->profiles = (optcl_hashtable*)POISON;
 #endif
 
-	free(media);
+    free(media);
 
-	return error;
+    return error;
 }
 
 int optcl_media_info_get_type(const optcl_media_info *media, int *type)
 {
-	assert(media);
-	assert(type);
+    assert(media);
+    assert(type);
 
-	if (!media || !type)
-		return E_INVALIDARG;
+    if (!media || !type)
+        return E_INVALIDARG;
 
-	*type = media->type;
+    *type = media->type;
 
-	return SUCCESS;
+    return SUCCESS;
 }
 
-int optcl_media_info_get_profiles(const optcl_media_info *media, 
-				  optcl_list **profiles)
+int optcl_media_info_get_profiles(const optcl_media_info *media,
+                                  optcl_list **profiles)
 {
-	assert(media);
-	assert(profiles);
+    assert(media);
+    assert(profiles);
 
-	if (!media || !profiles)
-		return E_INVALIDARG;
+    if (!media || !profiles)
+        return E_INVALIDARG;
 
-	return optcl_hashtable_get_pairs(media->profiles, profiles);
+    return optcl_hashtable_get_pairs(media->profiles, profiles);
 }
 

@@ -26,75 +26,75 @@
 
 /* Device profile */
 struct tag_profile {
-	optcl_hashtable *features;
+    optcl_hashtable *features;
 };
 
-int optcl_profile_check_feature(const optcl_profile *profile, 
-				int feature_code,
-				int *present)
+int optcl_profile_check_feature(const optcl_profile *profile,
+                                int feature_code,
+                                int *present)
 {
-	int error;
-	optcl_feature_descriptor *descriptor = 0;
+    int error;
+    optcl_feature_descriptor *descriptor = 0;
 
-	assert(profile);
-	assert(present);
+    assert(profile);
+    assert(present);
 
-	if (!profile || !present)
-		return E_INVALIDARG;
+    if (!profile || !present)
+        return E_INVALIDARG;
 
-	assert(profile->features);
+    assert(profile->features);
 
-	if (!profile->features) {
-		*present = 0;
-		return SUCCESS;
-	}
+    if (!profile->features) {
+        *present = 0;
+        return SUCCESS;
+    }
 
-	error = optcl_hashtable_lookup(
-		profile->features, 
-		(ptr_t)&feature_code, 
-		(pptr_t)&descriptor);
+    error = optcl_hashtable_lookup(
+                profile->features,
+                (ptr_t)&feature_code,
+                (pptr_t)&descriptor);
 
-	if (FAILED(error))
-		return error;
+    if (FAILED(error))
+        return error;
 
-	*present = (descriptor) ? 1 : 0;
+    *present = (descriptor) ? 1 : 0;
 
-	return SUCCESS;
+    return SUCCESS;
 }
 
 int optcl_profile_clear(optcl_profile *profile)
 {
-	int error;
+    int error;
 
-	assert(profile);
+    assert(profile);
 
-	if (!profile)
-		return E_INVALIDARG;
+    if (!profile)
+        return E_INVALIDARG;
 
-	if (profile->features) {
-		error = optcl_hashtable_destroy(profile->features, 1);
+    if (profile->features) {
+        error = optcl_hashtable_destroy(profile->features, 1);
 
-		if (FAILED(error))
-			return error;
-	}
+        if (FAILED(error))
+            return error;
+    }
 
-	profile->features = 0;
+    profile->features = 0;
 
-	return SUCCESS;
+    return SUCCESS;
 }
 
 int optcl_profile_copy(optcl_profile *dest, const optcl_profile *src)
 {
-	//int error;
+    //int error;
 
-	//assert(src);
-	//assert(dest);
+    //assert(src);
+    //assert(dest);
 
-	//if (!src || !dest)
-	//	return E_INVALIDARG;
+    //if (!src || !dest)
+    //	return E_INVALIDARG;
 
-	return SUCCESS;
+    return SUCCESS;
 
-	(void)dest;
-	(void)src;
+    (void)dest;
+    (void)src;
 }

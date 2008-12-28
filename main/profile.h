@@ -85,12 +85,12 @@ typedef struct tag_profile optcl_profile;
 
 /*
  * Profile functions
- */ 
+ */
 
 /* Check if feature is present */
-int optcl_profile_check_feature(const optcl_profile *profile, 
-				int feature_code,
-				int *present);
+int optcl_profile_check_feature(const optcl_profile *profile,
+                                int feature_code,
+                                int *present);
 
 /* Clear profile structure */
 int optcl_profile_clear(optcl_profile *profile);
@@ -105,12 +105,12 @@ int optcl_profile_create(optcl_profile **profile);
 int optcl_profile_destroy(optcl_profile *profile);
 
 /* Get profile features */
-int optcl_profile_get_features(const optcl_profile *profile, 
-			       optcl_hashtable **features);
+int optcl_profile_get_features(const optcl_profile *profile,
+                               optcl_hashtable **features);
 
 /* Set device features */
-int optcl_profile_set_features(optcl_profile *profile, 
-			       optcl_hashtable *features);
+int optcl_profile_set_features(optcl_profile *profile,
+                               optcl_hashtable *features);
 
 #endif /* _PROFILE_H */
 

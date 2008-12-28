@@ -344,7 +344,7 @@
 #define RTI_LJRS_DAO_INCREMENTAL		0x00
 #define RTI_LJRS_LJ_UNSPECIFIED			0x01
 #define RTI_LJRS_LJ_MANUAL			0x10
-#define RTI_LJRS_LJ_REGULAR_INTERVAL		0x11 
+#define RTI_LJRS_LJ_REGULAR_INTERVAL		0x11
 
 
 /*
@@ -439,7 +439,7 @@
  */
 
 typedef struct tag_mmc_response {
-	uint16_t command_opcode;
+    uint16_t command_opcode;
 } optcl_mmc_response;
 
 
@@ -448,9 +448,9 @@ typedef struct tag_mmc_response {
  */
 
 typedef struct tag_mmc_blank {
-	bool_t immed;
-	uint8_t blanking_type;
-	uint32_t start_address;
+    bool_t immed;
+    uint8_t blanking_type;
+    uint32_t start_address;
 } optcl_mmc_blank;
 
 
@@ -459,9 +459,9 @@ typedef struct tag_mmc_blank {
  */
 
 typedef struct tag_mmc_close_track_session {
-	bool_t immed;
-	uint8_t close_function;
-	uint16_t logical_track_number;
+    bool_t immed;
+    uint8_t close_function;
+    uint16_t logical_track_number;
 } optcl_mmc_close_track_session;
 
 
@@ -470,34 +470,34 @@ typedef struct tag_mmc_close_track_session {
  */
 
 typedef struct tag_mmc_format_unit {
-	bool_t cmplist;
-	bool_t fov;
-	bool_t dcrt;
-	bool_t try_out;
-	bool_t immed;
-	bool_t vs;
-	uint32_t num_of_blocks;
-	uint8_t format_type;
-	uint8_t format_subtype;
-	union tag_type_dependent {
-		struct tag_ff_with_sparing {
-			uint8_t m;
-			uint8_t n;
-		} ff_with_sparing;
-		struct tag_dvd_plus_rw_basicf {
-			bool_t quick_start;
-			bool_t restart;
-		} dvd_plus_rw_basicf;
-		struct tag_bd_r_with_spare_areas {
-			bool_t isa_v;
-			bool_t tdma_v;
-			uint8_t sadp;
-			uint8_t tdmadp;
-		} bd_r_with_spare_areas;
-		struct tag_other {
-			uint32_t type_dependent;
-		} other;
-	} type_dependant;
+    bool_t cmplist;
+    bool_t fov;
+    bool_t dcrt;
+    bool_t try_out;
+    bool_t immed;
+    bool_t vs;
+    uint32_t num_of_blocks;
+    uint8_t format_type;
+    uint8_t format_subtype;
+    union tag_type_dependent {
+        struct tag_ff_with_sparing {
+            uint8_t m;
+            uint8_t n;
+        } ff_with_sparing;
+        struct tag_dvd_plus_rw_basicf {
+            bool_t quick_start;
+            bool_t restart;
+        } dvd_plus_rw_basicf;
+        struct tag_bd_r_with_spare_areas {
+            bool_t isa_v;
+            bool_t tdma_v;
+            uint8_t sadp;
+            uint8_t tdmadp;
+        } bd_r_with_spare_areas;
+        struct tag_other {
+            uint32_t type_dependent;
+        } other;
+    } type_dependant;
 } optcl_mmc_format_unit;
 
 
@@ -506,15 +506,15 @@ typedef struct tag_mmc_format_unit {
  */
 
 typedef struct tag_mmc_get_configuration {
-	uint8_t rt;
-	uint16_t start_feature;
+    uint8_t rt;
+    uint16_t start_feature;
 } optcl_mmc_get_configuration;
 
 typedef struct tag_mmc_response_get_configuration {
-	optcl_mmc_response header;
-	uint32_t data_length;
-	uint16_t current_profile;
-	optcl_list *descriptors;
+    optcl_mmc_response header;
+    uint32_t data_length;
+    uint16_t current_profile;
+    optcl_list *descriptors;
 } optcl_mmc_response_get_configuration;
 
 
@@ -523,69 +523,69 @@ typedef struct tag_mmc_response_get_configuration {
  */
 
 typedef struct tag_mmc_get_event_status {
-	bool_t polled;
-	uint8_t class_request;
-	uint16_t allocation_length;
+    bool_t polled;
+    uint8_t class_request;
+    uint16_t allocation_length;
 } optcl_mmc_get_event_status;
 
 typedef struct tag_mmc_ges_header {
-	bool_t nea;
-	uint8_t event_class;
-	uint8_t notification_class;
-	uint16_t descriptor_len;
+    bool_t nea;
+    uint8_t event_class;
+    uint8_t notification_class;
+    uint16_t descriptor_len;
 } optcl_mmc_ges_header;
 
 typedef struct tag_mmc_ges_operational_change {
-	optcl_mmc_ges_header header;
-	uint8_t status;
-	uint8_t event_code;
-	bool_t persistent_prev;
-	uint16_t change;
+    optcl_mmc_ges_header header;
+    uint8_t status;
+    uint8_t event_code;
+    bool_t persistent_prev;
+    uint16_t change;
 } optcl_mmc_ges_operational_change;
 
 typedef struct tag_mmc_ges_power_management {
-	optcl_mmc_ges_header header;
-	uint8_t event_code;
-	uint8_t power_status;
+    optcl_mmc_ges_header header;
+    uint8_t event_code;
+    uint8_t power_status;
 } optcl_mmc_ges_power_management;
 
 typedef struct tag_mmc_ges_external_request {
-	optcl_mmc_ges_header header;
-	bool_t persistent_prev;
-	uint8_t event_code;
-	uint8_t ext_req_status;
-	uint16_t external_request;
+    optcl_mmc_ges_header header;
+    bool_t persistent_prev;
+    uint8_t event_code;
+    uint8_t ext_req_status;
+    uint16_t external_request;
 } optcl_mmc_ges_external_request;
 
 typedef struct tag_mmc_ges_media {
-	optcl_mmc_ges_header header;
-	uint8_t event_code;
-	bool_t media_present;
-	bool_t tray_open;
-	uint8_t start_slot;
-	uint8_t end_slot;
+    optcl_mmc_ges_header header;
+    uint8_t event_code;
+    bool_t media_present;
+    bool_t tray_open;
+    uint8_t start_slot;
+    uint8_t end_slot;
 } optcl_mmc_ges_media;
 
 typedef struct tag_mmc_ges_multihost {
-	optcl_mmc_ges_header header;
-	bool_t persistent_prev;
-	uint8_t event_code;
-	uint8_t multi_host_status;
-	uint16_t multi_host_priority;
+    optcl_mmc_ges_header header;
+    bool_t persistent_prev;
+    uint8_t event_code;
+    uint8_t multi_host_status;
+    uint16_t multi_host_priority;
 } optcl_mmc_ges_multihost;
 
 typedef struct tag_mmc_ges_device_busy {
-	optcl_mmc_ges_header header;
-	uint8_t event_code;
-	uint8_t busy_status;
-	uint16_t time;
+    optcl_mmc_ges_header header;
+    uint8_t event_code;
+    uint8_t busy_status;
+    uint16_t time;
 } optcl_mmc_ges_device_busy;
 
 typedef struct tag_mmc_response_get_event_status {
-	optcl_mmc_response header;
-	optcl_mmc_ges_header ges_header;
-	uint8_t event_class;
-	optcl_list *descriptors;
+    optcl_mmc_response header;
+    optcl_mmc_ges_header ges_header;
+    uint8_t event_class;
+    optcl_list *descriptors;
 } optcl_mmc_response_get_event_status;
 
 typedef optcl_mmc_ges_header optcl_mmc_ges_descriptor;
@@ -596,87 +596,87 @@ typedef optcl_mmc_ges_header optcl_mmc_ges_descriptor;
  */
 
 typedef struct tag_mmc_get_performance {
-	uint8_t data_type;
-	uint32_t start_lba;
-	uint16_t max_desc_num;
-	uint8_t type;
+    uint8_t data_type;
+    uint32_t start_lba;
+    uint16_t max_desc_num;
+    uint8_t type;
 } optcl_mmc_get_performance;
 
 typedef struct tag_mmc_gpdesc_header {
-	uint8_t descriptor_type;
+    uint8_t descriptor_type;
 } optcl_mmc_gpdesc_header;
 
 typedef struct tag_mmc_gpdesc_pd {
-	optcl_mmc_gpdesc_header header;
-	uint8_t data_type;
-	union tag_nominal {
-		uint32_t start_lba;
-		uint32_t end_lba;
-		uint32_t start_performance;
-		uint32_t end_performance;
-	} nominal;
-	union tag_exceptions {
-		uint32_t lba;
-		uint16_t time;
-	} exceptions;
+    optcl_mmc_gpdesc_header header;
+    uint8_t data_type;
+    union tag_nominal {
+        uint32_t start_lba;
+        uint32_t end_lba;
+        uint32_t start_performance;
+        uint32_t end_performance;
+    } nominal;
+    union tag_exceptions {
+        uint32_t lba;
+        uint16_t time;
+    } exceptions;
 }  optcl_mmc_gpdesc_pd;
 
 typedef struct tag_mmc_gpdesc_uad {
-	optcl_mmc_gpdesc_header header;
-	uint32_t lba;
-	uint32_t upb_num;
+    optcl_mmc_gpdesc_header header;
+    uint32_t lba;
+    uint32_t upb_num;
 } optcl_mmc_gpdesc_uad;
 
 typedef struct tag_mmc_gpdesc_dsd {
-	optcl_mmc_gpdesc_header header;
-	uint32_t start_lba;
-	uint32_t end_lba;
-	uint8_t blocking_factor;
-	uint8_t fbo;
-	uint8_t defect_statuses[2038];
+    optcl_mmc_gpdesc_header header;
+    uint32_t start_lba;
+    uint32_t end_lba;
+    uint8_t blocking_factor;
+    uint8_t fbo;
+    uint8_t defect_statuses[2038];
 } optcl_mmc_gpdesc_dsd;
 
 typedef struct tag_mmc_gpdesc_wsd {
-	optcl_mmc_gpdesc_header header;
-	uint8_t wrc;
-	bool_t rdd;
-	bool_t exact;
-	bool_t mrw;
-	uint32_t end_lba;
-	uint32_t read_speed;
-	uint32_t write_speed;
+    optcl_mmc_gpdesc_header header;
+    uint8_t wrc;
+    bool_t rdd;
+    bool_t exact;
+    bool_t mrw;
+    uint32_t end_lba;
+    uint32_t read_speed;
+    uint32_t write_speed;
 } optcl_mmc_gpdesc_wsd;
 
 typedef struct tag_mmc_gpdesc_dbi {
-	optcl_mmc_gpdesc_header header;
-	uint32_t start_lba;
-	uint16_t def_blocks_num;
-	bool_t dbif;
-	uint8_t error_level;
+    optcl_mmc_gpdesc_header header;
+    uint32_t start_lba;
+    uint16_t def_blocks_num;
+    bool_t dbif;
+    uint8_t error_level;
 } optcl_mmc_gpdesc_dbi;
 
 typedef struct tag_mmc_gpdesc_dbicz {
-	optcl_mmc_gpdesc_header header;
-	uint32_t start_lba;
+    optcl_mmc_gpdesc_header header;
+    uint32_t start_lba;
 } optcl_mmc_gpdesc_dbicz;
 
 typedef struct tag_mmc_response_get_performance {
-	optcl_mmc_response header;
-	uint8_t type;
-	union tag_gp_header {
-		struct tag_perf_header {
-			uint32_t perf_data_len;
-			bool_t write;
-			bool_t except;
-		} perf_header;
-		struct tag_dbi_header {
-			uint32_t dbi_data_len;
-		} dbi_header;
-		struct tag_dbicz_header {
-			uint32_t dbicz_data_len;
-		} dbicz_header;
-	} gp_header;
-	optcl_list *descriptors;
+    optcl_mmc_response header;
+    uint8_t type;
+    union tag_gp_header {
+        struct tag_perf_header {
+            uint32_t perf_data_len;
+            bool_t write;
+            bool_t except;
+        } perf_header;
+        struct tag_dbi_header {
+            uint32_t dbi_data_len;
+        } dbi_header;
+        struct tag_dbicz_header {
+            uint32_t dbicz_data_len;
+        } dbicz_header;
+    } gp_header;
+    optcl_list *descriptors;
 } optcl_mmc_response_get_performance;
 
 
@@ -685,51 +685,51 @@ typedef struct tag_mmc_response_get_performance {
  */
 
 typedef struct tag_mmc_inquiry {
-	uint8_t evpd;
-	uint8_t page_code;
+    uint8_t evpd;
+    uint8_t page_code;
 } optcl_mmc_inquiry;
 
 typedef struct tag_mmc_response_inquiry {
-	optcl_mmc_response header;
-	uint8_t qualifier;	/* Peripheral qualifier */
-	uint8_t device_type;
-	bool_t rmb;
-	uint8_t version;
-	bool_t normaca;
-	bool_t hisup;
-	uint8_t rdf;		/* Response data format */
-	uint8_t additional_len;
-	bool_t sccs;
-	bool_t acc;
-	bool_t tpgs;
-	bool_t _3pc;
-	bool_t protect;
-	bool_t bque;
-	bool_t encserv;
-	bool_t vs1;
-	bool_t vs2;
-	bool_t multip;
-	bool_t mchngr;
-	bool_t addr16;
-	bool_t wbus16;
-	bool_t sync;
-	bool_t linked;
-	bool_t cmdque;
-	uint8_t vendor[9];
-	uint8_t product[17];
-	uint32_t revision_level;
-	uint8_t vendor_string[21];
-	uint8_t clocking;
-	bool_t qas;
-	bool_t ius;
-	uint16_t ver_desc1;
-	uint16_t ver_desc2;
-	uint16_t ver_desc3;
-	uint16_t ver_desc4;
-	uint16_t ver_desc5;
-	uint16_t ver_desc6;
-	uint16_t ver_desc7;
-	uint16_t ver_desc8;
+    optcl_mmc_response header;
+    uint8_t qualifier;	/* Peripheral qualifier */
+    uint8_t device_type;
+    bool_t rmb;
+    uint8_t version;
+    bool_t normaca;
+    bool_t hisup;
+    uint8_t rdf;		/* Response data format */
+    uint8_t additional_len;
+    bool_t sccs;
+    bool_t acc;
+    bool_t tpgs;
+    bool_t _3pc;
+    bool_t protect;
+    bool_t bque;
+    bool_t encserv;
+    bool_t vs1;
+    bool_t vs2;
+    bool_t multip;
+    bool_t mchngr;
+    bool_t addr16;
+    bool_t wbus16;
+    bool_t sync;
+    bool_t linked;
+    bool_t cmdque;
+    uint8_t vendor[9];
+    uint8_t product[17];
+    uint32_t revision_level;
+    uint8_t vendor_string[21];
+    uint8_t clocking;
+    bool_t qas;
+    bool_t ius;
+    uint16_t ver_desc1;
+    uint16_t ver_desc2;
+    uint16_t ver_desc3;
+    uint16_t ver_desc4;
+    uint16_t ver_desc5;
+    uint16_t ver_desc6;
+    uint16_t ver_desc7;
+    uint16_t ver_desc8;
 } optcl_mmc_response_inquiry;
 
 
@@ -738,10 +738,10 @@ typedef struct tag_mmc_response_inquiry {
  */
 
 typedef struct tag_mmc_load_unload_medium {
-	bool_t immed;
-	bool_t load_unload;
-	bool_t start;
-	uint8_t slot;
+    bool_t immed;
+    bool_t load_unload;
+    bool_t start;
+    uint8_t slot;
 } optcl_mmc_load_unload_medium;
 
 
@@ -750,21 +750,21 @@ typedef struct tag_mmc_load_unload_medium {
  */
 
 typedef struct tag_mmc_response_mechanism_status {
-	optcl_mmc_response header;
-	bool_t fault;
-	uint8_t changer_state;
-	uint8_t current_slot;
-	uint8_t mechanism_state;
-	bool_t door_open;
-	uint32_t current_lba;
-	uint8_t available_slots;
-	uint16_t slot_table_len;
-	struct tag_slot_entry {
-		bool_t disk_present;
-		bool_t change;
-		bool_t cwp_v;
-		bool_t cwp;
-	} slot_entries[256];
+    optcl_mmc_response header;
+    bool_t fault;
+    uint8_t changer_state;
+    uint8_t current_slot;
+    uint8_t mechanism_state;
+    bool_t door_open;
+    uint32_t current_lba;
+    uint8_t available_slots;
+    uint16_t slot_table_len;
+    struct tag_slot_entry {
+        bool_t disk_present;
+        bool_t change;
+        bool_t cwp_v;
+        bool_t cwp;
+    } slot_entries[256];
 } optcl_mmc_response_mechanism_status;
 
 
@@ -773,117 +773,117 @@ typedef struct tag_mmc_response_mechanism_status {
  */
 
 typedef struct tag_mmc_mode_sense {
-	bool_t dbd;
-	uint8_t pc;
-	uint8_t page_code;
+    bool_t dbd;
+    uint8_t pc;
+    uint8_t page_code;
 } optcl_mmc_mode_sense;
 
 typedef struct tag_mmc_msdesc_header {
-	uint8_t page_code;
+    uint8_t page_code;
 } optcl_mmc_msdesc_header;
 
 typedef struct tag_mmc_msdesc_vendor {
-	optcl_mmc_msdesc_header header;
-	bool_t ps;
-	uint8_t page_len;
-	uint8_t vendor_data[254];
+    optcl_mmc_msdesc_header header;
+    bool_t ps;
+    uint8_t page_len;
+    uint8_t vendor_data[254];
 } optcl_mmc_msdesc_vendor;
 
 typedef struct tag_mmc_msdesc_rwrecovery {
-	optcl_mmc_msdesc_header header;
-	bool_t ps;
-	bool_t awre;
-	bool_t arre;
-	bool_t tb;
-	bool_t rc;
-	bool_t per;
-	bool_t dte;
-	bool_t dcr;
-	uint8_t emcdr;
-	uint8_t read_retry_count;
-	uint8_t write_retry_count;
-	uint32_t window_size;
+    optcl_mmc_msdesc_header header;
+    bool_t ps;
+    bool_t awre;
+    bool_t arre;
+    bool_t tb;
+    bool_t rc;
+    bool_t per;
+    bool_t dte;
+    bool_t dcr;
+    uint8_t emcdr;
+    uint8_t read_retry_count;
+    uint8_t write_retry_count;
+    uint32_t window_size;
 } optcl_mmc_msdesc_rwrecovery;
 
 typedef struct tag_mmc_msdesc_mrw {
-	optcl_mmc_msdesc_header header;
-	bool_t ps;
-	bool_t lba_space;
+    optcl_mmc_msdesc_header header;
+    bool_t ps;
+    bool_t lba_space;
 } optcl_mmc_msdesc_mrw;
 
 typedef struct tag_mmc_msdesc_writeparams {
-	optcl_mmc_msdesc_header header;
-	bool_t ps;
-	bool_t bufe;
-	bool_t ls_v;
-	bool_t test_write;
-	uint8_t write_type;
-	uint8_t multi_session;
-	bool_t fp;
-	bool_t copy;
-	uint8_t track_mode;
-	uint8_t dbt;
-	uint8_t link_size;
-	uint8_t hac;
-	uint8_t session_fmt;
-	uint32_t packet_size;
-	uint16_t audio_pause_len;
-	uint8_t mcn[16];
-	uint8_t isrc[16];
-	uint8_t subheader_0;
-	uint8_t subheader_1;
-	uint8_t subheader_2;
-	uint8_t subheader_3;
-	uint8_t vendor_specific[4];
+    optcl_mmc_msdesc_header header;
+    bool_t ps;
+    bool_t bufe;
+    bool_t ls_v;
+    bool_t test_write;
+    uint8_t write_type;
+    uint8_t multi_session;
+    bool_t fp;
+    bool_t copy;
+    uint8_t track_mode;
+    uint8_t dbt;
+    uint8_t link_size;
+    uint8_t hac;
+    uint8_t session_fmt;
+    uint32_t packet_size;
+    uint16_t audio_pause_len;
+    uint8_t mcn[16];
+    uint8_t isrc[16];
+    uint8_t subheader_0;
+    uint8_t subheader_1;
+    uint8_t subheader_2;
+    uint8_t subheader_3;
+    uint8_t vendor_specific[4];
 } optcl_mmc_msdesc_writeparams;
 
 typedef struct tag_mmc_msdesc_caching {
-	optcl_mmc_msdesc_header header;
-	bool_t ps;
-	bool_t wce;
-	bool_t rcd;
+    optcl_mmc_msdesc_header header;
+    bool_t ps;
+    bool_t wce;
+    bool_t rcd;
 } optcl_mmc_msdesc_caching;
 
 typedef struct tag_mmc_msdesc_power {
-	optcl_mmc_msdesc_header header;
-	bool_t ps;
-	bool_t spf;
-	bool_t idle;
-	bool_t standby;
-	uint32_t idle_timer;
-	uint32_t standby_timer;
+    optcl_mmc_msdesc_header header;
+    bool_t ps;
+    bool_t spf;
+    bool_t idle;
+    bool_t standby;
+    uint32_t idle_timer;
+    uint32_t standby_timer;
 } optcl_mmc_msdesc_power;
 
 typedef struct tag_mmc_msdesc_infoexceptions {
-	optcl_mmc_msdesc_header header;
-	bool_t ps;
-	bool_t spf;
-	bool_t perf;
-	bool_t ebf;
-	bool_t ewasc;
-	bool_t dexcpt;
-	bool_t test;
-	bool_t logerr;
-	uint8_t mrie;
-	uint32_t interval_timer;
-	uint32_t report_count;
+    optcl_mmc_msdesc_header header;
+    bool_t ps;
+    bool_t spf;
+    bool_t perf;
+    bool_t ebf;
+    bool_t ewasc;
+    bool_t dexcpt;
+    bool_t test;
+    bool_t logerr;
+    uint8_t mrie;
+    uint32_t interval_timer;
+    uint32_t report_count;
 } optcl_mmc_msdesc_infoexceptions;
 
 typedef struct tag_mmc_msdesc_timeout_protect {
-	optcl_mmc_msdesc_header header;
-	bool_t ps;
-	bool_t g3enable;
-	bool_t tmoe;
-	bool_t disp;
-	bool_t swpp;
-	uint16_t group1_mintimeout;
-	uint16_t group2_mintimeout;
-	uint16_t group3_mintimeout;
+    optcl_mmc_msdesc_header header;
+    bool_t ps;
+    bool_t g3enable;
+    bool_t tmoe;
+    bool_t disp;
+    bool_t swpp;
+    uint16_t group1_mintimeout;
+    uint16_t group2_mintimeout;
+    uint16_t group3_mintimeout;
 } optcl_mmc_msdesc_timeout_protect;
 
 typedef struct tag_mmc_response_mode_sense {
-	optcl_mmc_response header;
-	optcl_list *descriptors;
+    optcl_mmc_response header;
+    optcl_list *descriptors;
 } optcl_mmc_response_mode_sense;
 
 /*
@@ -891,9 +891,9 @@ typedef struct tag_mmc_response_mode_sense {
  */
 
 typedef struct tag_mmc_mode_select {
-	bool_t pf;
-	bool_t sp;
-	optcl_list *descriptors;
+    bool_t pf;
+    bool_t sp;
+    optcl_list *descriptors;
 } optcl_mmc_mode_select;
 
 
@@ -902,8 +902,8 @@ typedef struct tag_mmc_mode_select {
  */
 
 typedef struct tag_mmc_prevent_allow_removal {
-	bool_t persistent;
-	bool_t prevent;
+    bool_t persistent;
+    bool_t prevent;
 } optcl_mmc_prevent_allow_removal;
 
 
@@ -912,21 +912,21 @@ typedef struct tag_mmc_prevent_allow_removal {
  */
 
 typedef struct tag_mmc_read_10 {
-	bool_t fua;
-	uint32_t start_lba;
-	uint16_t transfer_length;
+    bool_t fua;
+    uint32_t start_lba;
+    uint16_t transfer_length;
 } optcl_mmc_read_10;
 
 typedef struct tag_mmc_read_12 {
-	bool_t fua;
-	uint32_t start_lba;
-	uint32_t transfer_length;
-	bool_t streaming;
+    bool_t fua;
+    uint32_t start_lba;
+    uint32_t transfer_length;
+    bool_t streaming;
 } optcl_mmc_read_12;
 
 typedef struct tag_mmc_response_read {
-	optcl_mmc_response header;
-	ptr_t data;
+    optcl_mmc_response header;
+    ptr_t data;
 } optcl_mmc_response_read;
 
 
@@ -935,46 +935,46 @@ typedef struct tag_mmc_response_read {
  */
 
 typedef struct tag_mmc_read_buffer {
-	uint8_t mode;
-	uint8_t buffer_id;
-	uint32_t buffer_offset;
-	uint32_t allocation_len;
+    uint8_t mode;
+    uint8_t buffer_id;
+    uint32_t buffer_offset;
+    uint32_t allocation_len;
 } optcl_mmc_read_buffer;
 
 typedef union tag_mmc_response_read_buffer_union {
-	struct tag_rb_combined {
-		uint32_t buffer_capacity;
-		ptr_t buffer;
-	} combined;
-	struct tag_rb_data {
-		ptr_t buffer;
-		uint32_t buffer_capacity;
-	} data;
-	struct tag_rb_descriptor {
-		uint8_t offset_boundary;
-		uint32_t buffer_capacity;
-	} descriptor;
-	struct tag_rb_echo {
-		ptr_t buffer;
-	} echo;
-	struct tag_rb_echo_desc {
-		uint32_t buffer_capacity;
-	} echo_desc;
-	struct tag_rb_expander {
-		ptr_t buffer;
-	} expander;
-	struct tag_rb_vendor {
-		ptr_t buffer;
-		uint32_t buffer_len;
-	} vendor;
+    struct tag_rb_combined {
+        uint32_t buffer_capacity;
+        ptr_t buffer;
+    } combined;
+    struct tag_rb_data {
+        ptr_t buffer;
+        uint32_t buffer_capacity;
+    } data;
+    struct tag_rb_descriptor {
+        uint8_t offset_boundary;
+        uint32_t buffer_capacity;
+    } descriptor;
+    struct tag_rb_echo {
+        ptr_t buffer;
+    } echo;
+    struct tag_rb_echo_desc {
+        uint32_t buffer_capacity;
+    } echo_desc;
+    struct tag_rb_expander {
+        ptr_t buffer;
+    } expander;
+    struct tag_rb_vendor {
+        ptr_t buffer;
+        uint32_t buffer_len;
+    } vendor;
 } mmc_response_read_buffer_union;
 
 typedef mmc_response_read_buffer_union mmc_read_buffer_union;
 
 typedef struct tag_mmc_response_read_buffer {
-	optcl_mmc_response header;
-	uint8_t mode;
-	mmc_read_buffer_union readdata;
+    optcl_mmc_response header;
+    uint8_t mode;
+    mmc_read_buffer_union readdata;
 } optcl_mmc_response_read_buffer;
 
 
@@ -983,23 +983,23 @@ typedef struct tag_mmc_response_read_buffer {
  */
 
 typedef struct tag_mmc_read_buffer_capacity {
-	bool_t block;
+    bool_t block;
 } optcl_mmc_read_buffer_capacity;
 
 typedef struct tag_mmc_resopnse_read_buffer_capacity {
-	optcl_mmc_response header;
-	union tag_desc {
-		struct tag_block {
-			bool_t block;
-			uint16_t data_length;
-			uint32_t available_buffer_len;
-		} block;
-		struct tag_bytes {
-			uint16_t data_length;
-			uint32_t buffer_len;
-			uint32_t buffer_blank_len;
-		} bytes;
-	} desc;
+    optcl_mmc_response header;
+    union tag_desc {
+        struct tag_block {
+            bool_t block;
+            uint16_t data_length;
+            uint32_t available_buffer_len;
+        } block;
+        struct tag_bytes {
+            uint16_t data_length;
+            uint32_t buffer_len;
+            uint32_t buffer_blank_len;
+        } bytes;
+    } desc;
 } optcl_mmc_response_read_buffer_capacity;
 
 
@@ -1008,9 +1008,9 @@ typedef struct tag_mmc_resopnse_read_buffer_capacity {
  */
 
 typedef struct tag_mmc_response_read_capacity {
-	optcl_mmc_response header;
-	uint32_t lba;
-	uint32_t block_len;
+    optcl_mmc_response header;
+    uint32_t lba;
+    uint32_t block_len;
 } optcl_mmc_response_read_capacity;
 
 
@@ -1019,20 +1019,20 @@ typedef struct tag_mmc_response_read_capacity {
  */
 
 typedef struct tag_mmc_read_cd {
-	uint8_t est;
-	bool_t dap;
-	uint32_t starting_lba;
-	uint32_t transfer_len;
-	bool_t sync;
-	uint8_t header_codes;
-	bool_t user_data;
-	bool_t edc_ecc;
-	uint8_t c2_error_info;
-	uint8_t subchannel_sel;
+    uint8_t est;
+    bool_t dap;
+    uint32_t starting_lba;
+    uint32_t transfer_len;
+    bool_t sync;
+    uint8_t header_codes;
+    bool_t user_data;
+    bool_t edc_ecc;
+    uint8_t c2_error_info;
+    uint8_t subchannel_sel;
 } optcl_mmc_read_cd;
 
 typedef struct tag_mmc_response_read_cd {
-	
+
 } optcl_mmc_response_read_cd;
 
 
@@ -1041,48 +1041,48 @@ typedef struct tag_mmc_response_read_cd {
  */
 
 typedef struct tag_mmc_response_read_msn {
-	optcl_mmc_response header;
-	uint16_t msn_len;
-	ptr_t msn;
+    optcl_mmc_response header;
+    uint16_t msn_len;
+    ptr_t msn;
 } optcl_mmc_response_read_msn;
 
 /*
  * READ TRACK INFORMATION command structures
  */
 typedef struct tag_mmc_read_track_info {
-	bool_t open;
-	uint8_t addrnum_type;
-	uint32_t lbatsnum;
-	uint16_t alloc_len; 
+    bool_t open;
+    uint8_t addrnum_type;
+    uint32_t lbatsnum;
+    uint16_t alloc_len;
 } optcl_mmc_read_track_info;
 
 typedef struct tag_mmc_response_read_track_info {
-	optcl_mmc_response header;
-	uint16_t data_len;
-	uint8_t ltn_lsb;
-	uint8_t sn_lsb;
-	uint8_t ljrs;
-	bool_t damage;
-	bool_t copy;
-	uint8_t track_mode;
-	bool_t rt;
-	bool_t blank;
-	bool_t packet_inc;
-	bool_t fp;
-	uint8_t data_mode;
-	bool_t lra_v;
-	bool_t nwa_v;
-	uint32_t ltsa;
-	uint32_t nwa;
-	uint32_t free_blocks;
-	uint32_t fps_bf;
-	uint32_t lts;
-	uint32_t lra;
-	uint8_t ltn_msb;
-	uint8_t sn_msb;
-	uint32_t rclba;
-	uint32_t nlja;
-	uint32_t llja;
+    optcl_mmc_response header;
+    uint16_t data_len;
+    uint8_t ltn_lsb;
+    uint8_t sn_lsb;
+    uint8_t ljrs;
+    bool_t damage;
+    bool_t copy;
+    uint8_t track_mode;
+    bool_t rt;
+    bool_t blank;
+    bool_t packet_inc;
+    bool_t fp;
+    uint8_t data_mode;
+    bool_t lra_v;
+    bool_t nwa_v;
+    uint32_t ltsa;
+    uint32_t nwa;
+    uint32_t free_blocks;
+    uint32_t fps_bf;
+    uint32_t lts;
+    uint32_t lra;
+    uint8_t ltn_msb;
+    uint8_t sn_msb;
+    uint32_t rclba;
+    uint32_t nlja;
+    uint32_t llja;
 } optcl_mmc_response_read_track_info;
 
 /*
@@ -1090,8 +1090,8 @@ typedef struct tag_mmc_response_read_track_info {
  */
 
 typedef struct tag_mmc_repair_track {
-	bool_t immed;
-	uint16_t ltn;
+    bool_t immed;
+    uint16_t ltn;
 } optcl_mmc_repair_track;
 
 
@@ -1100,14 +1100,14 @@ typedef struct tag_mmc_repair_track {
  */
 
 typedef struct tag_mmc_request_sense {
-	bool_t desc;
+    bool_t desc;
 } optcl_mmc_request_sense;
 
 typedef struct tag_mmc_response_request_sense {
-	optcl_mmc_response header;
-	uint8_t sk;
-	uint8_t asc;
-	uint8_t ascq;
+    optcl_mmc_response header;
+    uint8_t sk;
+    uint8_t asc;
+    uint8_t ascq;
 } optcl_mmc_response_request_sense;
 
 
@@ -1116,12 +1116,12 @@ typedef struct tag_mmc_response_request_sense {
  */
 
 typedef struct tag_mmc_reserve_track {
-	bool_t rmz;
-	bool_t arsv;
-	union tag_reservation {
-		uint32_t size;
-		uint32_t lba;
-	} reservation;
+    bool_t rmz;
+    bool_t arsv;
+    union tag_reservation {
+        uint32_t size;
+        uint32_t lba;
+    } reservation;
 } optcl_mmc_reserve_track;
 
 
@@ -1130,7 +1130,7 @@ typedef struct tag_mmc_reserve_track {
  */
 
 typedef struct tag_mmc_seek {
-	uint32_t lba;
+    uint32_t lba;
 } optcl_mmc_seek;
 
 
@@ -1139,68 +1139,68 @@ typedef struct tag_mmc_seek {
  */
 
 typedef struct tag_mmc_send_disc_structure {
-	uint8_t media_type;
-	uint8_t format_type;
-	uint8_t pac_type;
-	union tag_data {
-		struct tag_user_spec_data {
-			uint16_t data_len;
-			ptr_t data;
-		} user_spec_data;
-		struct tag_copyright_mngmt {
-			bool_t cpm;
-			uint8_t cgms;
-			uint8_t adp_ty;
-		} copyright_mngmt;
-		struct tag_timestamp {
-			uint32_t year;
-			uint16_t month;
-			uint16_t day;
-			uint16_t hour;
-			uint16_t minute;
-			uint16_t second;
-		} timestamp;
-		struct tag_lbi {
-			uint32_t l0_area_capacity;
-		} lbi;
-		struct tag_smasa {
-			uint32_t smasa;
-		} smasa;
-		struct tag_jis {
-			uint32_t jis;
-		} jis;
-		struct tag_mlja {
-			uint32_t ljlba;
-		} mlja;
-		struct tag_remapping_address {
-			uint16_t apn;
-			uint32_t remapping_address;
-		} remapping_address;
-		struct tag_dcb {
-			bool_t erase;
-			uint16_t dcb_len;
-			ptr_t dcb;
-		} dcb;
-		struct tag_write_protection {
-			bool_t pwp;
-		} write_protection;
-		struct tag_send_pac {
-			bool_t erase;
-			uint16_t pac_header_len;
-			uint16_t pac_info_len;
-			ptr_t pac_header;
-			ptr_t pac_info;
-		} send_pac;
-		struct tag_send_pac_dwp {
-			bool_t vwe;
-			bool_t erase;
-			uint16_t pac_header_len;
-			ptr_t pac_header;
-			uint8_t kpedf;
-			uint8_t wpcb;
-			uint8_t wp_password[32];
-		} send_pac_dwp;
-	} data;
+    uint8_t media_type;
+    uint8_t format_type;
+    uint8_t pac_type;
+    union tag_data {
+        struct tag_user_spec_data {
+            uint16_t data_len;
+            ptr_t data;
+        } user_spec_data;
+        struct tag_copyright_mngmt {
+            bool_t cpm;
+            uint8_t cgms;
+            uint8_t adp_ty;
+        } copyright_mngmt;
+        struct tag_timestamp {
+            uint32_t year;
+            uint16_t month;
+            uint16_t day;
+            uint16_t hour;
+            uint16_t minute;
+            uint16_t second;
+        } timestamp;
+        struct tag_lbi {
+            uint32_t l0_area_capacity;
+        } lbi;
+        struct tag_smasa {
+            uint32_t smasa;
+        } smasa;
+        struct tag_jis {
+            uint32_t jis;
+        } jis;
+        struct tag_mlja {
+            uint32_t ljlba;
+        } mlja;
+        struct tag_remapping_address {
+            uint16_t apn;
+            uint32_t remapping_address;
+        } remapping_address;
+        struct tag_dcb {
+            bool_t erase;
+            uint16_t dcb_len;
+            ptr_t dcb;
+        } dcb;
+        struct tag_write_protection {
+            bool_t pwp;
+        } write_protection;
+        struct tag_send_pac {
+            bool_t erase;
+            uint16_t pac_header_len;
+            uint16_t pac_info_len;
+            ptr_t pac_header;
+            ptr_t pac_info;
+        } send_pac;
+        struct tag_send_pac_dwp {
+            bool_t vwe;
+            bool_t erase;
+            uint16_t pac_header_len;
+            ptr_t pac_header;
+            uint8_t kpedf;
+            uint8_t wpcb;
+            uint8_t wp_password[32];
+        } send_pac_dwp;
+    } data;
 } optcl_mmc_send_disc_structure;
 
 
@@ -1209,9 +1209,9 @@ typedef struct tag_mmc_send_disc_structure {
  */
 
 typedef struct tag_mmc_set_cd_cpeed {
-	uint8_t rotctrl;
-	uint16_t drive_read_speed;
-	uint16_t drive_write_speed;
+    uint8_t rotctrl;
+    uint16_t drive_read_speed;
+    uint16_t drive_write_speed;
 } optcl_mmc_set_cd_speed;
 
 
@@ -1220,8 +1220,8 @@ typedef struct tag_mmc_set_cd_cpeed {
  */
 
 typedef struct tag_mmc_set_read_ahead {
-	uint32_t trigger_lba;
-	uint32_t read_ahead_lba;
+    uint32_t trigger_lba;
+    uint32_t read_ahead_lba;
 } optcl_mmc_set_read_ahead;
 
 
@@ -1230,25 +1230,25 @@ typedef struct tag_mmc_set_read_ahead {
  */
 
 typedef struct tag_mmc_set_streaming {
-	uint8_t type;
-	union tag_descriptors {
-		struct tag_performance {
-			uint8_t wrc;
-			bool_t rdd;
-			bool_t exact;
-			bool_t ra;
-			uint32_t start_lba;
-			uint32_t end_lba;
-			uint32_t read_size;
-			uint32_t read_time;
-			uint32_t write_size;
-			uint32_t write_time;
-		} performance;
-		struct tag_dbi_cache_zones {
-			uint16_t desc_num;
-			uint32_t *descriptors;
-		} dbi_cache_zones;
-	} descriptors;
+    uint8_t type;
+    union tag_descriptors {
+        struct tag_performance {
+            uint8_t wrc;
+            bool_t rdd;
+            bool_t exact;
+            bool_t ra;
+            uint32_t start_lba;
+            uint32_t end_lba;
+            uint32_t read_size;
+            uint32_t read_time;
+            uint32_t write_size;
+            uint32_t write_time;
+        } performance;
+        struct tag_dbi_cache_zones {
+            uint16_t desc_num;
+            uint32_t *descriptors;
+        } dbi_cache_zones;
+    } descriptors;
 } optcl_mmc_set_streaming;
 
 /*
@@ -1256,19 +1256,19 @@ typedef struct tag_mmc_set_streaming {
  */
 
 typedef struct tag_mmc_send_opc_information {
-	bool_t doopc;
-	bool_t exclude1;
-	bool_t exclude0;
-	uint8_t opc_entry_num;
-	struct tag_opc_table_entry {
-		uint16_t kbps;
-		uint8_t value0;
-		uint8_t value1;
-		uint8_t value2;
-		uint8_t value3;
-		uint8_t value4;
-		uint8_t value5;
-	} opc_table_entries[256];
+    bool_t doopc;
+    bool_t exclude1;
+    bool_t exclude0;
+    uint8_t opc_entry_num;
+    struct tag_opc_table_entry {
+        uint16_t kbps;
+        uint8_t value0;
+        uint8_t value1;
+        uint8_t value2;
+        uint8_t value3;
+        uint8_t value4;
+        uint8_t value5;
+    } opc_table_entries[256];
 } optcl_mmc_send_opc_information;
 
 /*
@@ -1276,12 +1276,12 @@ typedef struct tag_mmc_send_opc_information {
  */
 
 typedef struct tag_mmc_start_stop_unit {
-	bool_t immed;
-	uint8_t fln;
-	uint8_t pc;
-	bool_t fl;
-	bool_t loej;
-	bool_t start;
+    bool_t immed;
+    uint8_t fln;
+    uint8_t pc;
+    bool_t fl;
+    bool_t loej;
+    bool_t start;
 } optcl_mmc_start_stop_unit;
 
 /*
@@ -1289,9 +1289,9 @@ typedef struct tag_mmc_start_stop_unit {
  */
 
 typedef struct tag_mmc_synchronize_cache {
-	bool_t immed;
-	uint32_t lba;
-	uint16_t num_of_blocks;
+    bool_t immed;
+    uint32_t lba;
+    uint16_t num_of_blocks;
 } optcl_mmc_synchronize_cache;
 
 /*
@@ -1299,9 +1299,9 @@ typedef struct tag_mmc_synchronize_cache {
  */
 
 typedef struct tag_mmc_verify {
-	uint32_t lba;
-	bool_t g3tout;
-	uint16_t block_num;
+    uint32_t lba;
+    bool_t g3tout;
+    uint16_t block_num;
 } optcl_mmc_verify;
 
 /*
@@ -1309,10 +1309,10 @@ typedef struct tag_mmc_verify {
  */
 
 typedef struct tag_mmc_write {
-	bool_t fua;
-	bool_t tsr;
-	uint32_t lba;
-	uint16_t transfer_len;
+    bool_t fua;
+    bool_t tsr;
+    uint32_t lba;
+    uint16_t transfer_len;
 } optcl_mmc_write;
 
 /*
@@ -1320,12 +1320,12 @@ typedef struct tag_mmc_write {
  */
 
 typedef struct tag_mmc_write_12 {
-	bool_t fua;
-	bool_t tsr;
-	uint32_t lba;
-	uint32_t transfer_len;
-	bool_t streaming;
-	bool_t vnr;
+    bool_t fua;
+    bool_t tsr;
+    uint32_t lba;
+    uint32_t transfer_len;
+    bool_t streaming;
+    bool_t vnr;
 } optcl_mmc_write_12;
 
 /*
@@ -1333,8 +1333,8 @@ typedef struct tag_mmc_write_12 {
  */
 
 typedef struct tag_mmc_write_and_verify_10 {
-	uint32_t lba;
-	uint16_t transfer_len;
+    uint32_t lba;
+    uint16_t transfer_len;
 } optcl_mmc_write_and_verify_10;
 
 /*
@@ -1342,47 +1342,47 @@ typedef struct tag_mmc_write_and_verify_10 {
  */
 
 typedef union tag_mmc_write_buffer_union {
-	struct tag_wb_combined {
-		uint32_t buffer_capacity;
-		ptr_t buffer;
-	} combined;
-	struct tag_wb_vendor {
-		ptr_t buffer;
-		uint32_t buffer_len;
-	} vendor;
-	struct tag_wb_data {
-		ptr_t buffer;
-		uint32_t buffer_capacity;
-	} data;
-	struct tag_wb_microcode {
-		ptr_t microcode;
-		uint32_t microcode_len;
-	} microcode;
-	struct tag_wb_echo {
-		ptr_t echo_buffer;
-	} echo;
-	struct tag_wb_expander {
-		ptr_t expander_buffer;
-	} expander;
-	struct tag_wb_app_log_data {
-		uint8_t t10_vendor_id[8];
-		uint16_t error_type;
-		uint8_t time_stamp[6];
-		uint8_t code_set;
-		uint8_t error_loc_format;
-		uint16_t error_loc_len;
-		uint16_t vendor_spec_len;
-		ptr_t error_location;
-		ptr_t vendor_specific;
-	} app_log_data;
+    struct tag_wb_combined {
+        uint32_t buffer_capacity;
+        ptr_t buffer;
+    } combined;
+    struct tag_wb_vendor {
+        ptr_t buffer;
+        uint32_t buffer_len;
+    } vendor;
+    struct tag_wb_data {
+        ptr_t buffer;
+        uint32_t buffer_capacity;
+    } data;
+    struct tag_wb_microcode {
+        ptr_t microcode;
+        uint32_t microcode_len;
+    } microcode;
+    struct tag_wb_echo {
+        ptr_t echo_buffer;
+    } echo;
+    struct tag_wb_expander {
+        ptr_t expander_buffer;
+    } expander;
+    struct tag_wb_app_log_data {
+        uint8_t t10_vendor_id[8];
+        uint16_t error_type;
+        uint8_t time_stamp[6];
+        uint8_t code_set;
+        uint8_t error_loc_format;
+        uint16_t error_loc_len;
+        uint16_t vendor_spec_len;
+        ptr_t error_location;
+        ptr_t vendor_specific;
+    } app_log_data;
 } mmc_write_buffer_union;
 
 typedef struct tag_mmc_write_buffer {
-	uint8_t mode;
-	uint8_t buffer_id;
-	uint32_t buffer_offset;
-	uint32_t param_list_len;
-	mmc_write_buffer_union dataout;
+    uint8_t mode;
+    uint8_t buffer_id;
+    uint32_t buffer_offset;
+    uint32_t param_list_len;
+    mmc_write_buffer_union dataout;
 } optcl_mmc_write_buffer;
 
 
@@ -1390,169 +1390,169 @@ typedef struct tag_mmc_write_buffer {
  * Command functions
  */
 
-extern RESULT 
-optcl_command_blank(const optcl_device *device, const optcl_mmc_blank *command);
-
-extern RESULT 
-optcl_command_close_track_session(const optcl_device *device, 
-	const optcl_mmc_close_track_session *command);
-
-extern RESULT 
-optcl_command_destroy_response(optcl_mmc_response *response);
-
-extern RESULT 
-optcl_command_format_unit(const optcl_device *device, 
-	const optcl_mmc_format_unit *command);
-
-extern RESULT 
-optcl_command_get_configuration(const optcl_device *device, 
-	const optcl_mmc_get_configuration *command, 
-	optcl_mmc_response_get_configuration **response);
-
-extern RESULT 
-optcl_command_get_event_status(const optcl_device *device,
-	const optcl_mmc_get_event_status *command, 
-	optcl_mmc_response_get_event_status **response);
-
-extern RESULT 
-optcl_command_get_performance(const optcl_device *device,
-	const optcl_mmc_get_performance *command,
-	optcl_mmc_response_get_performance **response);
-
-extern RESULT 
-optcl_command_inquiry(const optcl_device *device,
-	const optcl_mmc_inquiry *command, 
-	optcl_mmc_response_inquiry **response);
-
-extern RESULT 
-optcl_command_load_unload_medium(const optcl_device *device,
-	const optcl_mmc_load_unload_medium *command);
-
-extern RESULT 
-optcl_command_mechanism_status(const optcl_device *device,
-	optcl_mmc_response_mechanism_status **response);
-
-extern RESULT 
-optcl_command_mode_sense_10(const optcl_device *device,
-	const optcl_mmc_mode_sense *command,
-	optcl_mmc_response_mode_sense **response);
-
-extern RESULT 
-optcl_command_mode_select_10(const optcl_device *device,
-	const optcl_mmc_mode_select *command);
-
-extern RESULT 
-optcl_command_prevent_allow_removal(const optcl_device *device,
-	const optcl_mmc_prevent_allow_removal *command);
-
-extern RESULT 
-optcl_command_read_10(const optcl_device *device,
-	const optcl_mmc_read_10 *command, 
-	optcl_mmc_response_read **response);
-
-extern RESULT 
-optcl_command_read_12(const optcl_device *device,
-	const optcl_mmc_read_12 *command, 
-	optcl_mmc_response_read **response);
-
-extern RESULT 
-optcl_command_read_buffer(const optcl_device *device,
-	const optcl_mmc_read_buffer *command, 
-	optcl_mmc_response_read_buffer **response);
-
-extern RESULT 
-optcl_command_read_buffer_capacity(const optcl_device *device,
-	const optcl_mmc_read_buffer_capacity *command, 
-	optcl_mmc_response_read_buffer_capacity **response);
-
-extern RESULT 
-optcl_command_read_capacity(const optcl_device *device, 
-	optcl_mmc_response_read_capacity **response);
+extern RESULT
+    optcl_command_blank(const optcl_device *device, const optcl_mmc_blank *command);
 
 extern RESULT
-optcl_command_read_cd(const optcl_device *device,
-	const optcl_mmc_read_cd *command,
-	optcl_mmc_response_read_cd **response);
-
-extern RESULT 
-optcl_command_read_msn(const optcl_device *device,
-	optcl_mmc_response_read_msn **response);
+    optcl_command_close_track_session(const optcl_device *device,
+                                      const optcl_mmc_close_track_session *command);
 
 extern RESULT
-optcl_command_read_track_information(const optcl_device *device,
-	const optcl_mmc_read_track_info *command,
-	optcl_mmc_response_read_track_info **response);
+    optcl_command_destroy_response(optcl_mmc_response *response);
 
-extern RESULT 
-optcl_command_repair_track(const optcl_device *device,
-	const optcl_mmc_repair_track *command);
+extern RESULT
+    optcl_command_format_unit(const optcl_device *device,
+                              const optcl_mmc_format_unit *command);
 
-extern RESULT 
-optcl_command_request_sense(const optcl_device *device, 
-	const optcl_mmc_request_sense *command, 
-	optcl_mmc_response_request_sense **response);
+extern RESULT
+    optcl_command_get_configuration(const optcl_device *device,
+                                    const optcl_mmc_get_configuration *command,
+                                    optcl_mmc_response_get_configuration **response);
 
-extern RESULT 
-optcl_command_reserve_track(const optcl_device *device, 
-	const optcl_mmc_reserve_track *command);
+extern RESULT
+    optcl_command_get_event_status(const optcl_device *device,
+                                   const optcl_mmc_get_event_status *command,
+                                   optcl_mmc_response_get_event_status **response);
 
-extern RESULT 
-optcl_command_seek(const optcl_device *device, const optcl_mmc_seek *command);
+extern RESULT
+    optcl_command_get_performance(const optcl_device *device,
+                                  const optcl_mmc_get_performance *command,
+                                  optcl_mmc_response_get_performance **response);
 
-extern RESULT 
-optcl_command_send_disc_structure(const optcl_device *device, 
-	const optcl_mmc_send_disc_structure *command);
+extern RESULT
+    optcl_command_inquiry(const optcl_device *device,
+                          const optcl_mmc_inquiry *command,
+                          optcl_mmc_response_inquiry **response);
 
-extern RESULT 
-optcl_command_send_opc_information(const optcl_device *device, 
-	const optcl_mmc_send_opc_information *command);
+extern RESULT
+    optcl_command_load_unload_medium(const optcl_device *device,
+                                     const optcl_mmc_load_unload_medium *command);
 
-extern RESULT 
-optcl_command_set_cd_speed(const optcl_device *device,
-	const optcl_mmc_set_cd_speed *command);
+extern RESULT
+    optcl_command_mechanism_status(const optcl_device *device,
+                                   optcl_mmc_response_mechanism_status **response);
 
-extern RESULT 
-optcl_command_set_read_ahead(const optcl_device *device,
-	const optcl_mmc_set_read_ahead *command);
+extern RESULT
+    optcl_command_mode_sense_10(const optcl_device *device,
+                                const optcl_mmc_mode_sense *command,
+                                optcl_mmc_response_mode_sense **response);
 
-extern RESULT 
-optcl_command_start_stop_unit(const optcl_device *device,
-	const optcl_mmc_start_stop_unit *command);
+extern RESULT
+    optcl_command_mode_select_10(const optcl_device *device,
+                                 const optcl_mmc_mode_select *command);
 
-extern RESULT 
-optcl_command_set_streaming(const optcl_device *device,
-	const optcl_mmc_set_streaming *command);
+extern RESULT
+    optcl_command_prevent_allow_removal(const optcl_device *device,
+                                        const optcl_mmc_prevent_allow_removal *command);
 
-extern RESULT 
-optcl_command_synchronize_cache(const optcl_device *device,
-	const optcl_mmc_synchronize_cache *command);
+extern RESULT
+    optcl_command_read_10(const optcl_device *device,
+                          const optcl_mmc_read_10 *command,
+                          optcl_mmc_response_read **response);
 
-extern RESULT 
-optcl_command_test_unit_ready(const optcl_device *device);
+extern RESULT
+    optcl_command_read_12(const optcl_device *device,
+                          const optcl_mmc_read_12 *command,
+                          optcl_mmc_response_read **response);
 
-extern RESULT 
-optcl_command_verify(const optcl_device *device, 
-	const optcl_mmc_verify *command);
+extern RESULT
+    optcl_command_read_buffer(const optcl_device *device,
+                              const optcl_mmc_read_buffer *command,
+                              optcl_mmc_response_read_buffer **response);
 
-extern RESULT 
-optcl_command_write(const optcl_device *device,
-	const optcl_mmc_write *command, ptr_t data, 
-	uint32_t data_len);
+extern RESULT
+    optcl_command_read_buffer_capacity(const optcl_device *device,
+                                       const optcl_mmc_read_buffer_capacity *command,
+                                       optcl_mmc_response_read_buffer_capacity **response);
 
-extern RESULT 
-optcl_command_write_12(const optcl_device *device,
-	const optcl_mmc_write_12 *command, 
-	ptr_t data, 
-	uint32_t data_len);
+extern RESULT
+    optcl_command_read_capacity(const optcl_device *device,
+                                optcl_mmc_response_read_capacity **response);
 
-extern RESULT 
-optcl_command_write_and_verify_10(const optcl_device *device,
-	const optcl_mmc_write_and_verify_10 *command, 
-	ptr_t data, 
-	uint32_t data_len);
+extern RESULT
+    optcl_command_read_cd(const optcl_device *device,
+                          const optcl_mmc_read_cd *command,
+                          optcl_mmc_response_read_cd **response);
 
-extern RESULT 
-optcl_command_write_buffer(const optcl_device *device, 
-	const optcl_mmc_write_buffer *command);
+extern RESULT
+    optcl_command_read_msn(const optcl_device *device,
+                           optcl_mmc_response_read_msn **response);
+
+extern RESULT
+    optcl_command_read_track_information(const optcl_device *device,
+                                         const optcl_mmc_read_track_info *command,
+                                         optcl_mmc_response_read_track_info **response);
+
+extern RESULT
+    optcl_command_repair_track(const optcl_device *device,
+                               const optcl_mmc_repair_track *command);
+
+extern RESULT
+    optcl_command_request_sense(const optcl_device *device,
+                                const optcl_mmc_request_sense *command,
+                                optcl_mmc_response_request_sense **response);
+
+extern RESULT
+    optcl_command_reserve_track(const optcl_device *device,
+                                const optcl_mmc_reserve_track *command);
+
+extern RESULT
+    optcl_command_seek(const optcl_device *device, const optcl_mmc_seek *command);
+
+extern RESULT
+    optcl_command_send_disc_structure(const optcl_device *device,
+                                      const optcl_mmc_send_disc_structure *command);
+
+extern RESULT
+    optcl_command_send_opc_information(const optcl_device *device,
+                                       const optcl_mmc_send_opc_information *command);
+
+extern RESULT
+    optcl_command_set_cd_speed(const optcl_device *device,
+                               const optcl_mmc_set_cd_speed *command);
+
+extern RESULT
+    optcl_command_set_read_ahead(const optcl_device *device,
+                                 const optcl_mmc_set_read_ahead *command);
+
+extern RESULT
+    optcl_command_start_stop_unit(const optcl_device *device,
+                                  const optcl_mmc_start_stop_unit *command);
+
+extern RESULT
+    optcl_command_set_streaming(const optcl_device *device,
+                                const optcl_mmc_set_streaming *command);
+
+extern RESULT
+    optcl_command_synchronize_cache(const optcl_device *device,
+                                    const optcl_mmc_synchronize_cache *command);
+
+extern RESULT
+    optcl_command_test_unit_ready(const optcl_device *device);
+
+extern RESULT
+    optcl_command_verify(const optcl_device *device,
+                         const optcl_mmc_verify *command);
+
+extern RESULT
+    optcl_command_write(const optcl_device *device,
+                        const optcl_mmc_write *command, ptr_t data,
+                        uint32_t data_len);
+
+extern RESULT
+    optcl_command_write_12(const optcl_device *device,
+                           const optcl_mmc_write_12 *command,
+                           ptr_t data,
+                           uint32_t data_len);
+
+extern RESULT
+    optcl_command_write_and_verify_10(const optcl_device *device,
+                                      const optcl_mmc_write_and_verify_10 *command,
+                                      ptr_t data,
+                                      uint32_t data_len);
+
+extern RESULT
+    optcl_command_write_buffer(const optcl_device *device,
+                               const optcl_mmc_write_buffer *command);
 
 #endif /* _COMMAND_H */

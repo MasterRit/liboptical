@@ -139,7 +139,7 @@
 /* 0x00040000 - 0xFFFFFFFF Reserved */
 
 /*
- * Loading mechanism type 
+ * Loading mechanism type
  */
 
 #define LMT_CADDY				0x0
@@ -156,11 +156,11 @@
 
 /* Feature descriptor header */
 typedef struct tag_feature_descriptor {
-	uint16_t feature_code;
-	uint8_t version;
-	uint8_t persistent;
-	uint8_t current;
-	uint8_t additional_length;
+    uint16_t feature_code;
+    uint8_t version;
+    uint8_t persistent;
+    uint8_t current;
+    uint8_t additional_length;
 } optcl_feature_descriptor;
 
 /* Feature typedef */
@@ -172,396 +172,396 @@ typedef optcl_feature_descriptor optcl_feature;
 
 /* Profile list */
 typedef struct tag_feature_profile_list {
-	optcl_feature_descriptor descriptor;
-	uint8_t profile_count;
-	uint16_t profile_numbers[64];
-	bool_t current_profiles[64];
+    optcl_feature_descriptor descriptor;
+    uint8_t profile_count;
+    uint16_t profile_numbers[64];
+    bool_t current_profiles[64];
 } optcl_feature_profile_list;
 
 /* Core feature*/
 typedef struct tag_feature_core {
-	optcl_feature_descriptor descriptor;
-	uint32_t phys_i_standard;
-	uint8_t inq2;
-	uint8_t dbe;
+    optcl_feature_descriptor descriptor;
+    uint32_t phys_i_standard;
+    uint8_t inq2;
+    uint8_t dbe;
 } optcl_feature_core;
 
 /* Morphing feature */
 typedef struct tag_feature_morphing {
-	optcl_feature_descriptor descriptor;
-	uint8_t ocevent;
-	uint8_t async;
+    optcl_feature_descriptor descriptor;
+    uint8_t ocevent;
+    uint8_t async;
 } optcl_feature_morphing;
 
 /* Removable medium feature */
 typedef struct tag_feature_removable_medium {
-	optcl_feature_descriptor descriptor;
-	uint8_t lmt;
-	uint8_t eject;
-	uint8_t pvnt_jmpr;
-	uint8_t lock;
+    optcl_feature_descriptor descriptor;
+    uint8_t lmt;
+    uint8_t eject;
+    uint8_t pvnt_jmpr;
+    uint8_t lock;
 } optcl_feature_removable_medium;
 
 /* Write protect feature */
 typedef struct tag_feature_write_protect {
-	optcl_feature_descriptor descriptor;
-	uint8_t dwp;
-	uint8_t wdcb;
-	uint8_t spwp;
-	uint8_t sswpp;
+    optcl_feature_descriptor descriptor;
+    uint8_t dwp;
+    uint8_t wdcb;
+    uint8_t spwp;
+    uint8_t sswpp;
 } optcl_feature_write_protect;
 
 /* Random readable feature */
 typedef struct tag_feature_random_readable {
-	optcl_feature_descriptor descriptor;
-	uint32_t logical_block_size;
-	uint16_t blocking;
-	uint8_t pp;
+    optcl_feature_descriptor descriptor;
+    uint32_t logical_block_size;
+    uint16_t blocking;
+    uint8_t pp;
 } optcl_feature_random_readable;
 
 /* Multi read feature */
 typedef struct tag_feature_multi_read {
-	optcl_feature_descriptor descriptor;
+    optcl_feature_descriptor descriptor;
 } optcl_feature_multi_read;
 
 /* CD read feature */
 typedef struct tag_feature_cd_read {
-	optcl_feature_descriptor descriptor;
-	uint8_t dap;
-	uint8_t c2_flags;
-	uint8_t cd_text;
+    optcl_feature_descriptor descriptor;
+    uint8_t dap;
+    uint8_t c2_flags;
+    uint8_t cd_text;
 } optcl_feature_cd_read;
 
 /* DVD read feature */
 typedef struct tag_feature_dvd_read {
-	optcl_feature_descriptor descriptor;
-	uint8_t multi110;
-	uint8_t dual_r;
+    optcl_feature_descriptor descriptor;
+    uint8_t multi110;
+    uint8_t dual_r;
 } optcl_feature_dvd_read;
 
 /* Random writable feature */
 typedef struct tag_feature_random_writable {
-	optcl_feature_descriptor descriptor;
-	uint32_t last_logical_block;
-	uint32_t logical_block_size;
-	uint16_t blocking;
-	uint8_t pp;
+    optcl_feature_descriptor descriptor;
+    uint32_t last_logical_block;
+    uint32_t logical_block_size;
+    uint16_t blocking;
+    uint8_t pp;
 } optcl_feature_random_writable;
 
 /* Incremental streaming writable feature */
 typedef struct tag_feature_inc_streaming_writable {
-	optcl_feature_descriptor descriptor;
-	uint16_t supported_dbts;
-	uint8_t trio;
-	uint8_t arsv;
-	uint8_t buf;
-	uint8_t link_size_number;
-	uint8_t link_sizes[256];
+    optcl_feature_descriptor descriptor;
+    uint16_t supported_dbts;
+    uint8_t trio;
+    uint8_t arsv;
+    uint8_t buf;
+    uint8_t link_size_number;
+    uint8_t link_sizes[256];
 } optcl_feature_inc_streaming_writable;
 
 /* Sector erasable feature */
 typedef struct tag_feature_sector_erasable {
-	optcl_feature_descriptor descriptor;
+    optcl_feature_descriptor descriptor;
 } optcl_feature_sector_erasable;
 
 /* Formattable feature */
 typedef struct tag_feature_formattable {
-	optcl_feature_descriptor descriptor;
-	uint8_t renosa;
-	uint8_t expand;
-	uint8_t qcert;
-	uint8_t cert;
-	uint8_t rrm;
+    optcl_feature_descriptor descriptor;
+    uint8_t renosa;
+    uint8_t expand;
+    uint8_t qcert;
+    uint8_t cert;
+    uint8_t rrm;
 } optcl_feature_formattable;
 
 /* Hardware defect management feature */
 typedef struct tag_feature_hw_defect_mngmnt {
-	optcl_feature_descriptor descriptor;
-	uint8_t ssa;
+    optcl_feature_descriptor descriptor;
+    uint8_t ssa;
 } optcl_feature_hw_defect_mngmnt;
 
 /* Write once feature */
 typedef struct tag_feature_write_once {
-	optcl_feature_descriptor descriptor;
-	uint32_t logical_block_size;
-	uint16_t blocking;
-	uint8_t pp;
+    optcl_feature_descriptor descriptor;
+    uint32_t logical_block_size;
+    uint16_t blocking;
+    uint8_t pp;
 } optcl_feature_write_once;
 
 /* Restricted overwrite feature */
 typedef struct tag_feature_restricted_ovr {
-	optcl_feature_descriptor descriptor;
+    optcl_feature_descriptor descriptor;
 } optcl_feature_restricted_ovr;
 
 /* CD-RW CAV write feature */
 typedef struct tag_feature_cdrw_cav_write {
-	optcl_feature_descriptor descriptor;
+    optcl_feature_descriptor descriptor;
 } optcl_feature_cdrw_cav_write;
 
 /* MRW feature */
 typedef struct tag_feature_mrw {
-	optcl_feature_descriptor descriptor;
-	uint8_t dvd_plus_write;
-	uint8_t dvd_plus_read;
-	uint8_t cd_write;
+    optcl_feature_descriptor descriptor;
+    uint8_t dvd_plus_write;
+    uint8_t dvd_plus_read;
+    uint8_t cd_write;
 } optcl_feature_mrw;
 
 /* Enhanced defect reporting feature */
 typedef struct tag_feature_enh_defect_reporting {
-	optcl_feature_descriptor descriptor;
-	uint8_t drt_dm;
-	uint8_t dbi_cache_zones_num;
-	uint16_t entries_num;
+    optcl_feature_descriptor descriptor;
+    uint8_t drt_dm;
+    uint8_t dbi_cache_zones_num;
+    uint16_t entries_num;
 } optcl_feature_enh_defect_reporting;
 
 /* DVD+RW feature */
 typedef struct tag_feature_dvd_plus_rw {
-	optcl_feature_descriptor descriptor;
-	uint8_t write;
-	uint8_t quick_start;
-	uint8_t close_only;
+    optcl_feature_descriptor descriptor;
+    uint8_t write;
+    uint8_t quick_start;
+    uint8_t close_only;
 } optcl_feature_dvd_plus_rw;
 
 /* DVD+R feature */
 typedef struct tag_feature_dvd_plus_r {
-	optcl_feature_descriptor descriptor;
-	uint8_t write;
+    optcl_feature_descriptor descriptor;
+    uint8_t write;
 } optcl_feature_dvd_plus_r;
 
 /* Rigid restricted overwrite feature */
 typedef struct tag_feature_rigid_restricted_ovr {
-	optcl_feature_descriptor descriptor;
-	uint8_t dsdg;
-	uint8_t dsdr;
-	uint8_t intermediate;
-	uint8_t blank;
+    optcl_feature_descriptor descriptor;
+    uint8_t dsdg;
+    uint8_t dsdr;
+    uint8_t intermediate;
+    uint8_t blank;
 } optcl_feature_rigid_restricted_ovr;
 
 /* CD track at once feature */
 typedef struct tag_feature_cd_tao {
-	optcl_feature_descriptor descriptor;
-	uint8_t buf;
-	uint8_t rw_raw;
-	uint8_t rw_pack;
-	uint8_t test_write;
-	uint8_t cd_rw;
-	uint8_t rw_subcode;
-	uint16_t data_type_supported;
+    optcl_feature_descriptor descriptor;
+    uint8_t buf;
+    uint8_t rw_raw;
+    uint8_t rw_pack;
+    uint8_t test_write;
+    uint8_t cd_rw;
+    uint8_t rw_subcode;
+    uint16_t data_type_supported;
 } optcl_feature_cd_tao;
 
 /* CD mastering (session at once) feature */
 typedef struct tag_feature_cd_mastering {
-	optcl_feature_descriptor descriptor;
-	uint8_t buf;
-	uint8_t sao;
-	uint8_t raw_ms;
-	uint8_t raw;
-	uint8_t test_write;
-	uint8_t cd_rw;
-	uint8_t rw;
-	uint32_t max_cue_length;
+    optcl_feature_descriptor descriptor;
+    uint8_t buf;
+    uint8_t sao;
+    uint8_t raw_ms;
+    uint8_t raw;
+    uint8_t test_write;
+    uint8_t cd_rw;
+    uint8_t rw;
+    uint32_t max_cue_length;
 } optcl_feature_cd_mastering;
 
 /* DVD-R/-RW write feature */
 typedef struct tag_feature_dvd_minus_r_minus_rw_write {
-	optcl_feature_descriptor descriptor;
-	uint8_t buf;
-	uint8_t rdl;
-	uint8_t test_write;
-	uint8_t dvd_rw;
+    optcl_feature_descriptor descriptor;
+    uint8_t buf;
+    uint8_t rdl;
+    uint8_t test_write;
+    uint8_t dvd_rw;
 } optcl_feature_dvd_minus_r_minus_rw_write;
 
 /* Layer jump recording feature */
 typedef struct tag_feature_layer_jmp_rec {
-	optcl_feature_descriptor descriptor;
-	uint8_t link_sizes_num;
-	uint8_t link_sizes[256];
+    optcl_feature_descriptor descriptor;
+    uint8_t link_sizes_num;
+    uint8_t link_sizes[256];
 } optcl_feature_layer_jmp_rec;
 
 /* CD-RW media write feature */
 typedef struct tag_feature_cdrw_media_write {
-	optcl_feature_descriptor descriptor;
-	uint8_t subtype0;
-	uint8_t subtype1;
-	uint8_t subtype2;
-	uint8_t subtype3;
-	uint8_t subtype4;
-	uint8_t subtype5;
-	uint8_t subtype6;
-	uint8_t subtype7;
+    optcl_feature_descriptor descriptor;
+    uint8_t subtype0;
+    uint8_t subtype1;
+    uint8_t subtype2;
+    uint8_t subtype3;
+    uint8_t subtype4;
+    uint8_t subtype5;
+    uint8_t subtype6;
+    uint8_t subtype7;
 } optcl_feature_cdrw_media_write;
 
 /* BD-R pseudo-overwrite (POW) feature */
 typedef struct tag_feature_bdr_pow {
-	optcl_feature_descriptor descriptor;
+    optcl_feature_descriptor descriptor;
 } optcl_feature_bdr_pow;
 
 /* DVD+RW dual layer feature */
 typedef struct tag_feature_dvd_plus_rw_dual_layer {
-	optcl_feature_descriptor descriptor;
-	uint8_t write;
-	uint8_t quick_start;
-	uint8_t close_only;
+    optcl_feature_descriptor descriptor;
+    uint8_t write;
+    uint8_t quick_start;
+    uint8_t close_only;
 } optcl_feature_dvd_plus_rw_dual_layer;
 
 /* DVD+R dual layer feature */
 typedef struct tag_feature_dvd_r_plus_dual_layer {
-	optcl_feature_descriptor descriptor;
-	uint8_t write;
+    optcl_feature_descriptor descriptor;
+    uint8_t write;
 } optcl_feature_dvd_r_plus_dual_layer;
 
 /* BD read feature */
 typedef struct tag_feature_bd_read {
-	optcl_feature_descriptor descriptor;
-	uint16_t bd_re_class0_bitmap;
-	uint16_t bd_re_class1_bitmap;
-	uint16_t bd_re_class2_bitmap;
-	uint16_t bd_re_class3_bitmap;
-	uint16_t bd_r_class0_bitmap;
-	uint16_t bd_r_class1_bitmap;
-	uint16_t bd_r_class2_bitmap;
-	uint16_t bd_r_class3_bitmap;
-	uint16_t bd_rom_class0_bitmap;
-	uint16_t bd_rom_class1_bitmap;
-	uint16_t bd_rom_class2_bitmap;
-	uint16_t bd_rom_class3_bitmap;
+    optcl_feature_descriptor descriptor;
+    uint16_t bd_re_class0_bitmap;
+    uint16_t bd_re_class1_bitmap;
+    uint16_t bd_re_class2_bitmap;
+    uint16_t bd_re_class3_bitmap;
+    uint16_t bd_r_class0_bitmap;
+    uint16_t bd_r_class1_bitmap;
+    uint16_t bd_r_class2_bitmap;
+    uint16_t bd_r_class3_bitmap;
+    uint16_t bd_rom_class0_bitmap;
+    uint16_t bd_rom_class1_bitmap;
+    uint16_t bd_rom_class2_bitmap;
+    uint16_t bd_rom_class3_bitmap;
 } optcl_feature_bd_read;
 
 /* BD write feature */
 typedef struct tag_feature_bd_write {
-	optcl_feature_descriptor descriptor;
-	uint8_t svnr;
-	uint16_t bd_re_class0_bitmap;
-	uint16_t bd_re_class1_bitmap;
-	uint16_t bd_re_class2_bitmap;
-	uint16_t bd_re_class3_bitmap;
-	uint16_t bd_r_class0_bitmap;
-	uint16_t bd_r_class1_bitmap;
-	uint16_t bd_r_class2_bitmap;
-	uint16_t bd_r_class3_bitmap;
+    optcl_feature_descriptor descriptor;
+    uint8_t svnr;
+    uint16_t bd_re_class0_bitmap;
+    uint16_t bd_re_class1_bitmap;
+    uint16_t bd_re_class2_bitmap;
+    uint16_t bd_re_class3_bitmap;
+    uint16_t bd_r_class0_bitmap;
+    uint16_t bd_r_class1_bitmap;
+    uint16_t bd_r_class2_bitmap;
+    uint16_t bd_r_class3_bitmap;
 } optcl_feature_bd_write;
 
 /* TSR feature */
 typedef struct tag_feature_tsr {
-	optcl_feature_descriptor descriptor;
+    optcl_feature_descriptor descriptor;
 } optcl_feature_tsr;
 
 /* HD DVD read feature */
 typedef struct tag_feature_hd_dvd_read {
-	optcl_feature_descriptor descriptor;
-	uint8_t hd_dvd_r;
-	uint8_t hd_dvd_ram;
+    optcl_feature_descriptor descriptor;
+    uint8_t hd_dvd_r;
+    uint8_t hd_dvd_ram;
 } optcl_feature_hd_dvd_read;
 
 /* HD DVD write feature */
 typedef struct tag_feature_hd_dvd_write {
-	optcl_feature_descriptor descriptor;
-	uint8_t hd_dvd_r;
-	uint8_t hd_dvd_ram;
+    optcl_feature_descriptor descriptor;
+    uint8_t hd_dvd_r;
+    uint8_t hd_dvd_ram;
 } optcl_feature_hd_dvd_write;
 
 /* Hybrid disk feature */
 typedef struct tag_feature_hybrid_disk {
-	optcl_feature_descriptor descriptor;
-	uint8_t ri;
+    optcl_feature_descriptor descriptor;
+    uint8_t ri;
 } optcl_feature_hybrid_disk;
 
 /* Power management feature */
 typedef struct tag_feature_power_mngmnt {
-	optcl_feature_descriptor descriptor;
+    optcl_feature_descriptor descriptor;
 } optcl_feature_power_mngmnt;
 
 /* S.M.A.R.T. feature */
 typedef struct tag_feature_smart {
-	optcl_feature_descriptor descriptor;
-	uint8_t pp;
+    optcl_feature_descriptor descriptor;
+    uint8_t pp;
 } optcl_feature_smart;
 
 /* Embeded changer feature */
 typedef struct tag_feature_embedded_changer {
-	optcl_feature_descriptor descriptor;
-	uint8_t scc;
-	uint8_t sdp;
-	uint8_t highest_slot_num;
+    optcl_feature_descriptor descriptor;
+    uint8_t scc;
+    uint8_t sdp;
+    uint8_t highest_slot_num;
 } optcl_feature_embedded_changer;
 
 /* Microcode upgrade feature */
 typedef struct tag_feature_microcode_upgrade {
-	optcl_feature_descriptor descriptor;
-	uint8_t m5;
+    optcl_feature_descriptor descriptor;
+    uint8_t m5;
 } optcl_feature_microcode_upgrade;
 
 /* Timeout feature */
 typedef struct tag_feature_timeout {
-	optcl_feature_descriptor descriptor;
-	uint8_t group3;
-	uint16_t unit_length;
+    optcl_feature_descriptor descriptor;
+    uint8_t group3;
+    uint16_t unit_length;
 } optcl_feature_timeout;
 
 /* DVD CSS feature */
 typedef struct tag_feature_dvd_css {
-	optcl_feature_descriptor descriptor;
-	uint8_t css_version;
+    optcl_feature_descriptor descriptor;
+    uint8_t css_version;
 } optcl_feature_dvd_css;
 
 /* Real time streaming feature */
 typedef struct tag_feature_rt_streaming {
-	optcl_feature_descriptor descriptor;
-	uint8_t rbcb;
-	uint8_t scs;
-	uint8_t mp2a;
-	uint8_t wspd;
-	uint8_t sw;
+    optcl_feature_descriptor descriptor;
+    uint8_t rbcb;
+    uint8_t scs;
+    uint8_t mp2a;
+    uint8_t wspd;
+    uint8_t sw;
 } optcl_feature_rt_streaming;
 
 /* Drive serial number feature */
 typedef struct tag_feature_drive_serial_number {
-	optcl_feature_descriptor descriptor;
-	uint8_t serial_number[257];
+    optcl_feature_descriptor descriptor;
+    uint8_t serial_number[257];
 } optcl_feature_drive_serial_number;
 
 /* Media serial number feature */
 typedef struct tag_feature_media_serial_number {
-	optcl_feature_descriptor descriptor;
+    optcl_feature_descriptor descriptor;
 } optcl_feature_media_serial_number;
 
 /* Disc control blocks (DCBs) feature */
 typedef struct tag_feature_dcbs {
-	optcl_feature_descriptor descriptor;
-	uint8_t dcb_entries_num;
-	uint32_t dcb_entries[256];
+    optcl_feature_descriptor descriptor;
+    uint8_t dcb_entries_num;
+    uint32_t dcb_entries[256];
 } optcl_feature_dcbs;
 
 /* DVD CPRM feature */
 typedef struct tag_feature_dvd_cprm {
-	optcl_feature_descriptor descriptor;
-	uint8_t cprm_version;
+    optcl_feature_descriptor descriptor;
+    uint8_t cprm_version;
 } optcl_feature_dvd_cprm;
 
 /* Firmware information feature */
 typedef struct tag_feature_firmware_info {
-	optcl_feature_descriptor descriptor;
-	uint16_t century;
-	uint16_t year;
-	uint16_t month;
-	uint16_t day;
-	uint16_t hour;
-	uint16_t minute;
-	uint16_t second;
+    optcl_feature_descriptor descriptor;
+    uint16_t century;
+    uint16_t year;
+    uint16_t month;
+    uint16_t day;
+    uint16_t hour;
+    uint16_t minute;
+    uint16_t second;
 } optcl_feature_firmware_info;
 
 /* AACS feature */
 typedef struct tag_feature_aacs {
-	optcl_feature_descriptor descriptor;
-	uint8_t bng;
-	uint8_t block_count;
-	uint8_t agids_num;
-	uint8_t aacs_version;
+    optcl_feature_descriptor descriptor;
+    uint8_t bng;
+    uint8_t block_count;
+    uint8_t agids_num;
+    uint8_t aacs_version;
 } optcl_feature_aacs;
 
 /* VCPS feature */
 typedef struct tag_feature_vcps {
-	optcl_feature_descriptor descriptor;
+    optcl_feature_descriptor descriptor;
 } optcl_feature_vcps;
 
 
@@ -570,22 +570,22 @@ typedef struct tag_feature_vcps {
  */
 
 /* Copy feature */
-extern RESULT optcl_feature_copy(optcl_feature **dest, 
-				 const optcl_feature *src);
+extern RESULT optcl_feature_copy(optcl_feature **dest,
+                                     const optcl_feature *src);
 
 /* Create feature structure */
 extern RESULT optcl_feature_create(uint16_t feature_code,
-				   optcl_feature **feature);
+                                       optcl_feature **feature);
 
 /* Create feature from raw MMC data */
 extern RESULT optcl_feature_create_from_raw(optcl_feature **feature,
-					    const uint8_t mmc_data[],
-					    uint32_t size);
+            const uint8_t mmc_data[],
+            uint32_t size);
 
 /* Create feature descriptor from raw MMC data */
 extern RESULT optcl_feature_create_descriptor(optcl_feature_descriptor **descriptor,
-					      const uint8_t mmc_data[],
-					      uint32_t size);
+            const uint8_t mmc_data[],
+            uint32_t size);
 
 
 /* Destroy feature structure */

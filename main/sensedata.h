@@ -853,13 +853,13 @@
  */
 
 /* Parse error code from raw sense data */
-extern RESULT optcl_sensedata_get_code(const uint8_t raw_data[], 
-				       uint8_t size, 
-				       RESULT *error_code);
+extern RESULT optcl_sensedata_get_code(const uint8_t raw_data[],
+                                           uint8_t size,
+                                           RESULT *error_code);
 
 /* Format error code message */
 extern RESULT optcl_sensedata_get_formatted_msg(RESULT error_code,
-						char **message);
+            char **message);
 
 
 #endif /* _SENSEDATA_H */

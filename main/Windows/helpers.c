@@ -27,32 +27,32 @@
 
 
 /*
- * Memory allocation 
+ * Memory allocation
  */
 
 void* xmalloc_aligned(size_t size, size_t alignment)
 {
-	ptr_t memptr = 0;
-	
-	memptr = (ptr_t)_aligned_malloc(size, alignment);
-	
-	if (memptr == 0) {
-		return(0);
-	}
-	
-	memset(memptr, 0, size);
-	
-	return(memptr);
+    ptr_t memptr = 0;
+
+    memptr = (ptr_t)_aligned_malloc(size, alignment);
+
+    if (memptr == 0) {
+        return(0);
+    }
+
+    memset(memptr, 0, size);
+
+    return(memptr);
 }
 
 void* xrealloc_aligned(void *memblock, size_t size, size_t alignment)
 {
-	return _aligned_realloc(memblock, size, alignment);
+    return _aligned_realloc(memblock, size, alignment);
 }
 
 void xfree_aligned(void *memoryblock)
 {
-	_aligned_free(memoryblock);
+    _aligned_free(memoryblock);
 }
 
 /*
@@ -61,21 +61,21 @@ void xfree_aligned(void *memoryblock)
 
 char* xstrdup(const char *string)
 {
-	return _strdup(string);
+    return _strdup(string);
 }
 
 errno_t xstrncpy(char *dest, size_t dest_size, const char *src, size_t count)
 {
-	errno_t err = strncpy_s(dest, dest_size, src, count);
-	assert(err == 0);
-	return(err);
+    errno_t err = strncpy_s(dest, dest_size, src, count);
+    assert(err == 0);
+    return(err);
 }
 
 errno_t xstrcat(char *dest, size_t dest_size, const char *src)
 {
-	errno_t err = strcat_s(dest, dest_size, src);
-	assert(err == 0);
-	return(err);
+    errno_t err = strcat_s(dest, dest_size, src);
+    assert(err == 0);
+    return(err);
 }
 
 /*
@@ -84,7 +84,7 @@ errno_t xstrcat(char *dest, size_t dest_size, const char *src)
 
 errno_t xmemcpy(void *dest, size_t dest_size, const void *src, size_t count)
 {
-	errno_t err = memcpy_s(dest, dest_size, src, count);
-	assert(err == 0);
-	return(err);
+    errno_t err = memcpy_s(dest, dest_size, src, count);
+    assert(err == 0);
+    return(err);
 }

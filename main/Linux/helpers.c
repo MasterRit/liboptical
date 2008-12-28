@@ -30,32 +30,32 @@
 
 
 /*
- * Memory allocation 
+ * Memory allocation
  */
 
 void* xmalloc_aligned(size_t size, size_t alignment)
 {
-	ptr_t memptr = 0;
-	
-	posix_memalign((void**)&memptr, alignment, size);
-	
-	if (memptr == 0) {
-		return(0);
-	}
-	
-	memset(memptr, 0, size);
-	
-	return(memptr);
+    ptr_t memptr = 0;
+
+    posix_memalign((void**)&memptr, alignment, size);
+
+    if (memptr == 0) {
+        return(0);
+    }
+
+    memset(memptr, 0, size);
+
+    return(memptr);
 }
 
 void* xrealloc_aligned(void *memblock, size_t size, size_t alignment)
 {
-	return(realloc(memblock, size));
+    return(realloc(memblock, size));
 }
 
 void xfree_aligned(void *memoryblock)
 {
-	free(memoryblock);
+    free(memoryblock);
 }
 
 /*
@@ -64,36 +64,36 @@ void xfree_aligned(void *memoryblock)
 
 char* xstrdup(const char *string)
 {
-	return(strdup(string));
+    return(strdup(string));
 }
 
 errno_t xstrncpy(char *dest, size_t dest_size, const char *src, size_t count)
 {
-	assert(count <= dest_size);
-	
-	if (count > dest_size) {
-		return(EINVAL);
-	}
-	
-	strncpy(dest, src, count);
-	
-	return(errno);
+    assert(count <= dest_size);
+
+    if (count > dest_size) {
+        return(EINVAL);
+    }
+
+    strncpy(dest, src, count);
+
+    return(errno);
 }
 
 errno_t xstrcat(char *dest, size_t dest_size, const char *src)
 {
-	int dest_len = strlen(dest);
-	int src_len = strlen(src);
-	
-	assert(dest_len + src_len < dest_size);
-	
-	if (dest_len + src_len >= dest_size) {
-		return(EINVAL);
-	}
-	
-	strcat(dest, src);
-	
-	return(errno);
+    int dest_len = strlen(dest);
+    int src_len = strlen(src);
+
+    assert(dest_len + src_len < dest_size);
+
+    if (dest_len + src_len >= dest_size) {
+        return(EINVAL);
+    }
+
+    strcat(dest, src);
+
+    return(errno);
 }
 
 /*
@@ -102,13 +102,13 @@ errno_t xstrcat(char *dest, size_t dest_size, const char *src)
 
 errno_t xmemcpy(void *dest, size_t dest_size, const void *src, size_t count)
 {
-	assert(count <= dest_size);
-	
-	if (count > dest_size) {
-		return(EINVAL);
-	}
-	
-	memcpy(dest, src, count);
+    assert(count <= dest_size);
 
-	return(errno);
+    if (count > dest_size) {
+        return(EINVAL);
+    }
+
+    memcpy(dest, src, count);
+
+    return(errno);
 }

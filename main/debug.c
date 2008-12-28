@@ -42,61 +42,61 @@ static char *_log_file = "optical.log";
 
 RESULT optcl_debug_set_log_file(char filename[])
 {
-	_log_file = filename;
-	return(SUCCESS);
+    _log_file = filename;
+    return(SUCCESS);
 }
 
 RESULT optcl_debug_log_bytes(const char message[],
-			     const uint8_t data[],
-			     uint32_t size)
+                             const uint8_t data[],
+                             uint32_t size)
 {
-	uint32_t i;
-	FILE *stream;
-	errno_t error;
+    uint32_t i;
+    FILE *stream;
+    errno_t error;
 
-	assert(message != 0);
+    assert(message != 0);
 
-	if (message == 0) {
-		return(E_INVALIDARG);
-	}
+    if (message == 0) {
+        return(E_INVALIDARG);
+    }
 
-	if (_log_file == 0) {
-		stream = stderr;
-	} else {
+    if (_log_file == 0) {
+        stream = stderr;
+    } else {
 #ifdef _WIN32
-		error = fopen_s(&stream, _log_file, "a");
+        error = fopen_s(&stream, _log_file, "a");
 #else
-		stream = fopen(_log_file, "a");
-		error = errno;
+        stream = fopen(_log_file, "a");
+        error = errno;
 #endif
 
-		if (stream == 0) {
-			return(MAKE_ERRORCODE(
-				SEVERITY_ERROR,
-				FACILITY_GENERAL,
-				error
-				));
-		}
-	}
+        if (stream == 0) {
+            return(MAKE_ERRORCODE(
+                       SEVERITY_ERROR,
+                       FACILITY_GENERAL,
+                       error
+                   ));
+        }
+    }
 
-	fprintf(stream, "%s\r\n\n", message);
+    fprintf(stream, "%s\r\n\n", message);
 
-	if (data != 0 && size > 0) {
-		for(i = 0; i < size; ++i) {
-			fprintf(stream, "%x", data[i]);
+    if (data != 0 && size > 0) {
+        for (i = 0; i < size; ++i) {
+            fprintf(stream, "%x", data[i]);
 
-			if (i < size - 1) {
-				fprintf(stream, "%s", ", ");
-			}
-		}
-	} else {
-		fprintf(stream, "%s", "null");
-	}
+            if (i < size - 1) {
+                fprintf(stream, "%s", ", ");
+            }
+        }
+    } else {
+        fprintf(stream, "%s", "null");
+    }
 
-	fprintf(stream, "%s", "\r\n\n");
-	fclose(stream);
+    fprintf(stream, "%s", "\r\n\n");
+    fclose(stream);
 
-	return(SUCCESS);
+    return(SUCCESS);
 }
 
 #endif /* _DEBUG */

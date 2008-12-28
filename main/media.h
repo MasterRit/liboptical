@@ -35,8 +35,8 @@ int optcl_media_info_create(optcl_media_info **media);
 int optcl_media_info_clear(optcl_media_info *media);
 
 /* Gets deep copy of a media structure */
-int optcl_media_info_copy(optcl_media_info *dest, 
-			  const optcl_media_info *src);
+int optcl_media_info_copy(optcl_media_info *dest,
+                          const optcl_media_info *src);
 
 /* Destroys media structure */
 int optcl_media_info_destroy(optcl_media_info *media);
@@ -45,14 +45,14 @@ int optcl_media_info_destroy(optcl_media_info *media);
 int optcl_media_info_get_type(const optcl_media_info *media, int *type);
 
 /* Gets media profiles */
-int optcl_media_info_get_profiles(const optcl_media_info *media, 
-				  optcl_list **profiles);
+int optcl_media_info_get_profiles(const optcl_media_info *media,
+                                  optcl_list **profiles);
 
 /* Sets media type */
 int optcl_media_info_set_type(optcl_media_info *media, int type);
 
 /* Sets media profiles */
-int optcl_media_info_set_profiles(optcl_media_info *media, 
-				  const optcl_list *profiles);
+int optcl_media_info_set_profiles(optcl_media_info *media,
+                                  const optcl_list *profiles);
 
 #endif /* _MEDIA_H */
