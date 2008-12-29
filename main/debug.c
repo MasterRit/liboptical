@@ -55,14 +55,12 @@ RESULT optcl_debug_log_bytes(const char message[],
     errno_t error;
 
     assert(message != 0);
+    if (message == 0)
+        return E_INVALIDARG;
 
-    if (message == 0) {
-        return(E_INVALIDARG);
-    }
-
-    if (_log_file == 0) {
+    if (_log_file == 0)
         stream = stderr;
-    } else {
+    else {
 #ifdef _WIN32
         error = fopen_s(&stream, _log_file, "a");
 #else
@@ -70,13 +68,8 @@ RESULT optcl_debug_log_bytes(const char message[],
         error = errno;
 #endif
 
-        if (stream == 0) {
-            return(MAKE_ERRORCODE(
-                       SEVERITY_ERROR,
-                       FACILITY_GENERAL,
-                       error
-                   ));
-        }
+        if (stream == 0)
+            return MAKE_ERRORCODE(SEVERITY_ERROR, FACILITY_GENERAL, error);
     }
 
     fprintf(stream, "%s\r\n\n", message);
@@ -85,18 +78,16 @@ RESULT optcl_debug_log_bytes(const char message[],
         for (i = 0; i < size; ++i) {
             fprintf(stream, "%x", data[i]);
 
-            if (i < size - 1) {
+            if (i < size - 1)
                 fprintf(stream, "%s", ", ");
-            }
         }
-    } else {
+    } else
         fprintf(stream, "%s", "null");
-    }
 
     fprintf(stream, "%s", "\r\n\n");
     fclose(stream);
 
-    return(SUCCESS);
+    return SUCCESS;
 }
 
 #endif /* _DEBUG */

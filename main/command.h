@@ -31,48 +31,48 @@
  * BLANK command command field flags
  */
 
-#define MMC_BLANK_BLANK_DISK			0x00
-#define MMC_BLANK_MINIMAL_BLANK_DISK		0x01
-#define MMC_BLANK_BLANK_TRACK			0x02
-#define MMC_BLANK_UNRESERVE_TRACK		0x03
-#define MMC_BLANK_TRACK_TRAIL			0x04
-#define MMC_BLANK_UNCLOSE_LAST_SESSION		0x05
-#define MMC_BLANK_LAST_SESSION			0x06
+#define MMC_BLANK_BLANK_DISK                                        0x00
+#define MMC_BLANK_MINIMAL_BLANK_DISK                                0x01
+#define MMC_BLANK_BLANK_TRACK                                       0x02
+#define MMC_BLANK_UNRESERVE_TRACK                                   0x03
+#define MMC_BLANK_TRACK_TRAIL                                       0x04
+#define MMC_BLANK_UNCLOSE_LAST_SESSION                              0x05
+#define MMC_BLANK_LAST_SESSION                                      0x06
 
 
 /*
  * CLOSE TRACK SESSION command field flags
  */
 
-#define MMC_CTS_CD_R_RW_CLOSE_LOGICAL_TRACK			0x01
-#define MMC_CTS_CD_R_RW_CLOSE_SESSION_FINALIZE			0x02
-#define MMC_CTS_DVD_R_RW_CLOSE_LOGICAL_TRACK			0x01
-#define MMC_CTS_DVD_R_RW_CLOSE_SESSION_FINALIZE			0x02
-#define MMC_CTS_DVD_R_RW_FINALIZE_DVD_RW_DISC			0x03
-#define MMC_CTS_DVD_R_DL_CLOSE_LOGICAL_TRACK			0x01
-#define MMC_CTS_DVD_R_DL_CLOSE_SESSION_FINALIZE			0x02
-#define MMC_CTS_DVD_PLUS_R_CLOSE_LOGICAL_TRACK			0x01
-#define MMC_CTS_DVD_PLUS_R_CLOSE_SESSION			0x02
-#define MMC_CTS_DVD_PLUS_R_FINALIZE_30MM_RADIUS			0x05
-#define MMC_CTS_DVD_PLUS_R_FINALIZE_DISC			0x06
-#define MMC_CTS_DVD_PLUS_R_DL_CLOSE_LOGICAL_TRACK		0x01
-#define MMC_CTS_DVD_PLUS_R_DL_CLOSE_SESSION			0x02
-#define MMC_CTS_DVD_PLUS_R_DL_REC_EXT_LEADOUT			0x04
-#define MMC_CTS_DVD_PLUS_R_DL_FINALIZE_30MM_RADIUS		0x05
-#define MMC_CTS_DVD_PLUS_R_DL_FINALIZE_DISC			0x06
-#define MMC_CTS_DVD_PLUS_RW_QUICKSTOP_BG_FORMAT			0x00
-#define MMC_CTS_DVD_PLUS_RW_COMPSTOP_BG_FORMAT_30MM_RADIUS	0x02
-#define MMC_CTS_DVD_PLUS_RW_COMPSTOP_BG_FORMAT			0x03
-#define MMC_CTS_DVD_PLUS_RW_DL_QUICKSTOP_BG_FORMAT		0x00
-#define MMC_CTS_DVD_PLUS_RW_DL_COMPSTOP_BG_FORMAT_30MM_RADIUS	0x02
-#define MMC_CTS_DVD_PLUS_RW_DL_COMPSTOP_BG_FORMAT		0x03
-#define MMC_CTS_HD_DVD_R_CLOSE_LOGICAL_TRACK			0x01
-#define MMC_CTS_HD_DVD_R_CLOSE_SESSION				0x02
-#define MMC_CTS_HD_DVD_R_FINALIZE_DISC				0x06
-#define MMC_CTS_BD_R_CLOSE_LOGICAL_TRACK			0x01
-#define MMC_CTS_BD_R_CLOSE_SESSION				0x02
-#define MMC_CTS_BD_R_FINALIZE_DISC				0x06
-#define MMC_CTS_MRW_STOP_BG_FORMAT				0x02
+#define MMC_CTS_CD_R_RW_CLOSE_LOGICAL_TRACK                         0x01
+#define MMC_CTS_CD_R_RW_CLOSE_SESSION_FINALIZE                      0x02
+#define MMC_CTS_DVD_R_RW_CLOSE_LOGICAL_TRACK                        0x01
+#define MMC_CTS_DVD_R_RW_CLOSE_SESSION_FINALIZE                     0x02
+#define MMC_CTS_DVD_R_RW_FINALIZE_DVD_RW_DISC                       0x03
+#define MMC_CTS_DVD_R_DL_CLOSE_LOGICAL_TRACK                        0x01
+#define MMC_CTS_DVD_R_DL_CLOSE_SESSION_FINALIZE                     0x02
+#define MMC_CTS_DVD_PLUS_R_CLOSE_LOGICAL_TRACK                      0x01
+#define MMC_CTS_DVD_PLUS_R_CLOSE_SESSION                            0x02
+#define MMC_CTS_DVD_PLUS_R_FINALIZE_30MM_RADIUS                     0x05
+#define MMC_CTS_DVD_PLUS_R_FINALIZE_DISC                            0x06
+#define MMC_CTS_DVD_PLUS_R_DL_CLOSE_LOGICAL_TRACK                   0x01
+#define MMC_CTS_DVD_PLUS_R_DL_CLOSE_SESSION                         0x02
+#define MMC_CTS_DVD_PLUS_R_DL_REC_EXT_LEADOUT                       0x04
+#define MMC_CTS_DVD_PLUS_R_DL_FINALIZE_30MM_RADIUS                  0x05
+#define MMC_CTS_DVD_PLUS_R_DL_FINALIZE_DISC                         0x06
+#define MMC_CTS_DVD_PLUS_RW_QUICKSTOP_BG_FORMAT                     0x00
+#define MMC_CTS_DVD_PLUS_RW_COMPSTOP_BG_FORMAT_30MM_RADIUS          0x02
+#define MMC_CTS_DVD_PLUS_RW_COMPSTOP_BG_FORMAT                      0x03
+#define MMC_CTS_DVD_PLUS_RW_DL_QUICKSTOP_BG_FORMAT                  0x00
+#define MMC_CTS_DVD_PLUS_RW_DL_COMPSTOP_BG_FORMAT_30MM_RADIUS       0x02
+#define MMC_CTS_DVD_PLUS_RW_DL_COMPSTOP_BG_FORMAT                   0x03
+#define MMC_CTS_HD_DVD_R_CLOSE_LOGICAL_TRACK                        0x01
+#define MMC_CTS_HD_DVD_R_CLOSE_SESSION                              0x02
+#define MMC_CTS_HD_DVD_R_FINALIZE_DISC                              0x06
+#define MMC_CTS_BD_R_CLOSE_LOGICAL_TRACK                            0x01
+#define MMC_CTS_BD_R_CLOSE_SESSION                                  0x02
+#define MMC_CTS_BD_R_FINALIZE_DISC                                  0x06
+#define MMC_CTS_MRW_STOP_BG_FORMAT                                  0x02
 
 
 /*
@@ -80,211 +80,209 @@
  */
 
 /* Format types */
-#define MMC_FORMAT_FULL_FORMAT					0x00
-#define MMC_FORMAT_SPARE_AREA_EXPANSION				0x01
-#define MMC_FORMAT_ZONE_REFORMAT				0x04
-#define MMC_FORMAT_ZONE_FORMAT					0x05
-#define MMC_FORMAT_CD_RW_DVD_RW_FULL_FORMAT			0x10
-#define MMC_FORMAT_CD_RW_DVD_RW_GROW_SESSION			0x11
-#define MMC_FORMAT_CD_RW_DVD_RW_ADD_SESSION			0x12
-#define MMC_FORMAT_DVD_RW_QUICK_GROW_LAST_BORDER		0x13
-#define MMC_FORMAT_DVD_RW_QUICK_ADD_BORDER			0x14
-#define MMC_FORMAT_DVD_RW_QUICK_FORMAT				0x15
-#define MMC_FORMAT_HD_DVD_R_TEST_ZONE_EXPANSION			0x16
-#define MMC_FORMAT_FULL_FORMAT_WITH_SPARING_PARAMS		0x20
-#define MMC_FORMAT_MRW_FORMAT					0x24
-#define MMC_FORMAT_DVD_PLUS_RW_BASIC_FORMAT			0x26
-#define MMC_FORMAT_BD_RE_FULL_FORMAT_WITH_SPARE_AREAS		0x30
-#define MMC_FORMAT_BD_RE_FULL_FORMAT_WITHOUT_SPARE_AREAS	0x31
-#define MMC_FORMAT_BD_R_FULL_FORMAT_WITH_SPARE_AREAS		0x32
+#define MMC_FORMAT_FULL_FORMAT                                      0x00
+#define MMC_FORMAT_SPARE_AREA_EXPANSION                             0x01
+#define MMC_FORMAT_ZONE_REFORMAT                                    0x04
+#define MMC_FORMAT_ZONE_FORMAT                                      0x05
+#define MMC_FORMAT_CD_RW_DVD_RW_FULL_FORMAT                         0x10
+#define MMC_FORMAT_CD_RW_DVD_RW_GROW_SESSION                        0x11
+#define MMC_FORMAT_CD_RW_DVD_RW_ADD_SESSION                         0x12
+#define MMC_FORMAT_DVD_RW_QUICK_GROW_LAST_BORDER                    0x13
+#define MMC_FORMAT_DVD_RW_QUICK_ADD_BORDER                          0x14
+#define MMC_FORMAT_DVD_RW_QUICK_FORMAT                              0x15
+#define MMC_FORMAT_HD_DVD_R_TEST_ZONE_EXPANSION                     0x16
+#define MMC_FORMAT_FULL_FORMAT_WITH_SPARING_PARAMS                  0x20
+#define MMC_FORMAT_MRW_FORMAT                                       0x24
+#define MMC_FORMAT_DVD_PLUS_RW_BASIC_FORMAT                         0x26
+#define MMC_FORMAT_BD_RE_FULL_FORMAT_WITH_SPARE_AREAS               0x30
+#define MMC_FORMAT_BD_RE_FULL_FORMAT_WITHOUT_SPARE_AREAS            0x31
+#define MMC_FORMAT_BD_R_FULL_FORMAT_WITH_SPARE_AREAS                0x32
 
 /* Format sub-types for BD-R discs*/
-#define MMC_FORMAT_SUBTYPE_BD_R_SRM_PLUS_POW			0x00
-#define MMC_FORMAT_SUBTYPE_BD_R_SRM_POW				0x01
-#define MMC_FORMAT_SUBTYPE_BD_R_RRM				0x02
+#define MMC_FORMAT_SUBTYPE_BD_R_SRM_PLUS_POW                        0x00
+#define MMC_FORMAT_SUBTYPE_BD_R_SRM_POW                             0x01
+#define MMC_FORMAT_SUBTYPE_BD_R_RRM                                 0x02
 
 /* Format sub-types for BD-RE discs with spare areas */
-#define MMC_FORMAT_SUBTYPE_BD_RE_QUICK_REFORMAT			0x00
-#define MMC_FORMAT_SUBTYPE_BD_RE_NO_CERTIFICATION		0x01
-#define MMC_FORMAT_SUBTYPE_BD_RE_FULL_CERTIFICATION		0x02
-#define MMC_FORMAT_SUBTYPE_BD_RE_QUICK_CERTIFICATION		0x03
+#define MMC_FORMAT_SUBTYPE_BD_RE_QUICK_REFORMAT                     0x00
+#define MMC_FORMAT_SUBTYPE_BD_RE_NO_CERTIFICATION                   0x01
+#define MMC_FORMAT_SUBTYPE_BD_RE_FULL_CERTIFICATION                 0x02
+#define MMC_FORMAT_SUBTYPE_BD_RE_QUICK_CERTIFICATION                0x03
 
 
 /*
  * GET CONFIGURATION command field flags
  */
 
-#define MMC_GET_CONFIG_RT_ALL			0x00
-#define MMC_GET_CONFIG_RT_CURRENT		0x01
-#define MMC_GET_CONFIG_RT_FROM			0x02
+#define MMC_GET_CONFIG_RT_ALL                                       0x00
+#define MMC_GET_CONFIG_RT_CURRENT                                   0x01
+#define MMC_GET_CONFIG_RT_FROM                                      0x02
 
 
 /*
  * GET EVENT STATUS NOTIFICATION command field flags
  */
 
-#define MMC_GET_EVENT_STATUS_OPCHANGE		0x01
-#define MMC_GET_EVENT_STATUS_POWERMGMT		0x02
-#define MMC_GET_EVENT_STATUS_EXTREQUEST		0x04
-#define MMC_GET_EVENT_STATUS_MEDIA		0x08
-#define MMC_GET_EVENT_STATUS_MULTIHOST		0x10
-#define MMC_GET_EVENT_STATUS_DEVICEBUSY		0x20
+#define MMC_GET_EVENT_STATUS_OPCHANGE                               0x01
+#define MMC_GET_EVENT_STATUS_POWERMGMT                              0x02
+#define MMC_GET_EVENT_STATUS_EXTREQUEST                             0x04
+#define MMC_GET_EVENT_STATUS_MEDIA                                  0x08
+#define MMC_GET_EVENT_STATUS_MULTIHOST                              0x10
+#define MMC_GET_EVENT_STATUS_DEVICEBUSY                             0x20
 
-#define EVENT_OC_EC_NOCHG			0x00
-#define EVENT_OC_EC_CHANGED			0x02
-#define EVENT_OC_OC_NOCHG			0x00
-#define EVENT_OC_OC_FEATCHANGE			0x02
-#define EVENT_PM_EC_NOCHG			0x00
-#define EVENT_PM_EC_PWRCHGOK			0x01
-#define EVENT_PM_EC_PWRCHGFAIL			0x02
-#define EVENT_PM_PS_ACTIVE			0x01
-#define EVENT_PM_PS_IDLE			0x02
-#define EVENT_PM_PS_STANDBY			0x03
-#define EVENT_PM_PS_SLEEP			0x04
-#define EVENT_ER_EC_NOCHG			0x00
-#define EVENT_ER_EC_DRIVEKEYDOWN		0x01
-#define EVENT_ER_EC_DRIVEKEYUP			0x02
-#define EVENT_ER_EC_EXTREQNOT			0x03
-#define EVENT_ER_ERC_READY			0x00
-#define EVENT_ER_ERC_OTHERPREVENT		0x01
+#define EVENT_OC_EC_NOCHG                                           0x00
+#define EVENT_OC_EC_CHANGED                                         0x02
+#define EVENT_OC_OC_NOCHG                                           0x00
+#define EVENT_OC_OC_FEATCHANGE                                      0x02
+#define EVENT_PM_EC_NOCHG                                           0x00
+#define EVENT_PM_EC_PWRCHGOK                                        0x01
+#define EVENT_PM_EC_PWRCHGFAIL                                      0x02
+#define EVENT_PM_PS_ACTIVE                                          0x01
+#define EVENT_PM_PS_IDLE                                            0x02
+#define EVENT_PM_PS_STANDBY                                         0x03
+#define EVENT_PM_PS_SLEEP                                           0x04
+#define EVENT_ER_EC_NOCHG                                           0x00
+#define EVENT_ER_EC_DRIVEKEYDOWN                                    0x01
+#define EVENT_ER_EC_DRIVEKEYUP                                      0x02
+#define EVENT_ER_EC_EXTREQNOT                                       0x03
+#define EVENT_ER_ERC_READY                                          0x00
+#define EVENT_ER_ERC_OTHERPREVENT                                   0x01
 
-#define EVENT_ER_ER_NOREQUEST			0x0000
-#define EVENT_ER_ER_OVERRUN			0x0001
-#define EVENT_ER_ER_PLAY			0x0101
-#define EVENT_ER_ER_REWIND			0x0102
-#define EVENT_ER_ER_FASTFORWARD			0x0103
-#define EVENT_ER_ER_PAUSE			0x0104
-#define EVENT_ER_ER_STOP			0x0106
+#define EVENT_ER_ER_NOREQUEST                                       0x0000
+#define EVENT_ER_ER_OVERRUN                                         0x0001
+#define EVENT_ER_ER_PLAY                                            0x0101
+#define EVENT_ER_ER_REWIND                                          0x0102
+#define EVENT_ER_ER_FASTFORWARD                                     0x0103
+#define EVENT_ER_ER_PAUSE                                           0x0104
+#define EVENT_ER_ER_STOP                                            0x0106
 /* 0x0200 - 0x02FF ASCII button */
 /* 0xF000 - 0xFFFF Vendor unique */
 
-#define EVENT_MEDIA_EC_NOCHG			0x00
-#define EVENT_MEDIA_EC_EJECTREQUEST		0x01
-#define EVENT_MEDIA_EC_NEWMEDIA			0x02
-#define EVENT_MEDIA_EC_MEDIAREMOVAL		0x03
-#define EVENT_MEDIA_EC_MEDIACHANGED		0x04
-#define EVENT_MEDIA_EC_BGFORMATCOMPLETE		0x05
-#define EVENT_MEDIA_EC_BGFORMATRESTART		0x06
+#define EVENT_MEDIA_EC_NOCHG                                        0x00
+#define EVENT_MEDIA_EC_EJECTREQUEST                                 0x01
+#define EVENT_MEDIA_EC_NEWMEDIA                                     0x02
+#define EVENT_MEDIA_EC_MEDIAREMOVAL                                 0x03
+#define EVENT_MEDIA_EC_MEDIACHANGED                                 0x04
+#define EVENT_MEDIA_EC_BGFORMATCOMPLETE                             0x05
+#define EVENT_MEDIA_EC_BGFORMATRESTART                              0x06
 
-#define EVENT_MH_EC_NOCHG			0x00
-#define EVENT_MH_EC_CTRLREQUEST			0x01
-#define EVENT_MH_EC_CTRLGRANT			0x02
-#define EVENT_MH_EC_CTRLRELEASE			0x03
-#define EVENT_MH_MHS_READY			0x00
-#define EVENT_MH_MHS_OTHERPREVENT		0x01
-#define EVENT_MH_MHP_NOREQUEST			0x00
-#define EVENT_MH_MHP_LOW			0x01
-#define EVENT_MH_MHP_MEDIUM			0x02
-#define EVENT_MH_MHP_HIGH			0x03
+#define EVENT_MH_EC_NOCHG                                           0x00
+#define EVENT_MH_EC_CTRLREQUEST                                     0x01
+#define EVENT_MH_EC_CTRLGRANT                                       0x02
+#define EVENT_MH_EC_CTRLRELEASE                                     0x03
+#define EVENT_MH_MHS_READY                                          0x00
+#define EVENT_MH_MHS_OTHERPREVENT                                   0x01
+#define EVENT_MH_MHP_NOREQUEST                                      0x00
+#define EVENT_MH_MHP_LOW                                            0x01
+#define EVENT_MH_MHP_MEDIUM                                         0x02
+#define EVENT_MH_MHP_HIGH                                           0x03
 
-#define EVENT_DB_EC_NOCHG			0x00
-#define EVENT_DB_EC_CHANGE			0x01
-#define EVENT_DB_DBS_NOTBUSY			0x00
-#define EVENT_DB_DBS_BUSY			0x01
+#define EVENT_DB_EC_NOCHG                                           0x00
+#define EVENT_DB_EC_CHANGE                                          0x01
+#define EVENT_DB_DBS_NOTBUSY                                        0x00
+#define EVENT_DB_DBS_BUSY                                           0x01
 
 
 /*
  * GET PERFORMANCE command field flags
  */
 
-#define MMC_GET_PERF_PERFOMANCE_DATA		0x00
-#define MMC_GET_PERF_UNUSABLE_AREA_DATA		0x01
-#define MMC_GET_PERF_DEFECT_STATUS_DATA		0x02
-#define MMC_GET_PERF_WRITE_SPEED_DESCRIPTOR	0x03
-#define MMC_GET_PERF_DBI			0x04
-#define MMC_GET_PERF_DBI_CACHE_ZONE		0x05
+#define MMC_GET_PERF_PERFOMANCE_DATA                                0x00
+#define MMC_GET_PERF_UNUSABLE_AREA_DATA                             0x01
+#define MMC_GET_PERF_DEFECT_STATUS_DATA                             0x02
+#define MMC_GET_PERF_WRITE_SPEED_DESCRIPTOR                         0x03
+#define MMC_GET_PERF_DBI                                            0x04
+#define MMC_GET_PERF_DBI_CACHE_ZONE                                 0x05
 
-#define PERFORMANCE_READ_NOMINAL		0x10
-#define PERFORMANCE_READ_ENTIRE			0x11
-#define PERFORMANCE_READ_EXCEPTIONS		0x12
-#define PERFORMANCE_WRITE_NOMINAL		0x14
-#define PERFORMANCE_WRITE_ENTIRE		0x15
-#define PERFORMANCE_WRITE_EXCEPTIONS		0x16
+#define PERFORMANCE_READ_NOMINAL                                    0x10
+#define PERFORMANCE_READ_ENTIRE                                     0x11
+#define PERFORMANCE_READ_EXCEPTIONS                                 0x12
+#define PERFORMANCE_WRITE_NOMINAL                                   0x14
+#define PERFORMANCE_WRITE_ENTIRE                                    0x15
+#define PERFORMANCE_WRITE_EXCEPTIONS                                0x16
 
-#define UAE_PBI					0x00
-#define UAE_SAI					0x01
-#define UAE_DBI					0x02
+#define UAE_PBI                                                     0x00
+#define UAE_SAI                                                     0x01
+#define UAE_DBI                                                     0x02
 
-#define WRC_DEFAULT				0x00
-#define WRC_CAV					0x01
+#define WRC_DEFAULT                                                 0x00
+#define WRC_CAV                                                     0x01
 
-#define ELT_RECOVERED_LIGHT			0x00
-#define ELT_RECOVERED_HEAVY_DEFECTS		0x01
-#define ELT_RECOVERED_UNRECOVERED		0x02
-#define ELT_RECOVERED_WRITE_ERROR		0x03
+#define ELT_RECOVERED_LIGHT                                         0x00
+#define ELT_RECOVERED_HEAVY_DEFECTS                                 0x01
+#define ELT_RECOVERED_UNRECOVERED                                   0x02
+#define ELT_RECOVERED_WRITE_ERROR                                   0x03
 
 /*
  * MECHANICAL STATUS command field flags
  */
 
-#define CHANGER_STATE_READY			0x00
-#define CHANGER_STATE_LOADING			0x01
-#define CHANGER_STATE_UNLOADING			0x02
-#define CHANGER_STATE_INITIALIZING		0x03
+#define CHANGER_STATE_READY                                         0x00
+#define CHANGER_STATE_LOADING                                       0x01
+#define CHANGER_STATE_UNLOADING                                     0x02
+#define CHANGER_STATE_INITIALIZING                                  0x03
 
-#define MECHANISM_STATE_IDLE			0x00
-#define MECHANISM_STATE_LEGACY_PLAYING		0x01
-#define MECHANISM_STATE_LEGACY_SCANNING		0x02
-#define MECHANISM_STATE_LEGACY_ACTIVE		0x03
+#define MECHANISM_STATE_IDLE                                        0x00
+#define MECHANISM_STATE_LEGACY_PLAYING                              0x01
+#define MECHANISM_STATE_LEGACY_SCANNING                             0x02
+#define MECHANISM_STATE_LEGACY_ACTIVE                               0x03
 
-#define MECHANISM_STATE_LEGACY_NO_STATE		0x07
+#define MECHANISM_STATE_LEGACY_NO_STATE                             0x07
 
 
 /*
  * MODE SENSE command field flags
  */
 
-#define SENSE_PAGECTRL_CURRENT			0x00
-#define SENSE_PAGECTRL_CHANGEABLE		0x01
-#define SENSE_PAGECTRL_DEFAULT			0x02
-#define SENSE_PAGECTRL_SAVED			0x03
+#define SENSE_PAGECTRL_CURRENT                                      0x00
+#define SENSE_PAGECTRL_CHANGEABLE                                   0x01
+#define SENSE_PAGECTRL_DEFAULT                                      0x02
+#define SENSE_PAGECTRL_SAVED                                        0x03
 
-#define SENSE_MODEPAGE_VENDOR			0x00
-#define SENSE_MODEPAGE_RW_ERROR			0x01
-#define SENSE_MODEPAGE_MRW			0x02
-#define SENSE_MODEPAGE_WRITE_PARAM		0x05
-#define SENSE_MODEPAGE_CACHING			0x08
-#define SENSE_MODEPAGE_PWR_CONDITION		0x1A
-#define SENSE_MODEPAGE_INFO_EXCEPTIONS		0x1C
-#define SENSE_MODEPAGE_TIMEOUT_PROTECT		0x1D
+#define SENSE_MODEPAGE_VENDOR                                       0x00
+#define SENSE_MODEPAGE_RW_ERROR                                     0x01
+#define SENSE_MODEPAGE_MRW                                          0x02
+#define SENSE_MODEPAGE_WRITE_PARAM                                  0x05
+#define SENSE_MODEPAGE_CACHING                                      0x08
+#define SENSE_MODEPAGE_PWR_CONDITION                                0x1A
+#define SENSE_MODEPAGE_INFO_EXCEPTIONS                              0x1C
+#define SENSE_MODEPAGE_TIMEOUT_PROTECT                              0x1D
 
-#define SENSE_WT_PACKET				0x00
-#define SENSE_WT_TAO				0x01
-#define SENSE_WT_SAO				0x02
-#define SENSE_WT_RAW				0x03
-#define SENSE_WT_LJR				0x04
+#define SENSE_WT_PACKET                                             0x00
+#define SENSE_WT_TAO                                                0x01
+#define SENSE_WT_SAO                                                0x02
+#define SENSE_WT_RAW                                                0x03
+#define SENSE_WT_LJR                                                0x04
 
-#define SENSE_MS_NB0PTR				0x00
-#define SENSE_MS_B0PTR_FF			0x01
+#define SENSE_MS_NB0PTR                                             0x00
+#define SENSE_MS_B0PTR_FF                                           0x01
+#define SENSE_MS_B0PTR_NPPA                                         0x03
 
-#define SENSE_MS_B0PTR_NPPA			0x03
+#define SENSE_DBT_RAW                                               0x00
+#define SENSE_DBT_RAW_PQSC                                          0x01
+#define SENSE_DBT_RAW_PWSC                                          0x02
+#define SENSE_DBT_RAW_PWSC_RAW                                      0x03
 
-#define SENSE_DBT_RAW				0x00
-#define SENSE_DBT_RAW_PQSC			0x01
-#define SENSE_DBT_RAW_PWSC			0x02
-#define SENSE_DBT_RAW_PWSC_RAW			0x03
+#define SENSE_DBT_VENDOR0                                           0x07
+#define SENSE_DBT_MODE1                                             0x08
+#define SENSE_DBT_MODE2                                             0x09
+#define SENSE_DBT_MODE2_2048                                        0x0A
+#define SENSE_DBT_MODE2_2056                                        0x0B
+#define SENSE_DBT_MODE2_2324                                        0x0C
+#define SENSE_DBT_MODE_MIXED                                        0x0D
+#define SENSE_DBT_VENDOR2                                           0x0F
 
-#define SENSE_DBT_VENDOR0			0x07
-#define SENSE_DBT_MODE1				0x08
-#define SENSE_DBT_MODE2				0x09
-#define SENSE_DBT_MODE2_2048			0x0A
-#define SENSE_DBT_MODE2_2056			0x0B
-#define SENSE_DBT_MODE2_2324			0x0C
-#define SENSE_DBT_MODE_MIXED			0x0D
+#define SENSE_SFC_CDDA_CDROM                                        0x00
+#define SENSE_SFC_CDI                                               0x10
+#define SENSE_SFC_CDROMXA                                           0x20
 
-#define SENSE_DBT_VENDOR2			0x0F
-
-#define SENSE_SFC_CDDA_CDROM			0x00
-#define SENSE_SFC_CDI				0x10
-#define SENSE_SFC_CDROMXA			0x20
-
-#define SENSE_MRIE_NROIEC			0x00
-#define SENSE_MRIE_AER				0x01
-#define SENSE_MRIE_GUA				0x02
-#define SENSE_MRIE_CGRE				0x03
-#define SENSE_MRIE_UGRE				0x04
-#define SENSE_MRIE_GNS				0x05
-#define SENSE_MRIE_ORIECOR			0x06
+#define SENSE_MRIE_NROIEC                                           0x00
+#define SENSE_MRIE_AER                                              0x01
+#define SENSE_MRIE_GUA                                              0x02
+#define SENSE_MRIE_CGRE                                             0x03
+#define SENSE_MRIE_UGRE                                             0x04
+#define SENSE_MRIE_GNS                                              0x05
+#define SENSE_MRIE_ORIECOR                                          0x06
 /* 0x07 - 0x0B Reserved */
 /* 0x0C - 0x0F Vendor specific */
 
@@ -293,13 +291,13 @@
  * READ BUFFER command field flags
  */
 
-#define MMC_READ_BUFFER_MODE_COMBINED		0x00
-#define MMC_READ_BUFFER_MODE_VENDOR		0x01
-#define MMC_READ_BUFFER_MODE_DATA		0x02
-#define MMC_READ_BUFFER_MODE_DESCRIPTOR		0x03
-#define MMC_READ_BUFFER_MODE_ECHO		0x0A
-#define MMC_READ_BUFFER_MODE_ECHO_DESC		0x0B
-#define MMC_READ_BUFFER_MODE_EXPANDER		0x1A
+#define MMC_READ_BUFFER_MODE_COMBINED                               0x00
+#define MMC_READ_BUFFER_MODE_VENDOR                                 0x01
+#define MMC_READ_BUFFER_MODE_DATA                                   0x02
+#define MMC_READ_BUFFER_MODE_DESCRIPTOR                             0x03
+#define MMC_READ_BUFFER_MODE_ECHO                                   0x0A
+#define MMC_READ_BUFFER_MODE_ECHO_DESC                              0x0B
+#define MMC_READ_BUFFER_MODE_EXPANDER                               0x1A
 
 
 /*
@@ -307,28 +305,28 @@
  */
 
 /* Expected sector types definitions */
-#define MMC_READ_CD_EST_ALL			0x00
-#define MMC_READ_CD_EST_CDDA			0x01
-#define MMC_READ_CD_EST_MODE1			0x02
-#define MMC_READ_CD_EST_MODE2_FORMLESS		0x03
-#define MMC_READ_CD_EST_MODE2_FORM1		0x04
-#define MMC_READ_CD_EST_MODE2_FORM2		0x05
+#define MMC_READ_CD_EST_ALL                                         0x00
+#define MMC_READ_CD_EST_CDDA                                        0x01
+#define MMC_READ_CD_EST_MODE1                                       0x02
+#define MMC_READ_CD_EST_MODE2_FORMLESS                              0x03
+#define MMC_READ_CD_EST_MODE2_FORM1                                 0x04
+#define MMC_READ_CD_EST_MODE2_FORM2                                 0x05
 
 /* Main Channel Selection Bits */
-#define MMC_READ_CD_MCSB_NO_HEADER		0x00
-#define MMC_READ_CD_MCSB_4BYTE_HEADER		0x01
-#define MMC_READ_CD_MCSB_8BYTE_SUBHEADER	0x02
-#define MMC_READ_CD_MCSB_BOTH			0x03
+#define MMC_READ_CD_MCSB_NO_HEADER                                  0x00
+#define MMC_READ_CD_MCSB_4BYTE_HEADER                               0x01
+#define MMC_READ_CD_MCSB_8BYTE_SUBHEADER                            0x02
+#define MMC_READ_CD_MCSB_BOTH                                       0x03
 
 /* C2 Error Information */
-#define MMC_READ_CD_C2EI_NO_ERROR		0x00
-#define MMC_READ_CD_C2EI_C2EC294		0x01
-#define MMC_READ_CD_C2EI_C2EC296		0x02
+#define MMC_READ_CD_C2EI_NO_ERROR                                   0x00
+#define MMC_READ_CD_C2EI_C2EC294                                    0x01
+#define MMC_READ_CD_C2EI_C2EC296                                    0x02
 
 /* Sub-channel Selection Bits */
-#define MMC_READ_CD_SCSB_NO_DATA		0x00
-#define MMC_READ_CD_SCSB_FORMQ_SUBCH		0x02
-#define MMC_READ_CD_SCSB_CORINTRW_SUBCH		0x04
+#define MMC_READ_CD_SCSB_NO_DATA                                    0x00
+#define MMC_READ_CD_SCSB_FORMQ_SUBCH                                0x02
+#define MMC_READ_CD_SCSB_CORINTRW_SUBCH                             0x04
 
 
 /*
@@ -336,15 +334,15 @@
  */
 
 /* Logical BlockAddress/Track/Session Number Fields */
-#define MMC_READ_TRACK_INFO_LBA			0x00
-#define MMC_READ_TRACK_INFO_LTN			0x01
-#define MMC_READ_TRACK_INFO_SN			0x02
+#define MMC_READ_TRACK_INFO_LBA                                     0x00
+#define MMC_READ_TRACK_INFO_LTN                                     0x01
+#define MMC_READ_TRACK_INFO_SN                                      0x02
 
 /* Layer Jump Recording Status (LJRS) */
-#define RTI_LJRS_DAO_INCREMENTAL		0x00
-#define RTI_LJRS_LJ_UNSPECIFIED			0x01
-#define RTI_LJRS_LJ_MANUAL			0x10
-#define RTI_LJRS_LJ_REGULAR_INTERVAL		0x11
+#define RTI_LJRS_DAO_INCREMENTAL                                    0x00
+#define RTI_LJRS_LJ_UNSPECIFIED                                     0x01
+#define RTI_LJRS_LJ_MANUAL                                          0x10
+#define RTI_LJRS_LJ_REGULAR_INTERVAL                                0x11
 
 
 /*
@@ -352,86 +350,86 @@
  */
 
 /* Media types  */
-#define MMC_SDS_MEDIA_TYPE_DVD_HDDVD		0x00
-#define MMC_SDS_MEDIA_TYPE_BD			0x01
+#define MMC_SDS_MEDIA_TYPE_DVD_HDDVD                                0x00
+#define MMC_SDS_MEDIA_TYPE_BD                                       0x01
 
 /* Format Field Definition for Media Type = 0 (DVD and HD DVD) */
-#define MMC_SDS_FMT_DVD_USD			0x04
-#define MMC_SDS_FMT_DVD_CM			0x05
-#define MMC_SDS_FMT_DVD_TIMESTAMP		0x0F
-#define MMC_SDS_FMT_DVD_LBI			0x20
-#define MMC_SDS_FMT_DVD_SMASA			0x21
-#define MMC_SDS_FMT_DVD_JIS			0x22
-#define MMC_SDS_FMT_DVD_MLJA			0x23
-#define MMC_SDS_FMT_DVD_RA			0x24
-#define MMC_SDS_FMT_DVD_DCB			0x30
-#define MMC_SDS_FMT_DVD_WP			0xC0
+#define MMC_SDS_FMT_DVD_USD                                         0x04
+#define MMC_SDS_FMT_DVD_CM                                          0x05
+#define MMC_SDS_FMT_DVD_TIMESTAMP                                   0x0F
+#define MMC_SDS_FMT_DVD_LBI                                         0x20
+#define MMC_SDS_FMT_DVD_SMASA                                       0x21
+#define MMC_SDS_FMT_DVD_JIS                                         0x22
+#define MMC_SDS_FMT_DVD_MLJA                                        0x23
+#define MMC_SDS_FMT_DVD_RA                                          0x24
+#define MMC_SDS_FMT_DVD_DCB                                         0x30
+#define MMC_SDS_FMT_DVD_WP                                          0xC0
 
 /* Format Field Definition for Media Type = 1 (BD) */
-#define MMC_SDS_FMT_BD_TIMESTAMP		0x0F
-#define MMC_SDS_FMT_BD_PAC			0x30
+#define MMC_SDS_FMT_BD_TIMESTAMP                                    0x0F
+#define MMC_SDS_FMT_BD_PAC                                          0x30
 
 /* CGMS field values for Copyright Management */
-#define CGMS_CIPWR				0x00
-#define CGMS_OGOCMBM				0x02
-#define CGMS_NCIP				0x03
+#define CGMS_CIPWR                                                  0x00
+#define CGMS_OGOCMBM                                                0x02
+#define CGMS_NCIP                                                   0x03
 
 /* Virtual Write Enable (VWE) field values */
-#define VWE_NOPWD_VIRT_WP_OFF			0x00
-#define VWE_NOPWD_VIRT_WP_ON			0x01
-#define VWE_NOPWD_PHYS_WP_OFF			0x02
-#define VWE_NOPWD_PHYS_WP_ON			0x03
-#define VWE_PWD_VIRT_WP_OFF			0x04
-#define VWE_PWD_VIRT_WP_ON			0x05
-#define VWE_PWD_PHYS_WP_OFF			0x06
-#define VWE_PWD_PHYS_WP_ON			0x07
+#define VWE_NOPWD_VIRT_WP_OFF                                       0x00
+#define VWE_NOPWD_VIRT_WP_ON                                        0x01
+#define VWE_NOPWD_PHYS_WP_OFF                                       0x02
+#define VWE_NOPWD_PHYS_WP_ON                                        0x03
+#define VWE_PWD_VIRT_WP_OFF                                         0x04
+#define VWE_PWD_VIRT_WP_ON                                          0x05
+#define VWE_PWD_PHYS_WP_OFF                                         0x06
+#define VWE_PWD_PHYS_WP_ON                                          0x07
 
 /* PAC type field values */
-#define PAC_GENERAL				0x00
-#define PAC_DWP					0x01
+#define PAC_GENERAL                                                 0x00
+#define PAC_DWP                                                     0x01
 
 
 /*
  * SET READ SPEED command field flags
  */
 
-#define MMC_SET_CD_SPEED_RC_CLV_NPCAV		0x00
-#define MMC_SET_CD_SPEED_RC_PCAV		0x01
+#define MMC_SET_CD_SPEED_RC_CLV_NPCAV                               0x00
+#define MMC_SET_CD_SPEED_RC_PCAV                                    0x01
 
 
 /*
  * SET STREAMING command field flags
  */
 
-#define MMC_SET_STREAMING_PERFORMANCE		0x00
-#define MMC_SET_STREAMING_DBI_CACHE_ZONE	0x05
+#define MMC_SET_STREAMING_PERFORMANCE                               0x00
+#define MMC_SET_STREAMING_DBI_CACHE_ZONE                            0x05
 
 
 /*
  * START STOP UNIT command field flags
  */
 
-#define MMC_SSUNIT_PWR_NOCHANGE			0x00
-#define MMC_SSUNIT_PWR_GOIDLE			0x02
-#define MMC_SSUNIT_PWR_GOSTANDBY		0x03
-#define MMC_SSUNIT_PWR_GOSLEEP			0x05
+#define MMC_SSUNIT_PWR_NOCHANGE                                     0x00
+#define MMC_SSUNIT_PWR_GOIDLE                                       0x02
+#define MMC_SSUNIT_PWR_GOSTANDBY                                    0x03
+#define MMC_SSUNIT_PWR_GOSLEEP                                      0x05
 
 
 /*
  * WRITE BUFFER command field flags
  */
 
-#define MMC_WRITE_BUFFER_MODE_COMBINED			0x00
-#define MMC_WRITE_BUFFER_MODE_VENDOR			0x01
-#define MMC_WRITE_BUFFER_MODE_DATA			0x02
-#define MMC_WRITE_BUFFER_MODE_MICROCODE			0x04
-#define MMC_WRITE_BUFFER_MODE_MICROCODE_SAVE		0x05
-#define MMC_WRITE_BUFFER_MODE_MICROCODE_WOFF		0x06
-#define MMC_WRITE_BUFFER_MODE_MICROCODE_WOFF_SAVE	0x07
-#define MMC_WRITE_BUFFER_MODE_ECHO			0x0A
-#define MMC_WRITE_BUFFER_MODE_EN_EXPANDER		0x1A
-#define MMC_WRITE_BUFFER_MODE_DIS_EXPANDER		0x1B
-#define MMC_WRITE_BUFFER_MODE_APPLOG			0x1C
+#define MMC_WRITE_BUFFER_MODE_COMBINED                              0x00
+#define MMC_WRITE_BUFFER_MODE_VENDOR                                0x01
+#define MMC_WRITE_BUFFER_MODE_DATA                                  0x02
+#define MMC_WRITE_BUFFER_MODE_MICROCODE                             0x04
+#define MMC_WRITE_BUFFER_MODE_MICROCODE_SAVE                        0x05
+#define MMC_WRITE_BUFFER_MODE_MICROCODE_WOFF                        0x06
+#define MMC_WRITE_BUFFER_MODE_MICROCODE_WOFF_SAVE                   0x07
+#define MMC_WRITE_BUFFER_MODE_ECHO                                  0x0A
+#define MMC_WRITE_BUFFER_MODE_EN_EXPANDER                           0x1A
+#define MMC_WRITE_BUFFER_MODE_DIS_EXPANDER                          0x1B
+#define MMC_WRITE_BUFFER_MODE_APPLOG                                0x1C
 
 
 /*
@@ -1390,169 +1388,170 @@ typedef struct tag_mmc_write_buffer {
  * Command functions
  */
 
-extern RESULT
-    optcl_command_blank(const optcl_device *device, const optcl_mmc_blank *command);
+extern 
+RESULT optcl_command_blank(const optcl_device *device, 
+                           const optcl_mmc_blank *command);
 
-extern RESULT
-    optcl_command_close_track_session(const optcl_device *device,
-                                      const optcl_mmc_close_track_session *command);
+extern 
+RESULT optcl_command_close_track_session(const optcl_device *device,
+                                         const optcl_mmc_close_track_session *command);
 
-extern RESULT
-    optcl_command_destroy_response(optcl_mmc_response *response);
+extern 
+RESULT optcl_command_destroy_response(optcl_mmc_response *response);
 
-extern RESULT
-    optcl_command_format_unit(const optcl_device *device,
-                              const optcl_mmc_format_unit *command);
+extern 
+RESULT optcl_command_format_unit(const optcl_device *device,
+                                 const optcl_mmc_format_unit *command);
 
-extern RESULT
-    optcl_command_get_configuration(const optcl_device *device,
-                                    const optcl_mmc_get_configuration *command,
-                                    optcl_mmc_response_get_configuration **response);
+extern 
+RESULT optcl_command_get_configuration(const optcl_device *device,
+                                       const optcl_mmc_get_configuration *command,
+                                       optcl_mmc_response_get_configuration **response);
 
-extern RESULT
-    optcl_command_get_event_status(const optcl_device *device,
-                                   const optcl_mmc_get_event_status *command,
-                                   optcl_mmc_response_get_event_status **response);
+extern 
+RESULT optcl_command_get_event_status(const optcl_device *device,
+                                      const optcl_mmc_get_event_status *command,
+                                      optcl_mmc_response_get_event_status **response);
 
-extern RESULT
-    optcl_command_get_performance(const optcl_device *device,
-                                  const optcl_mmc_get_performance *command,
-                                  optcl_mmc_response_get_performance **response);
+extern 
+RESULT optcl_command_get_performance(const optcl_device *device,
+                                     const optcl_mmc_get_performance *command,
+                                     optcl_mmc_response_get_performance **response);
 
-extern RESULT
-    optcl_command_inquiry(const optcl_device *device,
-                          const optcl_mmc_inquiry *command,
-                          optcl_mmc_response_inquiry **response);
+extern 
+RESULT optcl_command_inquiry(const optcl_device *device,
+                             const optcl_mmc_inquiry *command,
+                             optcl_mmc_response_inquiry **response);
 
-extern RESULT
-    optcl_command_load_unload_medium(const optcl_device *device,
-                                     const optcl_mmc_load_unload_medium *command);
+extern 
+RESULT optcl_command_load_unload_medium(const optcl_device *device,
+                                        const optcl_mmc_load_unload_medium *command);
 
-extern RESULT
-    optcl_command_mechanism_status(const optcl_device *device,
-                                   optcl_mmc_response_mechanism_status **response);
+extern 
+RESULT optcl_command_mechanism_status(const optcl_device *device,
+                                      optcl_mmc_response_mechanism_status **response);
 
-extern RESULT
-    optcl_command_mode_sense_10(const optcl_device *device,
-                                const optcl_mmc_mode_sense *command,
-                                optcl_mmc_response_mode_sense **response);
+extern 
+RESULT optcl_command_mode_sense_10(const optcl_device *device,
+                                   const optcl_mmc_mode_sense *command,
+                                   optcl_mmc_response_mode_sense **response);
 
-extern RESULT
-    optcl_command_mode_select_10(const optcl_device *device,
-                                 const optcl_mmc_mode_select *command);
+extern 
+RESULT optcl_command_mode_select_10(const optcl_device *device,
+                                    const optcl_mmc_mode_select *command);
 
-extern RESULT
-    optcl_command_prevent_allow_removal(const optcl_device *device,
-                                        const optcl_mmc_prevent_allow_removal *command);
+extern 
+RESULT optcl_command_prevent_allow_removal(const optcl_device *device,
+                                           const optcl_mmc_prevent_allow_removal *command);
 
-extern RESULT
-    optcl_command_read_10(const optcl_device *device,
-                          const optcl_mmc_read_10 *command,
-                          optcl_mmc_response_read **response);
+extern 
+RESULT optcl_command_read_10(const optcl_device *device,
+                             const optcl_mmc_read_10 *command,
+                             optcl_mmc_response_read **response);
 
-extern RESULT
-    optcl_command_read_12(const optcl_device *device,
-                          const optcl_mmc_read_12 *command,
-                          optcl_mmc_response_read **response);
+extern 
+RESULT optcl_command_read_12(const optcl_device *device,
+                             const optcl_mmc_read_12 *command,
+                             optcl_mmc_response_read **response);
 
-extern RESULT
-    optcl_command_read_buffer(const optcl_device *device,
-                              const optcl_mmc_read_buffer *command,
-                              optcl_mmc_response_read_buffer **response);
+extern 
+RESULT optcl_command_read_buffer(const optcl_device *device,
+                                 const optcl_mmc_read_buffer *command,
+                                 optcl_mmc_response_read_buffer **response);
 
-extern RESULT
-    optcl_command_read_buffer_capacity(const optcl_device *device,
-                                       const optcl_mmc_read_buffer_capacity *command,
-                                       optcl_mmc_response_read_buffer_capacity **response);
+extern 
+RESULT optcl_command_read_buffer_capacity(const optcl_device *device,
+                                          const optcl_mmc_read_buffer_capacity *command,
+                                          optcl_mmc_response_read_buffer_capacity **response);
 
-extern RESULT
-    optcl_command_read_capacity(const optcl_device *device,
-                                optcl_mmc_response_read_capacity **response);
+extern 
+RESULT optcl_command_read_capacity(const optcl_device *device,
+                                   optcl_mmc_response_read_capacity **response);
 
-extern RESULT
-    optcl_command_read_cd(const optcl_device *device,
-                          const optcl_mmc_read_cd *command,
-                          optcl_mmc_response_read_cd **response);
+extern 
+RESULT optcl_command_read_cd(const optcl_device *device,
+                             const optcl_mmc_read_cd *command,
+                             optcl_mmc_response_read_cd **response);
 
-extern RESULT
-    optcl_command_read_msn(const optcl_device *device,
-                           optcl_mmc_response_read_msn **response);
+extern 
+RESULT optcl_command_read_msn(const optcl_device *device,
+                              optcl_mmc_response_read_msn **response);
 
-extern RESULT
-    optcl_command_read_track_information(const optcl_device *device,
-                                         const optcl_mmc_read_track_info *command,
-                                         optcl_mmc_response_read_track_info **response);
+extern 
+RESULT optcl_command_read_track_information(const optcl_device *device,
+                                            const optcl_mmc_read_track_info *command,
+                                            optcl_mmc_response_read_track_info **response);
 
-extern RESULT
-    optcl_command_repair_track(const optcl_device *device,
-                               const optcl_mmc_repair_track *command);
+extern 
+RESULT optcl_command_repair_track(const optcl_device *device,
+                                  const optcl_mmc_repair_track *command);
 
-extern RESULT
-    optcl_command_request_sense(const optcl_device *device,
-                                const optcl_mmc_request_sense *command,
-                                optcl_mmc_response_request_sense **response);
+extern 
+RESULT optcl_command_request_sense(const optcl_device *device,
+                                   const optcl_mmc_request_sense *command,
+                                   optcl_mmc_response_request_sense **response);
 
-extern RESULT
-    optcl_command_reserve_track(const optcl_device *device,
-                                const optcl_mmc_reserve_track *command);
+extern 
+RESULT optcl_command_reserve_track(const optcl_device *device,
+                                   const optcl_mmc_reserve_track *command);
 
-extern RESULT
-    optcl_command_seek(const optcl_device *device, const optcl_mmc_seek *command);
+extern 
+RESULT optcl_command_seek(const optcl_device *device, const optcl_mmc_seek *command);
 
-extern RESULT
-    optcl_command_send_disc_structure(const optcl_device *device,
-                                      const optcl_mmc_send_disc_structure *command);
+extern 
+RESULT optcl_command_send_disc_structure(const optcl_device *device,
+                                         const optcl_mmc_send_disc_structure *command);
 
-extern RESULT
-    optcl_command_send_opc_information(const optcl_device *device,
-                                       const optcl_mmc_send_opc_information *command);
+extern 
+RESULT optcl_command_send_opc_information(const optcl_device *device,
+                                          const optcl_mmc_send_opc_information *command);
 
-extern RESULT
-    optcl_command_set_cd_speed(const optcl_device *device,
-                               const optcl_mmc_set_cd_speed *command);
+extern 
+RESULT optcl_command_set_cd_speed(const optcl_device *device,
+                                  const optcl_mmc_set_cd_speed *command);
 
-extern RESULT
-    optcl_command_set_read_ahead(const optcl_device *device,
-                                 const optcl_mmc_set_read_ahead *command);
+extern 
+RESULT optcl_command_set_read_ahead(const optcl_device *device,
+                                    const optcl_mmc_set_read_ahead *command);
 
-extern RESULT
-    optcl_command_start_stop_unit(const optcl_device *device,
-                                  const optcl_mmc_start_stop_unit *command);
+extern 
+RESULT optcl_command_start_stop_unit(const optcl_device *device,
+                                     const optcl_mmc_start_stop_unit *command);
 
-extern RESULT
-    optcl_command_set_streaming(const optcl_device *device,
-                                const optcl_mmc_set_streaming *command);
+extern 
+RESULT optcl_command_set_streaming(const optcl_device *device,
+                                   const optcl_mmc_set_streaming *command);
 
-extern RESULT
-    optcl_command_synchronize_cache(const optcl_device *device,
-                                    const optcl_mmc_synchronize_cache *command);
+extern 
+RESULT optcl_command_synchronize_cache(const optcl_device *device,
+                                       const optcl_mmc_synchronize_cache *command);
 
-extern RESULT
-    optcl_command_test_unit_ready(const optcl_device *device);
+extern 
+RESULT optcl_command_test_unit_ready(const optcl_device *device);
 
-extern RESULT
-    optcl_command_verify(const optcl_device *device,
-                         const optcl_mmc_verify *command);
+extern 
+RESULT optcl_command_verify(const optcl_device *device,
+                            const optcl_mmc_verify *command);
 
-extern RESULT
-    optcl_command_write(const optcl_device *device,
-                        const optcl_mmc_write *command, ptr_t data,
-                        uint32_t data_len);
-
-extern RESULT
-    optcl_command_write_12(const optcl_device *device,
-                           const optcl_mmc_write_12 *command,
-                           ptr_t data,
+extern 
+RESULT optcl_command_write(const optcl_device *device,
+                           const optcl_mmc_write *command, ptr_t data,
                            uint32_t data_len);
 
-extern RESULT
-    optcl_command_write_and_verify_10(const optcl_device *device,
-                                      const optcl_mmc_write_and_verify_10 *command,
-                                      ptr_t data,
-                                      uint32_t data_len);
+extern 
+RESULT optcl_command_write_12(const optcl_device *device,
+                              const optcl_mmc_write_12 *command,
+                              ptr_t data,
+                              uint32_t data_len);
 
-extern RESULT
-    optcl_command_write_buffer(const optcl_device *device,
-                               const optcl_mmc_write_buffer *command);
+extern 
+RESULT optcl_command_write_and_verify_10(const optcl_device *device,
+                                         const optcl_mmc_write_and_verify_10 *command,
+                                         ptr_t data,
+                                         uint32_t data_len);
+
+extern 
+RESULT optcl_command_write_buffer(const optcl_device *device,
+                                  const optcl_mmc_write_buffer *command);
 
 #endif /* _COMMAND_H */

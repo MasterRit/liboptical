@@ -40,38 +40,41 @@ typedef unsigned int (*optcl_hashtable_hashfn)(const uint8_t key[], uint32_t len
 
 
 /* Clear hashtable */
-extern RESULT optcl_hashtable_clear(optcl_hashtable *hashtable,
-                                        bool_t deallocate);
+extern 
+RESULT optcl_hashtable_clear(optcl_hashtable *hashtable, bool_t deallocate);
 
 /* Copy hashtable */
-extern RESULT optcl_hashtable_copy(optcl_hashtable *dest,
-                                       const optcl_hashtable *src);
+extern 
+RESULT optcl_hashtable_copy(optcl_hashtable *dest, const optcl_hashtable *src);
 
 /* Create new hashtable */
-extern RESULT optcl_hashtable_create(uint32_t keysize,
-                                         optcl_hashtable_hashfn hashfn,
-                                         optcl_hashtable **hashtable);
+extern 
+RESULT optcl_hashtable_create(uint32_t keysize, 
+                              optcl_hashtable_hashfn hashfn, 
+                              optcl_hashtable **hashtable);
 
 /* Destroy hashtable */
-extern RESULT optcl_hashtable_destroy(optcl_hashtable *hashtable,
-                                          bool_t deallocate);
+extern 
+RESULT optcl_hashtable_destroy(optcl_hashtable *hashtable, bool_t deallocate);
 
 /* Get list of all key/value pairs */
-extern RESULT optcl_hashtable_get_pairs(const optcl_hashtable *hashtable,
-                                            optcl_list **pairs);
+extern 
+RESULT optcl_hashtable_get_pairs(const optcl_hashtable *hashtable, optcl_list **pairs);
 
 /* Lookup key in the hashtable */
-extern RESULT optcl_hashtable_lookup(const optcl_hashtable *hashtable,
-                                         const ptr_t key,
-                                         const pptr_t value);
+extern 
+RESULT optcl_hashtable_lookup(const optcl_hashtable *hashtable, 
+                              const ptr_t key,
+                              const pptr_t value);
 
 /* Set key/value pair */
-extern RESULT optcl_hashtable_set(optcl_hashtable *hashtable,
-                                      const ptr_t key,
-                                      const ptr_t value);
+extern 
+RESULT optcl_hashtable_set(optcl_hashtable *hashtable,
+                           const ptr_t key,
+                           const ptr_t value);
 
 /* Rehash hashtable */
-extern RESULT optcl_hashtable_rehash(optcl_hashtable *hashtable);
-
+extern 
+RESULT optcl_hashtable_rehash(optcl_hashtable *hashtable);
 
 #endif /* _HASHTABLE_H */

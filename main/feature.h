@@ -27,89 +27,89 @@
  * MMC Features
  */
 
-#define FEATURE_PROFILE_LIST			0x0000
-#define FEATURE_CORE				0x0001
-#define FEATURE_MORPHING			0x0002
-#define FEATURE_REMOVABLE_MEDIUM		0x0003
-#define FEATURE_WRITE_PROTECT			0x0004
+#define FEATURE_PROFILE_LIST                0x0000
+#define FEATURE_CORE                        0x0001
+#define FEATURE_MORPHING                    0x0002
+#define FEATURE_REMOVABLE_MEDIUM            0x0003
+#define FEATURE_WRITE_PROTECT               0x0004
 
 /* 0x0005 – 0x000F Reserved */
 
-#define FEATURE_RANDOM_READABLE			0x0010
+#define FEATURE_RANDOM_READABLE             0x0010
 
 /* 0x0011 – 0x001C Reserved */
 
-#define FEATURE_MULTI_READ			0x001D
-#define FEATURE_CD_READ				0x001E
-#define FEATURE_DVD_READ			0x001F
-#define FEATURE_RANDOM_WRITABLE			0x0020
-#define FEATURE_INC_STREAMING_WRITABLE		0x0021
-#define FEATURE_SECTOR_ERASABLE			0x0022
-#define FEATURE_FORMATTABLE			0x0023
-#define FEATURE_HW_DEFECT_MANAGEMENT		0x0024
-#define FEATURE_WRITE_ONCE			0x0025
-#define FEATURE_RESTRICTED_OVERWRITE		0x0026
-#define FEATURE_CDRW_CAV_WRITE			0x0027
-#define FEATURE_MRW				0x0028
-#define FEATURE_ENH_DEFECT_REPORTING		0x0029
-#define FEATURE_DVD_PLUS_RW			0x002A
-#define FEATURE_DVD_PLUS_R			0x002B
-#define FEATURE_RIGID_RESTRICTED_OVERWRITE	0x002C
-#define FEATURE_CD_TAO				0x002D
-#define FEATURE_CD_MASTERING			0x002E
-#define FEATURE_DVD_MINUS_R_MINUS_RW_WRITE	0x002F
+#define FEATURE_MULTI_READ                  0x001D
+#define FEATURE_CD_READ                     0x001E
+#define FEATURE_DVD_READ                    0x001F
+#define FEATURE_RANDOM_WRITABLE             0x0020
+#define FEATURE_INC_STREAMING_WRITABLE      0x0021
+#define FEATURE_SECTOR_ERASABLE             0x0022
+#define FEATURE_FORMATTABLE                 0x0023
+#define FEATURE_HW_DEFECT_MANAGEMENT        0x0024
+#define FEATURE_WRITE_ONCE                  0x0025
+#define FEATURE_RESTRICTED_OVERWRITE        0x0026
+#define FEATURE_CDRW_CAV_WRITE              0x0027
+#define FEATURE_MRW                         0x0028
+#define FEATURE_ENH_DEFECT_REPORTING        0x0029
+#define FEATURE_DVD_PLUS_RW                 0x002A
+#define FEATURE_DVD_PLUS_R                  0x002B
+#define FEATURE_RIGID_RESTRICTED_OVERWRITE  0x002C
+#define FEATURE_CD_TAO                      0x002D
+#define FEATURE_CD_MASTERING                0x002E
+#define FEATURE_DVD_MINUS_R_MINUS_RW_WRITE  0x002F
 
 /* 0x0030 – 0x0032 Legacy */
 
-#define FEATURE_LAYER_JUMP_RECORDING		0x0033
+#define FEATURE_LAYER_JUMP_RECORDING        0x0033
 
 /* 0x0034 – 0x0036 */
 
-#define FEATURE_CDRW_MEDIA_WRITE_SUPPORT	0x0037
-#define FEATURE_BDR_POW				0x0038
+#define FEATURE_CDRW_MEDIA_WRITE_SUPPORT    0x0037
+#define FEATURE_BDR_POW                     0x0038
 
 /* 0x0039 Reserved */
 
-#define FEATURE_DVD_PLUS_RW_DUAL_LAYER		0x003A
-#define FEATURE_DVD_PLUS_R_DUAL_LAYER		0x003B
+#define FEATURE_DVD_PLUS_RW_DUAL_LAYER      0x003A
+#define FEATURE_DVD_PLUS_R_DUAL_LAYER       0x003B
 
 /* 0x003C – 0x003F Reserved */
 
-#define FEATURE_BD_READ				0x0040
-#define FEATURE_BD_WRITE			0x0041
-#define FEATURE_TSR				0x0042
+#define FEATURE_BD_READ                     0x0040
+#define FEATURE_BD_WRITE                    0x0041
+#define FEATURE_TSR                         0x0042
 
 /* 0x0043 – 0x004F Reserved */
 
-#define FEATURE_HD_DVD_READ			0x0050
-#define FEATURE_HD_DVD_WRITE			0x0051
+#define FEATURE_HD_DVD_READ                 0x0050
+#define FEATURE_HD_DVD_WRITE                0x0051
 
 /* 0x0052 – 0x007F Reserved */
 
-#define FEATURE_HYBRID_DISC			0x0080
+#define FEATURE_HYBRID_DISC                 0x0080
 
 /* 0x0081 – 0x00FF Reserved */
 
-#define FEATURE_POWER_MANAGEMENT		0x0100
-#define FEATURE_SMART				0x0101
-#define FEATURE_EMBEDDED_CHANGER		0x0102
+#define FEATURE_POWER_MANAGEMENT            0x0100
+#define FEATURE_SMART                       0x0101
+#define FEATURE_EMBEDDED_CHANGER            0x0102
 
 /* 0x0103 Legacy */
 
-#define FEATURE_MICROCODE_UPGRADE		0x0104
-#define FEATURE_TIMEOUT				0x0105
-#define FEATURE_DVD_CSS				0x0106
-#define FEATURE_RT_STREAMING			0x0107
-#define FEATURE_DRIVE_SERIAL_NUMBER		0x0108
-#define FEATURE_MEDIA_SERIAL_NUMBER		0x0109
-#define FEATURE_DCBS				0x010A
-#define FEATURE_DVD_CPRM			0x010B
-#define FEATURE_FIRMWARE_INFO			0x010C
-#define FEATURE_AACS				0x010D
+#define FEATURE_MICROCODE_UPGRADE           0x0104
+#define FEATURE_TIMEOUT                     0x0105
+#define FEATURE_DVD_CSS                     0x0106
+#define FEATURE_RT_STREAMING                0x0107
+#define FEATURE_DRIVE_SERIAL_NUMBER         0x0108
+#define FEATURE_MEDIA_SERIAL_NUMBER         0x0109
+#define FEATURE_DCBS                        0x010A
+#define FEATURE_DVD_CPRM                    0x010B
+#define FEATURE_FIRMWARE_INFO               0x010C
+#define FEATURE_AACS                        0x010D
 
 /* 0x010E – 0x010F Reserved */
 
-#define FEATURE_VCPS				0x0110
+#define FEATURE_VCPS                        0x0110
 
 /* 0x0111 – 0xFEFF Reserved */
 
@@ -119,19 +119,19 @@
  * Physical interface standard codes
  */
 
-#define PIS_UNSPECIFIED				0x00000000L
-#define PIS_SCSI_FAMILY				0x00000001L
-#define PIS_ATAPI				0x00000002L
-#define PIS_IEEE_1394_1995			0x00000003L
-#define PIS_IEEE_1394A				0x00000004L
-#define PIS_FIBRE_CHANNEL			0x00000005L
-#define PIS_IEEE_1394B				0x00000006L
-#define PIS_SERIAL_ATAPI			0x00000007L
-#define PIS_USB					0x00000008L
+#define PIS_UNSPECIFIED                     0x00000000L
+#define PIS_SCSI_FAMILY                     0x00000001L
+#define PIS_ATAPI                           0x00000002L
+#define PIS_IEEE_1394_1995                  0x00000003L
+#define PIS_IEEE_1394A                      0x00000004L
+#define PIS_FIBRE_CHANNEL                   0x00000005L
+#define PIS_IEEE_1394B                      0x00000006L
+#define PIS_SERIAL_ATAPI                    0x00000007L
+#define PIS_USB                             0x00000008L
 
 /* 0x00000009 - 0x0000FFFE Reserved */
 
-#define PIS_VENDOR_UNIQUE			0x0000FFFFL
+#define PIS_VENDOR_UNIQUE                   0x0000FFFFL
 
 /* 0x00010000 - 0x0001FFFF Defined by INCITS */
 /* 0x00020000 - 0x0002FFFF Defined by SFF */
@@ -142,14 +142,14 @@
  * Loading mechanism type
  */
 
-#define LMT_CADDY				0x0
-#define LMT_TRAY				0x1
-#define LMT_POP_UP				0x2
+#define LMT_CADDY                           0x0
+#define LMT_TRAY                            0x1
+#define LMT_POP_UP                          0x2
 
 /* 0x3 Reserved */
 
-#define LMT_CHANGER				0x4
-#define LMT_CHANGER_MAGAZINE			0x5
+#define LMT_CHANGER                         0x4
+#define LMT_CHANGER_MAGAZINE                0x5
 
 /* 0x6 - 0x7 Reserved */
 
@@ -570,26 +570,29 @@ typedef struct tag_feature_vcps {
  */
 
 /* Copy feature */
-extern RESULT optcl_feature_copy(optcl_feature **dest,
-                                     const optcl_feature *src);
+extern 
+RESULT optcl_feature_copy(optcl_feature **dest, const optcl_feature *src);
 
 /* Create feature structure */
-extern RESULT optcl_feature_create(uint16_t feature_code,
-                                       optcl_feature **feature);
+extern 
+RESULT optcl_feature_create(uint16_t feature_code, optcl_feature **feature);
 
 /* Create feature from raw MMC data */
-extern RESULT optcl_feature_create_from_raw(optcl_feature **feature,
-            const uint8_t mmc_data[],
-            uint32_t size);
+extern 
+RESULT optcl_feature_create_from_raw(optcl_feature **feature,
+                                     const uint8_t mmc_data[],
+                                     uint32_t size);
 
 /* Create feature descriptor from raw MMC data */
-extern RESULT optcl_feature_create_descriptor(optcl_feature_descriptor **descriptor,
-            const uint8_t mmc_data[],
-            uint32_t size);
+extern 
+RESULT optcl_feature_create_descriptor(optcl_feature_descriptor **descriptor,
+                                       const uint8_t mmc_data[],
+                                       uint32_t size);
 
 
 /* Destroy feature structure */
-extern RESULT optcl_feature_destroy(optcl_feature *feature);
+extern 
+RESULT optcl_feature_destroy(optcl_feature *feature);
 
 
 #endif /* _FEATURE_H */

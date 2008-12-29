@@ -27,14 +27,15 @@
 
 
 /* Enumerates all supported optical devices */
-extern RESULT optcl_device_enumerate(optcl_list **devices);
+extern 
+RESULT optcl_device_enumerate(optcl_list **devices);
 
 /* Execute SCSI command */
-extern RESULT optcl_device_command_execute(const optcl_device *device,
-            const uint8_t cdb[],
-            uint32_t cdb_size,
-            uint8_t param[],
-            uint32_t param_size);
-
+extern 
+RESULT optcl_device_command_execute(const optcl_device *device,
+                                    const uint8_t cdb[],
+                                    uint32_t cdb_size,
+                                    uint8_t param[],
+                                    uint32_t param_size);
 
 #endif /* _SYSDEVICE_H */

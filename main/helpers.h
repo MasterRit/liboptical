@@ -40,19 +40,20 @@ extern void xfree_aligned(void *memoryblock);
  * Safe string routines
  */
 
-extern char* xstrdup(const char *string);
+extern 
+char* xstrdup(const char *string);
 
-extern errno_t
-    xstrncpy(char *dest, size_t dest_size, const char *src, size_t count);
+extern 
+errno_t xstrncpy(char *dest, size_t dest_size, const char *src, size_t count);
 
-extern errno_t xstrcat(char *dest, size_t dest_size, const char *src);
+extern 
+errno_t xstrcat(char *dest, size_t dest_size, const char *src);
 
 /*
  * Safe memory routines
  */
 
-extern errno_t
-    xmemcpy(void *dest, size_t dest_size, const void *src, size_t count);
-
+extern 
+errno_t xmemcpy(void *dest, size_t dest_size, const void *src, size_t count);
 
 #endif /* _HELPERS_H */
